@@ -2,7 +2,7 @@
 
 This repository contains C implementations  for constrained (and non-constrained) devices of the IETF protocols:
 
-* [OSOCRE (RFC8613)](https://tools.ietf.org/html/rfc8613) and
+* [OSCORE (RFC8613)](https://tools.ietf.org/html/rfc8613) and
 * [EDHOC (draft-ietf-lake-edhoc-02 )](https://tools.ietf.org/html/draft-ietf-lake-edhoc-02). 
 
 Main features of uOSCORE and uEDHOC are their independence from the OS, cryptographic engine and in the case of uEDHOC transport protocol. Additionally,  uOSCORE and uEDHOC use only stack memory (no heap). uOSCORE and uEDHOC are available as pre-compiled static libraries for several popular architectures such as x86 and Cortex M.
