@@ -1,0 +1,15 @@
+[submodule "externals/cantcoap"]
+	path = externals/cantcoap
+	url = https://github.com/staropram/cantcoap.git
+[submodule "externals/tinycbor"]
+	path = externals/tinycbor
+	url = https://github.com/zephyrproject-rtos/tinycbor.git
+[submodule "externals/tinycrypt"]
+	path = externals/tinycrypt
+	url = https://github.com/intel/tinycrypt.git
+[submodule "externals/compact25519"]
+	path = externals/compact25519
+	url = https://github.com/DavyLandman/compact25519.git
+[submodule "externals/blerouter"]
+	path = externals/blerouter
+	url = https://github.com/Fraunhofer-AISEC/blerouter.git
