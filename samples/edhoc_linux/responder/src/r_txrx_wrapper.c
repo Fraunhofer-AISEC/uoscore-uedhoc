@@ -16,25 +16,29 @@
 #include "main.h"
 
 static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
-                     uint8_t count) {
-    if (destSize < count) {
-        return -1;
-    } else {
-        memcpy(dest, src, count);
-    }
-    return 0;
+		     uint8_t count)
+{
+	if (destSize < count) {
+		return -1;
+	} else {
+		memcpy(dest, src, count);
+	}
+	return 0;
 }
 
-EdhocError tx(uint8_t *data, uint32_t data_len) {
-    send_coap(data, data_len);
-    return EdhocNoError;
+EdhocError tx(uint8_t *data, uint32_t data_len)
+{
+	send_coap(data, data_len);
+	return EdhocNoError;
 }
 
-EdhocError rx(uint8_t *data, uint32_t *data_len) {
-    uint8_t *data_p;
-    uint32_t data_buf_capacity = *data_len;
-    recv_coap(&data_p, data_len);
-    int r = _memcpy_s(data, data_buf_capacity, data_p, *data_len);
-    if (r != 0) return MessageBuffToSmall;
-    return EdhocNoError;
+EdhocError rx(uint8_t *data, uint32_t *data_len)
+{
+	uint8_t *data_p;
+	uint32_t data_buf_capacity = *data_len;
+	recv_coap(&data_p, data_len);
+	int r = _memcpy_s(data, data_buf_capacity, data_p, *data_len);
+	if (r != 0)
+		return MessageBuffToSmall;
+	return EdhocNoError;
 }

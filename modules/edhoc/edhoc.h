@@ -61,7 +61,8 @@
 #define C_I_DEFAULT_SIZE 8
 #define G_Y_DEFAULT_SIZE 32
 #define G_X_DEFAULT_SIZE 32
-#define DATA_2_DEFAULT_SIZE (C_I_DEFAULT_SIZE + G_Y_DEFAULT_SIZE + C_R_DEFAULT_SIZE)
+#define DATA_2_DEFAULT_SIZE                                                    \
+	(C_I_DEFAULT_SIZE + G_Y_DEFAULT_SIZE + C_R_DEFAULT_SIZE)
 #define TH_INPUT_DEFAULT_SIZE (MSG_1_DEFAULT_SIZE + DATA_2_DEFAULT_SIZE)
 #define ECDH_SECRET_DEFAULT_SIZE 32
 #define DERIVED_SECRET_DEFAULT_SIZE 32
@@ -76,43 +77,46 @@
 #define AEAD_IV_DEFAULT_SIZE 13
 
 struct other_party_cred {
-    struct byte_array id_cred; /*ID_CRED_x of the other party*/
-    struct byte_array cred;    /*CBOR encoded credentials*/
-    struct byte_array pk;      /*authentication pub key of the party */
-    struct byte_array g;       /*authentication static DH pub key of other party */
-    struct byte_array ca;      /*use only when authentication with certificates*/
-    struct byte_array ca_pk;   /*use only when authentication with certificates*/
+	struct byte_array id_cred; /*ID_CRED_x of the other party*/
+	struct byte_array cred; /*CBOR encoded credentials*/
+	struct byte_array pk; /*authentication pub key of the party */
+	struct byte_array g; /*authentication static DH pub key of other party */
+	struct byte_array ca; /*use only when authentication with certificates*/
+	struct byte_array
+		ca_pk; /*use only when authentication with certificates*/
 };
 
 struct edhoc_responder_context {
-    struct byte_array suites_r;
-    struct byte_array g_y; /*ephemeral dh public key*/
-    struct byte_array y;   /*ephemeral dh secret key*/
-    struct byte_array c_r;
-    struct byte_array g_r; /* static DH pk -> use only with method 1 or 3*/
-    struct byte_array r;   /* static DH sk -> use only with method 1 or 3*/
-    struct byte_array ad_2;
-    struct byte_array id_cred_r;
-    struct byte_array cred_r;
-    struct byte_array sk_r; /*sign key -use with method 0 and 2*/
-    struct byte_array pk_r; /*coresp. pub key to sk_r -use with method 0 and 2*/
+	struct byte_array suites_r;
+	struct byte_array g_y; /*ephemeral dh public key*/
+	struct byte_array y; /*ephemeral dh secret key*/
+	struct byte_array c_r;
+	struct byte_array g_r; /* static DH pk -> use only with method 1 or 3*/
+	struct byte_array r; /* static DH sk -> use only with method 1 or 3*/
+	struct byte_array ad_2;
+	struct byte_array id_cred_r;
+	struct byte_array cred_r;
+	struct byte_array sk_r; /*sign key -use with method 0 and 2*/
+	struct byte_array
+		pk_r; /*coresp. pub key to sk_r -use with method 0 and 2*/
 };
 
 struct edhoc_initiator_context {
-    enum method_type method_type;
-    uint8_t corr;
-    struct byte_array suites_i;
-    struct byte_array c_i;
-    struct byte_array ad_1;
-    struct byte_array ad_3;
-    struct byte_array id_cred_i;
-    struct byte_array cred_i;
-    struct byte_array g_x;  /*ephemeral dh public key*/
-    struct byte_array x;    /*ephemeral dh secret key*/
-    struct byte_array g_i;  /* static DH pk -> use only with method 2 or 3*/
-    struct byte_array i;    /* static DH sk -> use only with method 2 or 3*/
-    struct byte_array sk_i; /*sign key use with method 0 and 2*/
-    struct byte_array pk_i; /*coresp. pub key to sk_r -use with method 0 and 2*/
+	enum method_type method_type;
+	uint8_t corr;
+	struct byte_array suites_i;
+	struct byte_array c_i;
+	struct byte_array ad_1;
+	struct byte_array ad_3;
+	struct byte_array id_cred_i;
+	struct byte_array cred_i;
+	struct byte_array g_x; /*ephemeral dh public key*/
+	struct byte_array x; /*ephemeral dh secret key*/
+	struct byte_array g_i; /* static DH pk -> use only with method 2 or 3*/
+	struct byte_array i; /* static DH sk -> use only with method 2 or 3*/
+	struct byte_array sk_i; /*sign key use with method 0 and 2*/
+	struct byte_array
+		pk_i; /*coresp. pub key to sk_r -use with method 0 and 2*/
 };
 
 /**
@@ -125,9 +129,9 @@ struct edhoc_initiator_context {
  * @param   sk pointer to a buffer where the secret key will be strored
  * @param   pk pointer to a buffer where the public key will be strored
  */
-EdhocError __attribute__((weak)) ephemeral_dh_key_gen(
-    enum ecdh_curve curve, uint32_t seed,
-    uint8_t *sk, uint8_t *pk);
+EdhocError __attribute__((weak))
+ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
+		     uint8_t *pk);
 
 /**
  * @brief   Executes the EDHOC protocol on the initiator side
@@ -146,13 +150,13 @@ EdhocError __attribute__((weak)) ephemeral_dh_key_gen(
  * @param   th4 transcript hash4 used in the exporter interface
  * @param   th4_len length of th4
  */
-EdhocError edhoc_initiator_run(
-    const struct edhoc_initiator_context* c,
-    struct other_party_cred* cred_r_array, uint16_t num_cred_r,
-    uint8_t* err_msg, uint32_t* err_msg_len,
-    uint8_t* ad_2, uint64_t* ad_2_len,
-    uint8_t* prk_4x3m, uint8_t prk_4x3m_len,
-    uint8_t* th4, uint8_t th4_len);
+EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
+			       struct other_party_cred *cred_r_array,
+			       uint16_t num_cred_r, uint8_t *err_msg,
+			       uint32_t *err_msg_len, uint8_t *ad_2,
+			       uint64_t *ad_2_len, uint8_t *prk_4x3m,
+			       uint8_t prk_4x3m_len, uint8_t *th4,
+			       uint8_t th4_len);
 
 /**
  * @brief   Executes the EDHOC protocol on the responder side
@@ -174,15 +178,14 @@ EdhocError edhoc_initiator_run(
  * @param   th4 transcript hash4 used in the exporter interface
  * @param   th4_len length of th4
  */
-EdhocError edhoc_responder_run(
-    struct edhoc_responder_context* c,
-    struct other_party_cred* cred_i_array,
-    uint16_t num_cred_i,
-    uint8_t* err_msg, uint32_t* err_msg_len,
-    uint8_t* ad_1, uint64_t* ad_1_len,
-    uint8_t* ad_3, uint64_t* ad_3_len,
-    uint8_t* prk_4x3m, uint16_t prk_4x3m_len,
-    uint8_t* th4, uint16_t th4_len);
+EdhocError edhoc_responder_run(struct edhoc_responder_context *c,
+			       struct other_party_cred *cred_i_array,
+			       uint16_t num_cred_i, uint8_t *err_msg,
+			       uint32_t *err_msg_len, uint8_t *ad_1,
+			       uint64_t *ad_1_len, uint8_t *ad_3,
+			       uint64_t *ad_3_len, uint8_t *prk_4x3m,
+			       uint16_t prk_4x3m_len, uint8_t *th4,
+			       uint16_t th4_len);
 
 /**
  * @brief   used to create application specific symmetric keys using the 
@@ -198,12 +201,9 @@ EdhocError edhoc_responder_run(
  * @param   out container for the derivide key
  * @param   out_len length of the derived key
  */
-EdhocError edhoc_exporter(
-    enum hash_alg app_hash_alg,
-    enum aead_alg app_aead_alg,
-    const uint8_t* prk_4x3m, uint16_t prk_4x3m_len,
-    const uint8_t* th4, uint16_t th4_len,
-    const char* label,
-    uint8_t* out,
-    uint16_t out_len);
+EdhocError edhoc_exporter(enum hash_alg app_hash_alg,
+			  enum aead_alg app_aead_alg, const uint8_t *prk_4x3m,
+			  uint16_t prk_4x3m_len, const uint8_t *th4,
+			  uint16_t th4_len, const char *label, uint8_t *out,
+			  uint16_t out_len);
 #endif

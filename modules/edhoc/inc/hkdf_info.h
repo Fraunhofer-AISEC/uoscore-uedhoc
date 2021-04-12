@@ -16,7 +16,6 @@
 #include "error.h"
 #include "suites.h"
 
-
 /**
  * @brief   Encodes the HKDF Info as into the out-array
  * @param   aead_alg AEAD Algorithm
@@ -28,13 +27,8 @@
  * @param   out_len length of out
  * @return  EdhocError
  */
-EdhocError create_hkdf_info(
-    enum aead_alg aead_alg,
-    const uint8_t *th,
-    uint8_t th_len,
-    const char *label,
-    uint64_t okm_len,
-    uint8_t *out,
-    uint8_t *out_len);
+EdhocError create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
+			    uint8_t th_len, const char *label, uint64_t okm_len,
+			    uint8_t *out, uint8_t *out_len);
 
 #endif

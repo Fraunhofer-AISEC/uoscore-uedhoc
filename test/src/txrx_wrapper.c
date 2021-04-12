@@ -23,45 +23,51 @@ extern struct byte_array M1, M2, M3;
  * [1]: https://docs.microsoft.com/de-de/cpp/c-runtime-library/reference/memcpy-s-wmemcpy-s?view=msvc-160
  */
 static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
-                     uint8_t count) {
-    if (destSize < count) {
-        return -1;
-    } else {
-        memcpy(dest, src, count);
-    }
-    return 0;
+		     uint8_t count)
+{
+	if (destSize < count) {
+		return -1;
+	} else {
+		memcpy(dest, src, count);
+	}
+	return 0;
 }
 
-EdhocError rx(uint8_t *data, uint32_t *data_len) {
-    int r;
-    if (rx_initiator_switch) {
-        PRINTF("TXRX wrapper test vectors\n");
-        /*The sender must get msg2*/
-        r = _memcpy_s(data, *data_len, M2.ptr, M2.len);
-        if (r != 0) return MessageBuffToSmall;
-        *data_len = M2.len;
+EdhocError rx(uint8_t *data, uint32_t *data_len)
+{
+	int r;
+	if (rx_initiator_switch) {
+		PRINTF("TXRX wrapper test vectors\n");
+		/*The sender must get msg2*/
+		r = _memcpy_s(data, *data_len, M2.ptr, M2.len);
+		if (r != 0)
+			return MessageBuffToSmall;
+		*data_len = M2.len;
 
-    } else {
-        PRINTF("TXRX wrapper test vectors\n");
-        static uint8_t msg_cnt = 1;
-        /*The recipient must get msg1 and msg3*/
-        if (msg_cnt == 1) {
-            /*message 1 */
-            r = _memcpy_s(data, *data_len, M1.ptr, M1.len);
-            if (r != 0) return MessageBuffToSmall;
-            *data_len = M1.len;
-            msg_cnt++;
-        } else {
-            /*message 2*/
-            r = _memcpy_s(data, *data_len, M3.ptr, M3.len);
-            if (r != 0) return MessageBuffToSmall;
-            *data_len = M3.len;
-            msg_cnt = 1;
-        }
-    }
-    return EdhocNoError;
+	} else {
+		PRINTF("TXRX wrapper test vectors\n");
+		static uint8_t msg_cnt = 1;
+		/*The recipient must get msg1 and msg3*/
+		if (msg_cnt == 1) {
+			/*message 1 */
+			r = _memcpy_s(data, *data_len, M1.ptr, M1.len);
+			if (r != 0)
+				return MessageBuffToSmall;
+			*data_len = M1.len;
+			msg_cnt++;
+		} else {
+			/*message 2*/
+			r = _memcpy_s(data, *data_len, M3.ptr, M3.len);
+			if (r != 0)
+				return MessageBuffToSmall;
+			*data_len = M3.len;
+			msg_cnt = 1;
+		}
+	}
+	return EdhocNoError;
 }
 
-EdhocError tx(uint8_t *data, uint32_t data_len) {
-    return EdhocNoError;
+EdhocError tx(uint8_t *data, uint32_t data_len)
+{
+	return EdhocNoError;
 }

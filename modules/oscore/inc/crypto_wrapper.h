@@ -15,9 +15,9 @@
 #include "byte_array.h"
 
 /*Indicates what kind of operation a symmetric cipher will execute*/
-enum aes_operation{
-    ENCRYPT,
-    DECRYPT,
+enum aes_operation {
+	ENCRYPT,
+	DECRYPT,
 };
 
 /**
@@ -33,14 +33,10 @@ enum aes_operation{
  * @retval  OscoreAuthenticationError if the authentication fails 
  *          else OscoreNoError
  */
-OscoreError aes_ccm_16_64_128(
-    enum aes_operation op,
-    struct byte_array *in,
-    struct byte_array *out,
-    struct byte_array *key,
-    struct byte_array *nonce,
-    struct byte_array *aad,
-    struct byte_array *tag);
+OscoreError aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
+			      struct byte_array *out, struct byte_array *key,
+			      struct byte_array *nonce, struct byte_array *aad,
+			      struct byte_array *tag);
 
 /**
  * @brief   HKDF funcion used for the derivation of the Common IV, 
@@ -49,11 +45,9 @@ OscoreError aes_ccm_16_64_128(
  * @param   master_salt the master salt
  * @param   info a CBOR structure containing id, id_context, alg_aead, type, L 
  * @param   out the derived Common IV, Recipient/Sender keys
- */ 
-OscoreError hkdf_sha_256(
-    struct byte_array *master_secret,
-    struct byte_array *master_salt,
-    struct byte_array *info,
-    struct byte_array *out);
+ */
+OscoreError hkdf_sha_256(struct byte_array *master_secret,
+			 struct byte_array *master_salt,
+			 struct byte_array *info, struct byte_array *out);
 
 #endif

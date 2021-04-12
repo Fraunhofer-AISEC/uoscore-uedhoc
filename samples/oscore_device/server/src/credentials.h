@@ -11,7 +11,6 @@
 #ifndef CREDENTIALS_H
 #define CREDENTIALS_H
 
-
 extern uint8_t MASTER_SECRET[];
 extern uint8_t SENDER_ID[];
 extern uint8_t RECIPIENT_ID[];
@@ -23,6 +22,5 @@ extern uint8_t SENDER_ID_LEN;
 extern uint8_t RECIPIENT_ID_LEN;
 extern uint8_t MASTER_SALT_LEN;
 extern uint8_t ID_CONTEXT_LEN;
-
 
 #endif

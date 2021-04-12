@@ -15,9 +15,9 @@
 
 #include "credentials_select.h"
 
-#if defined INITIATOR_TEST_1 || defined INITIATOR_TEST_2 || \
-    defined INITIATOR_TEST_3 || defined INITIATOR_TEST_4 || \
-    defined INITIATOR_TEST_5
+#if defined INITIATOR_TEST_1 || defined INITIATOR_TEST_2 ||                    \
+	defined INITIATOR_TEST_3 || defined INITIATOR_TEST_4 ||                \
+	defined INITIATOR_TEST_5
 extern enum method_type METHOD_TYPE;
 extern uint8_t CORR;
 
@@ -77,9 +77,9 @@ extern uint8_t CA_PK[];
 extern uint8_t CA_PK_LEN;
 #endif
 
-#if defined RESPONDER_TEST_1 || defined RESPONDER_TEST_2 || \
-    defined RESPONDER_TEST_3 || defined RESPONDER_TEST_4 || \
-    defined RESPONDER_TEST_5
+#if defined RESPONDER_TEST_1 || defined RESPONDER_TEST_2 ||                    \
+	defined RESPONDER_TEST_3 || defined RESPONDER_TEST_4 ||                \
+	defined RESPONDER_TEST_5
 extern uint8_t SUITES_R[];
 extern uint32_t SUITES_R_LEN;
 
@@ -133,11 +133,11 @@ extern uint8_t CA_PK[];
 extern uint8_t CA_PK_LEN;
 #endif
 
-#if (defined INITIATOR_TEST_1) || (defined RESPONDER_TEST_1) || \
-    (defined INITIATOR_TEST_2) || (defined RESPONDER_TEST_2) || \
-    (defined INITIATOR_TEST_3) || (defined RESPONDER_TEST_3) || \
-    (defined INITIATOR_TEST_4) || (defined RESPONDER_TEST_4) || \
-    (defined INITIATOR_TEST_5) || (defined RESPONDER_TEST_5)
+#if (defined INITIATOR_TEST_1) || (defined RESPONDER_TEST_1) ||                \
+	(defined INITIATOR_TEST_2) || (defined RESPONDER_TEST_2) ||            \
+	(defined INITIATOR_TEST_3) || (defined RESPONDER_TEST_3) ||            \
+	(defined INITIATOR_TEST_4) || (defined RESPONDER_TEST_4) ||            \
+	(defined INITIATOR_TEST_5) || (defined RESPONDER_TEST_5)
 
 extern uint8_t MSG_1[];
 extern uint32_t MSG_1_LEN;

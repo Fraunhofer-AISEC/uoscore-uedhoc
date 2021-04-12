@@ -18,8 +18,8 @@
 
 /* Array with pointer and length.*/
 struct byte_array {
-    uint32_t len;
-    uint8_t* ptr;
+	uint32_t len;
+	uint8_t *ptr;
 };
 
 /* Empty Array with len=0 but with a non-null pointer.*/
@@ -36,6 +36,7 @@ extern struct byte_array NULL_ARRAY;
  * @param   right second array
  * @return  if the contents of given arrays are equal
  */
-bool array_equals(const struct byte_array* left, const struct byte_array* right);
+bool array_equals(const struct byte_array *left,
+		  const struct byte_array *right);
 
 #endif

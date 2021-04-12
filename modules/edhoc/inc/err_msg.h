@@ -16,10 +16,7 @@
 
 #include "error.h"
 
-enum role {
-    INITIATOR,
-    RESPONDER
-};
+enum role { INITIATOR, RESPONDER };
 
 /**
  * @brief   creates and sends an error message
@@ -31,10 +28,9 @@ enum role {
  * @param   suites list of suported suites. To be used only after message 1
  * @param   suites_len length of suites
  */
-EdhocError tx_err_msg(
-    enum role role, uint8_t corr,
-    uint8_t* c_x, uint8_t c_x_len,
-    uint8_t* err_msg_str, uint8_t err_msg_str_len,
-    uint8_t* suites, uint8_t suites_len);
+EdhocError tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
+		      uint8_t c_x_len, uint8_t *err_msg_str,
+		      uint8_t err_msg_str_len, uint8_t *suites,
+		      uint8_t suites_len);
 
 #endif

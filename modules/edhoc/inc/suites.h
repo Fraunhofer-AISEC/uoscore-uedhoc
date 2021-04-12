@@ -18,45 +18,43 @@
 /*see https://www.iana.org/assignments/cose/cose.xhtml#algorithms for algorithm number reference*/
 
 enum suite_label {
-    SUITE_0 = 0,
-    SUITE_1 = 1,
-    SUITE_2 = 2,
-    SUITE_3 = 3,
+	SUITE_0 = 0,
+	SUITE_1 = 1,
+	SUITE_2 = 2,
+	SUITE_3 = 3,
 };
 
 enum aead_alg {
-    AES_CCM_16_64_128 = 10,
-    AES_CCM_16_128_128 = 30,
+	AES_CCM_16_64_128 = 10,
+	AES_CCM_16_128_128 = 30,
 };
 
-enum hash_alg {
-    SHA_256 = -16
-};
+enum hash_alg { SHA_256 = -16 };
 
 enum ecdh_curve {
-    P_256_ECDH = 1,
-    X25519 = 4,
+	P_256_ECDH = 1,
+	X25519 = 4,
 };
 
 enum sign_alg {
-    ES256 = -7,
-    EdDSA = -8,
+	ES256 = -7,
+	EdDSA = -8,
 };
 
 enum sign_alg_curve {
-    P_256_SIGN = 1,
-    Ed25519_SIGN = 6,
+	P_256_SIGN = 1,
+	Ed25519_SIGN = 6,
 };
 
 struct suite {
-    enum suite_label suite_label;
-    enum aead_alg edhoc_aead;
-    enum hash_alg edhoc_hash;
-    enum ecdh_curve edhoc_ecdh_curve;
-    enum sign_alg edhoc_sign_alg;
-    enum sign_alg_curve edhoc_sign_curve;
-    enum aead_alg app_aead;
-    enum hash_alg app_hash;
+	enum suite_label suite_label;
+	enum aead_alg edhoc_aead;
+	enum hash_alg edhoc_hash;
+	enum ecdh_curve edhoc_ecdh_curve;
+	enum sign_alg edhoc_sign_alg;
+	enum sign_alg_curve edhoc_sign_curve;
+	enum aead_alg app_aead;
+	enum hash_alg app_hash;
 };
 
 /**
@@ -64,5 +62,5 @@ struct suite {
  * @param   label the suite label 
  * @param   suite the algorithms coresponding to label
  */
-EdhocError get_suite(enum suite_label label, struct suite* suite);
+EdhocError get_suite(enum suite_label label, struct suite *suite);
 #endif

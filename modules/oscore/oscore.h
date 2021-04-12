@@ -28,23 +28,23 @@
  * small set of input parameters.
  */
 struct oscore_init_params {
-    enum dev_type dev_type;
-    /*master_secret must be provided. Currently 16 byte secrets are supported*/
-    const struct byte_array master_secret;
-    /*sender_id must be provided*/
-    const struct byte_array sender_id;
-    /*recipient_id must be provided*/
-    const struct byte_array recipient_id;
+	enum dev_type dev_type;
+	/*master_secret must be provided. Currently 16 byte secrets are supported*/
+	const struct byte_array master_secret;
+	/*sender_id must be provided*/
+	const struct byte_array sender_id;
+	/*recipient_id must be provided*/
+	const struct byte_array recipient_id;
 
-    /*The specification doesn't describe how the ID Context is created */
-    /*When the user wants to use ID Context it has to provide it in the initialization of the client. The servers ID Context is transported in the oscore option*/
-    struct byte_array id_context;
-    /*master_salt is optional (default empty byte string)*/
-    const struct byte_array master_salt;
-    /*aead_alg is optional (default AES-CCM-16-64-128)*/
-    const enum AEAD_algorithm aead_alg;
-    /*kdf is optional (default HKDF-SHA-256)*/
-    const enum hkdf hkdf;
+	/*The specification doesn't describe how the ID Context is created */
+	/*When the user wants to use ID Context it has to provide it in the initialization of the client. The servers ID Context is transported in the oscore option*/
+	struct byte_array id_context;
+	/*master_salt is optional (default empty byte string)*/
+	const struct byte_array master_salt;
+	/*aead_alg is optional (default AES-CCM-16-64-128)*/
+	const enum AEAD_algorithm aead_alg;
+	/*kdf is optional (default HKDF-SHA-256)*/
+	const enum hkdf hkdf;
 };
 
 /**
@@ -55,9 +55,8 @@ struct oscore_init_params {
  * @param	context a struct containing the contexts
  * @return  OscoreError
  */
-OscoreError oscore_context_init(
-    struct oscore_init_params* params,
-    struct context* c);
+OscoreError oscore_context_init(struct oscore_init_params *params,
+				struct context *c);
 
 /**
  * @brief  	Checks if the packet in buf_in is a OSCORE packet.
@@ -77,11 +76,9 @@ OscoreError oscore_context_init(
  * @param 	oscore_pkg indicates if an incoming packet is OSCORE
  * @return 	OscoreError
  */
-OscoreError oscore2coap(
-    uint8_t* buf_in, uint16_t buf_in_len,
-    uint8_t* buf_out, uint16_t* buf_out_len,
-    bool* oscore_pkg_flag,
-    struct context* c);
+OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
+			uint16_t *buf_out_len, bool *oscore_pkg_flag,
+			struct context *c);
 
 /**
  *@brief 	Converts a CoAP packet to OSCORE packet
@@ -93,9 +90,8 @@ OscoreError oscore2coap(
  *@param	c a struct containing the OSCORE context
  *@return 	OscoreError
  */
-OscoreError coap2oscore(
-    uint8_t* buf_o_coap, uint16_t buf_o_coap_len,
-    uint8_t* buf_oscore, uint16_t* buf_oscore_len,
-    struct context* c);
+OscoreError coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
+			uint8_t *buf_oscore, uint16_t *buf_oscore_len,
+			struct context *c);
 
 #endif

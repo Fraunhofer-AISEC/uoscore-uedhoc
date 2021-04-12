@@ -23,7 +23,7 @@
 extern uint8_t T1__MASTER_SECRET[16];
 extern uint8_t T1__MASTER_SECRET_LEN;
 
-extern uint8_t* T1__SENDER_ID;
+extern uint8_t *T1__SENDER_ID;
 extern uint8_t T1__SENDER_ID_LEN;
 
 extern uint8_t T1__RECIPIENT_ID[1];
@@ -32,7 +32,7 @@ extern uint8_t T1__RECIPIENT_ID_LEN;
 extern uint8_t T1__MASTER_SALT[8];
 extern uint8_t T1__MASTER_SALT_LEN;
 
-extern uint8_t* T1__ID_CONTEXT;
+extern uint8_t *T1__ID_CONTEXT;
 extern uint8_t T1__ID_CONTEXT_LEN;
 
 /*Test vector C4: Generating a OSCORE Packet with key material form test vector C.1 */
@@ -69,7 +69,7 @@ extern uint8_t T2__RECIPIENT_ID_LEN;
 extern uint8_t T2__MASTER_SALT[];
 extern uint8_t T2__MASTER_SALT_LEN;
 
-extern uint8_t* T2__ID_CONTEXT;
+extern uint8_t *T2__ID_CONTEXT;
 extern uint8_t T2__ID_CONTEXT_LEN;
 
 /*The OSCORE message created in C4 (35 Byte). Constructed from a CoAP request of length 22. This request contains no payload. The request contains only Uri-host (locahost) and Uri-path option (tv1). In the OSCORE packet Uri-host option is transferred as plain normal option, The Uri-path is contained in the ciphertext. */
@@ -104,10 +104,10 @@ extern uint8_t T3__SENDER_ID_LEN;
 extern uint8_t T3__RECIPIENT_ID[1];
 extern uint8_t T3__RECIPIENT_ID_LEN;
 
-extern uint8_t* T3__MASTER_SALT;
+extern uint8_t *T3__MASTER_SALT;
 extern uint8_t T3__MASTER_SALT_LEN;
 
-extern uint8_t* T3__ID_CONTEXT;
+extern uint8_t *T3__ID_CONTEXT;
 extern uint8_t T3__ID_CONTEXT_LEN;
 
 /*Test vector C5: Generating a OSCORE Packet with key material form test vector C.2.1 */
@@ -132,10 +132,10 @@ extern uint8_t T4__SENDER_ID_LEN;
 extern uint8_t T4__RECIPIENT_ID[1];
 extern uint8_t T4__RECIPIENT_ID_LEN;
 
-extern uint8_t* T4__MASTER_SALT;
+extern uint8_t *T4__MASTER_SALT;
 extern uint8_t T4__MASTER_SALT_LEN;
 
-extern uint8_t* T4__ID_CONTEXT;
+extern uint8_t *T4__ID_CONTEXT;
 extern uint8_t T4__ID_CONTEXT_LEN;
 
 /*expected result*/
@@ -157,7 +157,7 @@ extern uint8_t T4__COMMON_IV_LEN;
 extern uint8_t T5__MASTER_SECRET[16];
 extern uint8_t T5__MASTER_SECRET_LEN;
 
-extern uint8_t* T5__SENDER_ID;
+extern uint8_t *T5__SENDER_ID;
 extern uint8_t T5__SENDER_ID_LEN;
 
 extern uint8_t T5__RECIPIENT_ID[1];
@@ -187,7 +187,7 @@ extern uint8_t T6__MASTER_SECRET_LEN;
 extern uint8_t T6__SENDER_ID[1];
 extern uint8_t T6__SENDER_ID_LEN;
 
-extern uint8_t* T6__RECIPIENT_ID;
+extern uint8_t *T6__RECIPIENT_ID;
 extern uint8_t T6__RECIPIENT_ID_LEN;
 
 extern uint8_t T6__MASTER_SALT[8];
@@ -216,13 +216,13 @@ extern uint8_t T7__MASTER_SECRET_LEN;
 extern uint8_t T7__SENDER_ID[];
 extern uint8_t T7__SENDER_ID_LEN;
 
-extern uint8_t* T7__RECIPIENT_ID;
+extern uint8_t *T7__RECIPIENT_ID;
 extern uint8_t T7__RECIPIENT_ID_LEN;
 
 extern uint8_t T7__MASTER_SALT[8];
 extern uint8_t T7__MASTER_SALT_LEN;
 
-extern uint8_t* T7__ID_CONTEXT;
+extern uint8_t *T7__ID_CONTEXT;
 extern uint8_t T7__ID_CONTEXT_LEN;
 
 /*Test vector C4: Generating a OSCORE Packet with key material form test vector C.1 */

@@ -15,24 +15,24 @@
 #include "byte_array.h"
 
 struct msg_1 {
-    uint8_t method_corr;
-    struct byte_array suites_i;
-    struct byte_array g_x;
-    struct byte_array c_i;
-    struct byte_array ad_1;
+	uint8_t method_corr;
+	struct byte_array suites_i;
+	struct byte_array g_x;
+	struct byte_array c_i;
+	struct byte_array ad_1;
 };
 
 struct msg_2 {
-    struct byte_array c_i;
-    struct byte_array g_y;
-    struct byte_array c_r;
-    struct byte_array ciphertext;
+	struct byte_array c_i;
+	struct byte_array g_y;
+	struct byte_array c_r;
+	struct byte_array ciphertext;
 };
 
 struct error_msg {
-    struct byte_array c_x;
-    struct byte_array err_msg;
-    struct byte_array suites_r;
+	struct byte_array c_x;
+	struct byte_array err_msg;
+	struct byte_array suites_r;
 };
 
 #endif

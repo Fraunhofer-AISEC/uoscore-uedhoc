@@ -29,10 +29,10 @@
 */
 
 enum method_type {
-    INITIATOR_SK_RESPONDER_SK = 0,
-    INITIATOR_SK_RESPONDER_SDHK = 1,
-    INITIATOR_SDHK_RESPONDER_SK = 2,
-    INITIATOR_SDHK_RESPONDER_SDHK = 3,
+	INITIATOR_SK_RESPONDER_SK = 0,
+	INITIATOR_SK_RESPONDER_SDHK = 1,
+	INITIATOR_SDHK_RESPONDER_SK = 2,
+	INITIATOR_SDHK_RESPONDER_SDHK = 3,
 };
 
 /**
@@ -41,7 +41,8 @@ enum method_type {
  * @param   static_dh_i true if the initiator authenticates with static DH key
  * @param   static_dh_r true if the responder authenticates with static DH key
  */
-EdhocError authentication_type_get(
-    enum method_type m, volatile bool* static_dh_i, volatile bool* static_dh_r);
+EdhocError authentication_type_get(enum method_type m,
+				   volatile bool *static_dh_i,
+				   volatile bool *static_dh_r);
 
 #endif

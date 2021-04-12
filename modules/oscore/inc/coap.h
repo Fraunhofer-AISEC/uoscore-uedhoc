@@ -18,7 +18,8 @@
 #include "error.h"
 
 #define MAX_PIV_LEN 5
-#define MAX_KID_CONTEXT_LEN 8 /*This implementation supports Context IDs up to 8 byte*/
+#define MAX_KID_CONTEXT_LEN                                                    \
+	8 /*This implementation supports Context IDs up to 8 byte*/
 #define MAX_KID_LEN 7
 #define MAX_AAD_LEN 30
 #define MAX_INFO_LEN 50
@@ -39,7 +40,8 @@
 #define COMP_OSCORE_OPT_PIV_N_MASK 0x07
 #define COMP_OSCORE_OPT_PIV_N_OFFSET 0
 
-#define OSCORE_OPT_VALUE_LEN (2 + MAX_PIV_LEN + MAX_KID_CONTEXT_LEN + MAX_KID_LEN)
+#define OSCORE_OPT_VALUE_LEN                                                   \
+	(2 + MAX_PIV_LEN + MAX_KID_CONTEXT_LEN + MAX_KID_LEN)
 
 #define MAX_OPTION_COUNT 20
 
@@ -53,50 +55,50 @@
  * OSCORE and prevent conflicts with networking CoAP libraries 
  */
 struct o_coap_header {
-    uint8_t ver;
-    uint8_t type;
-    uint8_t TKL;
-    uint8_t code;
-    uint16_t MID;
+	uint8_t ver;
+	uint8_t type;
+	uint8_t TKL;
+	uint8_t code;
+	uint16_t MID;
 };
 
 struct o_coap_option {
-    uint16_t delta;
-    uint16_t len;
-    uint8_t *value;
-    uint8_t option_number;
+	uint16_t delta;
+	uint16_t len;
+	uint8_t *value;
+	uint8_t option_number;
 };
 
 struct oscore_option {
-    uint16_t delta;
-    uint16_t len;
-    uint8_t *value;
-    uint8_t buf[OSCORE_OPT_VALUE_LEN];
-    uint8_t option_number;
+	uint16_t delta;
+	uint16_t len;
+	uint8_t *value;
+	uint8_t buf[OSCORE_OPT_VALUE_LEN];
+	uint8_t option_number;
 };
 
 struct o_coap_packet {
-    struct o_coap_header header;
-    uint8_t *token;
-    uint8_t options_cnt;
-    struct o_coap_option options[MAX_OPTION_COUNT];
-    uint16_t payload_len;
-    uint8_t *payload;
+	struct o_coap_header header;
+	uint8_t *token;
+	uint8_t options_cnt;
+	struct o_coap_option options[MAX_OPTION_COUNT];
+	uint16_t payload_len;
+	uint8_t *payload;
 };
 
 struct compressed_oscore_option {
-    uint8_t h; /*flag bit for KID_context*/
-    uint8_t k; /*flag bit for KID*/
-    uint8_t n; /*bytes number of PIV*/
-    struct byte_array piv;
-    struct byte_array kid_context;
-    struct byte_array kid;
+	uint8_t h; /*flag bit for KID_context*/
+	uint8_t k; /*flag bit for KID*/
+	uint8_t n; /*bytes number of PIV*/
+	struct byte_array piv;
+	struct byte_array kid_context;
+	struct byte_array kid;
 };
 
 struct piv_kid_context {
-    struct byte_array partial_iv;
-    struct byte_array kid;
-    struct byte_array kid_context;
+	struct byte_array partial_iv;
+	struct byte_array kid;
+	struct byte_array kid_context;
 };
 
 /**
@@ -114,10 +116,8 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out);
  * @param   out_byte_string_len: length of the byte string
  * @return  OscoreError
  */
-OscoreError coap2buf(
-    struct o_coap_packet *in,
-    uint8_t *out_byte_string,
-    uint16_t *out_byte_string_len);
+OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
+		     uint16_t *out_byte_string_len);
 
 /**
  * @brief   Convert input options into byte string
@@ -127,8 +127,7 @@ OscoreError coap2buf(
  * @return  OscoreError
  *
  */
-OscoreError options_into_byte_string(
-    struct o_coap_option *options,
-    uint8_t options_cnt,
-    struct byte_array *out_byte_string);
+OscoreError options_into_byte_string(struct o_coap_option *options,
+				     uint8_t options_cnt,
+				     struct byte_array *out_byte_string);
 #endif

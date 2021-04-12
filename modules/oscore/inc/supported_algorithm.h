@@ -14,12 +14,12 @@
 
 /*default HKDF SHA256*/
 enum hkdf {
-    SHA_256,
+	SHA_256,
 };
 
 enum AEAD_algorithm {
-    //AES-CCM mode 128-bit key, 64-bit tag, 13-byte nonce
-    AES_CCM_16_64_128 = 10,
+	//AES-CCM mode 128-bit key, 64-bit tag, 13-byte nonce
+	AES_CCM_16_64_128 = 10,
 };
 
 #define AUTH_TAG_LEN 8

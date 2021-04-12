@@ -12,13 +12,14 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void print_array(uint8_t* in_data, uint16_t in_len) {
-    printf("(size %u):", in_len);
-    for (uint16_t i = 0; i < in_len; i++) {
-        if (i % 16 == 0)
-            printf("\n\t%02X ", in_data[i]);
-        else
-            printf("%02X ", in_data[i]);
-    }
-    printf("\n");
+void print_array(uint8_t *in_data, uint16_t in_len)
+{
+	printf("(size %u):", in_len);
+	for (uint16_t i = 0; i < in_len; i++) {
+		if (i % 16 == 0)
+			printf("\n\t%02X ", in_data[i]);
+		else
+			printf("%02X ", in_data[i]);
+	}
+	printf("\n");
 }

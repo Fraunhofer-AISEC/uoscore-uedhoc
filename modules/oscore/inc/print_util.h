@@ -16,12 +16,12 @@
 /**
  *@brief prints an array for debug pourposes 
  */
-void print_array(uint8_t* in_data, uint16_t in_len);
+void print_array(uint8_t *in_data, uint16_t in_len);
 
 #ifdef OSCORE_DEBUG_PRINT
-#define PRINT_ARRAY(msg, a, a_len) \
-    printf(msg);                   \
-    print_array(a, a_len);
+#define PRINT_ARRAY(msg, a, a_len)                                             \
+	printf(msg);                                                           \
+	print_array(a, a_len);
 #define PRINT_MSG(msg) printf(msg);
 #else
 #define PRINT_ARRAY(msg, a, a_len) {};

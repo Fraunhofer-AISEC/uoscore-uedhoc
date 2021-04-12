@@ -28,16 +28,10 @@
  * @param   th_len length of th
  * @param   okm ouput pointer
  * @param   okm_len length of okm
- */ 
-EdhocError okm_calc(
-    enum aead_alg aead_alg,
-    enum hash_alg hash_alg,
-    const char* label,
-    const uint8_t* prk,
-    uint8_t prk_len,
-    const uint8_t* th,
-    uint8_t th_len,
-    uint8_t* okm,
-    uint64_t okm_len);
+ */
+EdhocError okm_calc(enum aead_alg aead_alg, enum hash_alg hash_alg,
+		    const char *label, const uint8_t *prk, uint8_t prk_len,
+		    const uint8_t *th, uint8_t th_len, uint8_t *okm,
+		    uint64_t okm_len);
 
 #endif

@@ -11,18 +11,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-
-
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 #include <stdint.h>
 
-		void send_coap(uint8_t *msg, uint32_t msg_len);
-		void recv_coap(uint8_t **msg, uint32_t *msg_len);
+void send_coap(uint8_t *msg, uint32_t msg_len);
+void recv_coap(uint8_t **msg, uint32_t *msg_len);
 #ifdef __cplusplus
-	}
-#endif 
-
+}
+#endif
 
 #endif

@@ -20,13 +20,13 @@ extern int sockfd;
 #define MAXLINE 1024
 
 enum sock_type {
-    SOCK_CLIENT,
-    SOCK_SERVER,
+	SOCK_CLIENT,
+	SOCK_SERVER,
 };
 
 enum ip_addr_type {
-    IPv4,
-    IPv6,
+	IPv4,
+	IPv6,
 };
 
 /**
@@ -38,10 +38,6 @@ enum ip_addr_type {
  * @param   servaddr_len length of servaddr  
  * @retval	error code
  */
-int sock_init(
-    enum sock_type sock_t,
-    const char *addr_str,
-    enum ip_addr_type ip_t,
-    void *servaddr,
-    size_t servaddr_len) ;
+int sock_init(enum sock_type sock_t, const char *addr_str,
+	      enum ip_addr_type ip_t, void *servaddr, size_t servaddr_len);
 #endif

@@ -12,51 +12,52 @@
 
 #include "../inc/error.h"
 
-EdhocError get_suite(enum suite_label label, struct suite* suite) {
-    switch (label) {
-        case SUITE_0:
-            suite->suite_label = SUITE_0;
-            suite->edhoc_aead = AES_CCM_16_64_128;
-            suite->edhoc_hash = SHA_256;
-            suite->edhoc_ecdh_curve = X25519;
-            suite->edhoc_sign_alg = EdDSA;
-            suite->edhoc_sign_curve = Ed25519_SIGN;
-            suite->app_aead = AES_CCM_16_64_128;
-            suite->app_hash = SHA_256;
-            break;
-        case SUITE_1:
-            suite->suite_label = SUITE_1;
-            suite->edhoc_aead = AES_CCM_16_128_128;
-            suite->edhoc_hash = SHA_256;
-            suite->edhoc_ecdh_curve = X25519;
-            suite->edhoc_sign_alg = EdDSA;
-            suite->edhoc_sign_curve = Ed25519_SIGN;
-            suite->app_aead = AES_CCM_16_64_128;
-            suite->app_hash = SHA_256;
-            break;
-        case SUITE_2:
-            suite->suite_label = SUITE_2;
-            suite->edhoc_aead = AES_CCM_16_64_128;
-            suite->edhoc_hash = SHA_256;
-            suite->edhoc_ecdh_curve = 1;
-            suite->edhoc_sign_alg = ES256;
-            suite->edhoc_sign_curve = 1;
-            suite->app_aead = AES_CCM_16_64_128;
-            suite->app_hash = SHA_256;
-            break;
-        case SUITE_3:
-            suite->suite_label = SUITE_3;
-            suite->edhoc_aead = AES_CCM_16_128_128;
-            suite->edhoc_hash = SHA_256;
-            suite->edhoc_ecdh_curve = 1;
-            suite->edhoc_sign_alg = ES256;
-            suite->edhoc_sign_curve = 1;
-            suite->app_aead = AES_CCM_16_64_128;
-            suite->app_hash = SHA_256;
-            break;
-        default:
-            return UnsupportedCipherSuite;
-            break;
-    }
-    return EdhocNoError;
+EdhocError get_suite(enum suite_label label, struct suite *suite)
+{
+	switch (label) {
+	case SUITE_0:
+		suite->suite_label = SUITE_0;
+		suite->edhoc_aead = AES_CCM_16_64_128;
+		suite->edhoc_hash = SHA_256;
+		suite->edhoc_ecdh_curve = X25519;
+		suite->edhoc_sign_alg = EdDSA;
+		suite->edhoc_sign_curve = Ed25519_SIGN;
+		suite->app_aead = AES_CCM_16_64_128;
+		suite->app_hash = SHA_256;
+		break;
+	case SUITE_1:
+		suite->suite_label = SUITE_1;
+		suite->edhoc_aead = AES_CCM_16_128_128;
+		suite->edhoc_hash = SHA_256;
+		suite->edhoc_ecdh_curve = X25519;
+		suite->edhoc_sign_alg = EdDSA;
+		suite->edhoc_sign_curve = Ed25519_SIGN;
+		suite->app_aead = AES_CCM_16_64_128;
+		suite->app_hash = SHA_256;
+		break;
+	case SUITE_2:
+		suite->suite_label = SUITE_2;
+		suite->edhoc_aead = AES_CCM_16_64_128;
+		suite->edhoc_hash = SHA_256;
+		suite->edhoc_ecdh_curve = 1;
+		suite->edhoc_sign_alg = ES256;
+		suite->edhoc_sign_curve = 1;
+		suite->app_aead = AES_CCM_16_64_128;
+		suite->app_hash = SHA_256;
+		break;
+	case SUITE_3:
+		suite->suite_label = SUITE_3;
+		suite->edhoc_aead = AES_CCM_16_128_128;
+		suite->edhoc_hash = SHA_256;
+		suite->edhoc_ecdh_curve = 1;
+		suite->edhoc_sign_alg = ES256;
+		suite->edhoc_sign_curve = 1;
+		suite->app_aead = AES_CCM_16_64_128;
+		suite->app_hash = SHA_256;
+		break;
+	default:
+		return UnsupportedCipherSuite;
+		break;
+	}
+	return EdhocNoError;
 }

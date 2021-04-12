@@ -21,7 +21,8 @@
  * @param out: output encoded COSE byte string
  * @return OscoreError
  */
-OscoreError create_enc_structure(struct byte_array* external_aad, struct byte_array* out);
+OscoreError create_enc_structure(struct byte_array *external_aad,
+				 struct byte_array *out);
 
 /**
  * @brief Calculate the length of the COSE format for input AAD
@@ -29,7 +30,7 @@ OscoreError create_enc_structure(struct byte_array* external_aad, struct byte_ar
  * @param out: output length
  * @return OscoreError
  */
-OscoreError enc_structure_length(struct byte_array* external_aad, size_t* out);
+OscoreError enc_structure_length(struct byte_array *external_aad, size_t *out);
 
 /**
  * @brief Decrypt the ciphertext
@@ -40,12 +41,10 @@ OscoreError enc_structure_length(struct byte_array* external_aad, size_t* out);
  * @param recipient_key the recipient key
  * @return OscoreError
  */
-OscoreError cose_decrypt(
-    struct byte_array* in_ciphertext,
-    struct byte_array* out_plaintext,
-    struct byte_array* nonce,
-    struct byte_array* aad,
-    struct byte_array* recipient_key);
+OscoreError cose_decrypt(struct byte_array *in_ciphertext,
+			 struct byte_array *out_plaintext,
+			 struct byte_array *nonce, struct byte_array *aad,
+			 struct byte_array *recipient_key);
 
 /**
  * @brief Encrypt the plaintext
@@ -56,10 +55,8 @@ OscoreError cose_decrypt(
  * @param sender_key the sender key
  * @return OscoreError
  */
-OscoreError cose_encrypt(
-    struct byte_array* in_plaintext,
-    uint8_t *out_ciphertext, uint32_t out_ciphertext_len,
-    struct byte_array* nonce,
-    struct byte_array* sender_aad, 
-    struct byte_array* key) ;
+OscoreError cose_encrypt(struct byte_array *in_plaintext,
+			 uint8_t *out_ciphertext, uint32_t out_ciphertext_len,
+			 struct byte_array *nonce,
+			 struct byte_array *sender_aad, struct byte_array *key);
 #endif

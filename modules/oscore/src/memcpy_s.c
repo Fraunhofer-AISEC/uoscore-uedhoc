@@ -13,15 +13,13 @@
 
 #include "../inc/error.h"
 
-OscoreError _memcpy_s(
-    uint8_t *dest,
-    uint64_t destSize,
-    const uint8_t *src,
-    uint64_t count) {
-    if (destSize < count) {
-        return DestBufferToSmall;
-    } else {
-        memcpy(dest, src, count);
-    }
-    return 0;
+OscoreError _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
+		      uint64_t count)
+{
+	if (destSize < count) {
+		return DestBufferToSmall;
+	} else {
+		memcpy(dest, src, count);
+	}
+	return 0;
 }
