@@ -25,9 +25,9 @@ RESPONDER_TEST_4 | INITIATOR_SDHK_RESPONDER_SDHK | x5chain  | 0     | non
 
 */
 
-#define RESPONDER_TEST_1
+//#define RESPONDER_TEST_1
 //#define RESPONDER_TEST_2
 //#define RESPONDER_TEST_3
-//#define RESPONDER_TEST_4
+#define RESPONDER_TEST_4
 
 #endif
