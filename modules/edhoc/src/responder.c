@@ -350,6 +350,9 @@ EdhocError edhoc_responder_run(struct edhoc_responder_context *c,
 	uint16_t m_2_len = sizeof(m_2);
 	uint8_t sign_or_mac_2[64];
 	uint32_t sign_or_mac_2_len = sizeof(sign_or_mac_2);
+
+	PRINT_ARRAY("CRED_R", c->cred_r.ptr, c->cred_r.len);
+
 	r = signature_or_mac_msg_create(
 		static_dh_r, suite, "K_2m", "IV_2m", (uint8_t *)&PRK_3e2m,
 		sizeof(PRK_3e2m), (uint8_t *)&th2, sizeof(th2),
@@ -384,19 +387,19 @@ EdhocError edhoc_responder_run(struct edhoc_responder_context *c,
 		return r;
 	PRINT_ARRAY("P_2e", P_2e, P_2e_len);
 
-	/*Calculate K_2e*/
-	uint8_t K_2e[P_2e_len];
-	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "K_2e",
+	/*Calculate KEYSTREAM_2*/
+	uint8_t KEYSTREAM_2[P_2e_len];
+	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "KEYSTREAM_2",
 		     (uint8_t *)&PRK_2e, sizeof(PRK_2e), (uint8_t *)&th2,
-		     sizeof(th2), K_2e, sizeof(K_2e));
+		     sizeof(th2), KEYSTREAM_2, sizeof(KEYSTREAM_2));
 	if (r != EdhocNoError)
 		return r;
-	PRINT_ARRAY("K_2e", K_2e, sizeof(K_2e));
+	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
 
 	/*Ciphertext 2 calculate*/
 	ciphertext_2_len = P_2e_len;
 	for (uint16_t i = 0; i < P_2e_len; i++) {
-		ciphertext_2[i] = P_2e[i] ^ K_2e[i];
+		ciphertext_2[i] = P_2e[i] ^ KEYSTREAM_2[i];
 	}
 	PRINT_ARRAY("ciphertext_2", ciphertext_2, ciphertext_2_len);
 
