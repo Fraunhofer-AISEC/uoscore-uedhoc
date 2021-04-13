@@ -36,20 +36,33 @@
 static OscoreError derive(struct common_context *cc, struct byte_array *id,
 			  enum derive_type type, struct byte_array *out)
 {
-	uint64_t len;
 	OscoreError r;
-	r = hkdf_info_len(id, &cc->id_context, cc->aead_alg, type, &len);
-	if (r != OscoreNoError)
-		return r;
-	uint8_t info_bytes[len];
+
+	// r = hkdf_info_len(id, &cc->id_context, cc->aead_alg, type, &len);
+	// if (r != OscoreNoError)
+	// 	return r;
+	uint8_t info_bytes[30]; //todo use define here
 	struct byte_array info = {
-		.len = len,
+		.len = sizeof(info_bytes),
 		.ptr = info_bytes,
 	};
 
 	r = create_hkdf_info(id, &cc->id_context, cc->aead_alg, type, &info);
 	if (r != OscoreNoError)
 		return r;
+
+	// uint8_t info_bytes[30];
+	// struct byte_array info = {
+	// 	.len = sizeof(info_bytes),
+	// 	.ptr = info_bytes,
+	// };
+
+	// struct info info_struct = {
+	// 	._info_id = id,
+	// 	._info_type = type };
+
+	// success_encoding = cbor_encode_info(info.ptr, info.len, );
+
 	PRINT_ARRAY("info struct", info.ptr, info.len);
 
 	switch (cc->kdf) {

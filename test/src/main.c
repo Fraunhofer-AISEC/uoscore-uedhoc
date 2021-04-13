@@ -608,7 +608,7 @@ static void oscore_client_test1(void)
 
 	r = oscore_context_init(&params, &c_client);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init");
+	zassert_equal(r, OscoreNoError, "Error in oscore_context_init (%d)", r);
 
 	/* 
     required only for the test vector.
@@ -890,12 +890,14 @@ void test_main(void)
 #endif
 
 #ifdef OSCORE_TESTS
-	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
-			 ztest_unit_test(oscore_server_test2),
-			 ztest_unit_test(oscore_client_test3),
-			 ztest_unit_test(oscore_server_test4),
-			 ztest_unit_test(oscore_client_test5),
-			 ztest_unit_test(oscore_server_test6));
+	// ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
+	// 		 ztest_unit_test(oscore_server_test2),
+	// 		 ztest_unit_test(oscore_client_test3),
+	// 		 ztest_unit_test(oscore_server_test4),
+	// 		 ztest_unit_test(oscore_client_test5),
+	// 		 ztest_unit_test(oscore_server_test6));
+
+	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1));
 
 	ztest_run_test_suite(oscore_tests);
 #endif

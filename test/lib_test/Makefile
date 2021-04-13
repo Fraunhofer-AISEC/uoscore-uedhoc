@@ -53,7 +53,7 @@ endif
 ifeq	($(LIB_NAME), libuoscore.a) 
 	C_SOURCES = $(wildcard ../../modules/oscore/src/*.c)
 endif 
-
+C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/cddl-gen/src/*.c))
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycbor/src/*.c))
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycrypt/lib/source/*.c))
 
@@ -73,7 +73,8 @@ endif
 ifeq	($(LIB_NAME), libuoscore.a) 
 	C_INCLUDES =  \
 	-I../../externals/tinycbor/src/ \
-	-I../../externals/tinycrypt/lib/include 
+	-I../../externals/tinycrypt/lib/include \
+	-I../../externals/cddl-gen/include  
 endif 
 
 ################################################################################
@@ -103,7 +104,7 @@ endif
 ifeq	($(LIB_NAME), libuoscore.a) 
 	#use tyncrypt 
 	CFLAGS1 += -DOSCORE_WITH_TINYCRYPT
-	#CFLAGS1 += -DOSCORE_DEBUG_PRINT
+	CFLAGS1 += -DOSCORE_DEBUG_PRINT
 endif 
 
 #$(info    CFLAGS1 is $(CFLAGS1))
