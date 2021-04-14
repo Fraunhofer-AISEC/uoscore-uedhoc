@@ -88,6 +88,8 @@ void send_coap(uint8_t *msg, uint32_t msg_len)
 	pdu->setPayload(msg, msg_len);
 
 	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
+
+	delete pdu;
 }
 
 /**
@@ -116,6 +118,8 @@ void recv_coap(uint8_t **msg, uint32_t *msg_len)
 
 	*msg = recvPDU->getPayloadPointer();
 	*msg_len = recvPDU->getPayloadLength();
+
+	delete recvPDU;
 }
 
 int main()

@@ -41,6 +41,7 @@ typedef enum EdhocError {
 	CborByteStringBufferToSmall = 19,
 	ErrorDuringCborDecoding = 20,
 	UnsupportedEcdhCurve = 21,
+	UnsupportedAEADAlgorithm = 22,
 } EdhocError;
 
 #endif

@@ -110,6 +110,12 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" 
 
 
+# use AddressSanitizer to find memory bugs
+# comment this out for better speed
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS += -fsanitize=address -static-libasan
+
 ###########################################
 # default action: build all
 ###########################################

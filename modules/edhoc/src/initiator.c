@@ -519,10 +519,12 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		mac_len = 16;
 	}
 	uint8_t tag[mac_len];
-	uint8_t ciphertext_3[P_3ae_len + mac_len];
+	uint32_t ciphertext_3_len = P_3ae_len;
+	uint8_t ciphertext_3[ciphertext_3_len + mac_len];
+	
 	r = aead(ENCRYPT, P_3ae, P_3ae_len, K_3ae, sizeof(K_3ae), IV_3ae,
 		 sizeof(IV_3ae), A_3ae, A_3ae_len, ciphertext_3,
-		 sizeof(ciphertext_3), tag, mac_len);
+		 ciphertext_3_len, tag, mac_len);
 	if (r != EdhocNoError)
 		return r;
 
