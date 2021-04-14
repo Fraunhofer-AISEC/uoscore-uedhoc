@@ -15,22 +15,6 @@
 #include "byte_array.h"
 #include "error.h"
 
-/**
- * @brief Encode the input AAD to defined COSE structure
- * @param external_aad: input aad to form COSE structure
- * @param out: output encoded COSE byte string
- * @return OscoreError
- */
-OscoreError create_enc_structure(struct byte_array *external_aad,
-				 struct byte_array *out);
-
-/**
- * @brief Calculate the length of the COSE format for input AAD
- * @param external_aad: input aad to form COSE structure
- * @param out: output length
- * @return OscoreError
- */
-OscoreError enc_structure_length(struct byte_array *external_aad, size_t *out);
 
 /**
  * @brief Decrypt the ciphertext

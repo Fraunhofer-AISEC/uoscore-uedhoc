@@ -18,20 +18,6 @@
 #include "supported_algorithm.h"
 
 /**
- * @brief   Returns the length of the encoded HKDF Info as defined by OSCORE
- * @param   id "Sender ID or Recipient ID when deriving keys and the empty 
- *          byte string when deriving the Common IV"
- * @param   id_context ID Context
- * @param   aead_alg AEAD Algorithm
- * @param   type type of operation this HKDF Info is going to be used for
- * @param   out out-pointer containing the length afterwards
- * @return  OscoreError
- */
-OscoreError hkdf_info_len(struct byte_array *id, struct byte_array *id_context,
-			  enum AEAD_algorithm aead_alg, enum derive_type type,
-			  uint64_t *out);
-
-/**
  * @brief   Encodes the HKDF Info as defined by OSCORE into the out-array
  * @param   id "Sender ID or Recipient ID when deriving keys and the empty 
  *          byte string when deriving the Common IV"

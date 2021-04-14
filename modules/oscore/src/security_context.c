@@ -37,11 +37,7 @@ static OscoreError derive(struct common_context *cc, struct byte_array *id,
 			  enum derive_type type, struct byte_array *out)
 {
 	OscoreError r;
-
-	// r = hkdf_info_len(id, &cc->id_context, cc->aead_alg, type, &len);
-	// if (r != OscoreNoError)
-	// 	return r;
-	uint8_t info_bytes[30]; //todo use define here
+	uint8_t info_bytes[MAX_INFO_LEN];
 	struct byte_array info = {
 		.len = sizeof(info_bytes),
 		.ptr = info_bytes,
@@ -50,18 +46,6 @@ static OscoreError derive(struct common_context *cc, struct byte_array *id,
 	r = create_hkdf_info(id, &cc->id_context, cc->aead_alg, type, &info);
 	if (r != OscoreNoError)
 		return r;
-
-	// uint8_t info_bytes[30];
-	// struct byte_array info = {
-	// 	.len = sizeof(info_bytes),
-	// 	.ptr = info_bytes,
-	// };
-
-	// struct info info_struct = {
-	// 	._info_id = id,
-	// 	._info_type = type };
-
-	// success_encoding = cbor_encode_info(info.ptr, info.len, );
 
 	PRINT_ARRAY("info struct", info.ptr, info.len);
 
@@ -187,11 +171,6 @@ OscoreError context_update(enum dev_type dev, struct o_coap_option *options,
 
 	/**************************************************************************/
 	/*calculate AAD*/
-	r = aad_length(options, opt_num, c->cc.aead_alg, &c->rrc.kid,
-		       &c->rrc.piv, &c->rrc.aad.len);
-	if (r != OscoreNoError)
-		return r;
-
 	return create_aad(options, opt_num, c->cc.aead_alg, &c->rrc.kid,
 			  &c->rrc.piv, &c->rrc.aad);
 }

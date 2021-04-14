@@ -48,13 +48,14 @@ ifeq	($(LIB_NAME), libuedhoc.a)
 	C_SOURCES = $(wildcard ../../modules/edhoc/src/*.c)
 	C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
 	C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
+	C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycbor/src/*.c))
 endif 
 
 ifeq	($(LIB_NAME), libuoscore.a) 
 	C_SOURCES = $(wildcard ../../modules/oscore/src/*.c)
+	C_SOURCES += $(wildcard ../../modules/oscore/cbor/*.c)
 endif 
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/cddl-gen/src/*.c))
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycbor/src/*.c))
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycrypt/lib/source/*.c))
 
 #$(info    \n C_SOURCES is $(C_SOURCES))
@@ -72,9 +73,11 @@ endif
 
 ifeq	($(LIB_NAME), libuoscore.a) 
 	C_INCLUDES =  \
-	-I../../externals/tinycbor/src/ \
 	-I../../externals/tinycrypt/lib/include \
 	-I../../externals/cddl-gen/include  
+	
+	#-I../../externals/tinycbor/src/ \
+
 endif 
 
 ################################################################################
@@ -104,7 +107,8 @@ endif
 ifeq	($(LIB_NAME), libuoscore.a) 
 	#use tyncrypt 
 	CFLAGS1 += -DOSCORE_WITH_TINYCRYPT
-	CFLAGS1 += -DOSCORE_DEBUG_PRINT
+	#CFLAGS1 += -DOSCORE_DEBUG_PRINT
+	CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 endif 
 
 #$(info    CFLAGS1 is $(CFLAGS1))

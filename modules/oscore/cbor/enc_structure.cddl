@@ -9,13 +9,7 @@
 
 ; This file shold be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
-; run like that:
-; python3 <cddl-gen base>/scripts/cddl_gen.py -c oscore.cddl code -e -t info --oc info_encode.c --oh ../inc/info_encode.h
+; context can be one of "Encrypt" / "Encrypt0" / "Enc_Recipient" /
+;           "Mac_Recipient" / "Rec_Recipient"
 
-info = [
-id : bstr,
-id_context : bstr / nil,
-alg_aead : int / tstr,
-type : tstr,
-L : uint
-]
+enc_structure = [ context: tstr, protected: bstr, external_aad: bstr, ]

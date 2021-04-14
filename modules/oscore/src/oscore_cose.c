@@ -10,47 +10,44 @@
 */
 #include "../inc/oscore_cose.h"
 
-#include <cbor.h>
 #include <stdio.h>
 
 #include "../inc/crypto_wrapper.h"
 #include "../inc/print_util.h"
 #include "../inc/security_context.h"
+#include "../cbor/enc_structure.h"
 
-OscoreError create_enc_structure(struct byte_array *external_aad,
-				 struct byte_array *out)
+/*the additional bytes in the enc_structure are constant*/
+#define ENCRYPT0_ENCODING_OVERHEAD 12
+
+/**
+ * @brief Encode the input AAD to defined COSE structure
+ * @param external_aad: input aad to form COSE structure
+ * @param out: output encoded COSE byte string
+ * @return OscoreError
+ */
+static OscoreError create_enc_structure(struct byte_array *external_aad,
+					struct byte_array *out)
 {
-	CborEncoder enc;
-	cbor_encoder_init(&enc, out->ptr, out->len, 0);
-	CborEncoder array_enc;
-	cbor_encoder_create_array(&enc, &array_enc, 3);
-	/* context */
-	cbor_encode_text_stringz(&array_enc, "Encrypt0");
-	/* protected */
-	cbor_encode_byte_string(&array_enc, NULL, 0);
-	/* external_aad */
-	cbor_encode_byte_string(&array_enc, external_aad->ptr,
-				external_aad->len);
-	cbor_encoder_close_container(&enc, &array_enc);
+	bool success_encoding;
+	struct enc_structure enc_structure;
 
-	return OscoreNoError;
-}
+	uint8_t context[] = { "Encrypt0" };
+	enc_structure._enc_structure_context.value = context;
+	enc_structure._enc_structure_context.len = strlen(context);
+	enc_structure._enc_structure_protected.value = NULL;
+	enc_structure._enc_structure_protected.len = 0;
+	enc_structure._enc_structure_external_aad.value = external_aad->ptr;
+	enc_structure._enc_structure_external_aad.len = external_aad->len;
 
-OscoreError enc_structure_length(struct byte_array *external_aad, size_t *out)
-{
-	CborEncoder enc;
-	cbor_encoder_init(&enc, NULL, 0, 0);
-	CborEncoder array_enc;
-	cbor_encoder_create_array(&enc, &array_enc, 3);
-	/* context */
-	cbor_encode_text_stringz(&array_enc, "Encrypt0");
-	/* protected */
-	cbor_encode_byte_string(&array_enc, NULL, 0);
-	/* external_aad */
-	cbor_encode_byte_string(&array_enc, external_aad->ptr,
-				external_aad->len);
-	cbor_encoder_close_container(&enc, &array_enc);
-	*out = cbor_encoder_get_extra_bytes_needed(&enc);
+	size_t payload_len_out;
+	success_encoding = cbor_encode_enc_structure(
+		out->ptr, out->len, &enc_structure, &payload_len_out);
+
+	if (!success_encoding) {
+		return cbor_encoding_error;
+	}
+	out->len = payload_len_out;
 	return OscoreNoError;
 }
 
@@ -62,11 +59,7 @@ OscoreError cose_decrypt(struct byte_array *in_ciphertext,
 {
 	/* get enc_structure */
 	OscoreError r;
-	size_t aad_len;
-	r = enc_structure_length(recipient_aad, &aad_len);
-	if (r != OscoreNoError)
-		return r;
-
+	uint32_t aad_len = recipient_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
 	struct byte_array aad = {
 		.len = aad_len,
@@ -101,10 +94,8 @@ OscoreError cose_encrypt(struct byte_array *in_plaintext,
 {
 	/* get enc_structure  */
 	OscoreError r;
-	size_t aad_len;
-	r = enc_structure_length(sender_aad, &aad_len);
-	if (r != OscoreNoError)
-		return r;
+
+	uint32_t aad_len = sender_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
 	struct byte_array aad = {
 		.len = aad_len,

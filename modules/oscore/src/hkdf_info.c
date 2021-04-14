@@ -12,9 +12,7 @@
 
 #include "../inc/aad.h"
 #include "../inc/hkdf_info.h"
-#include "../inc/info_encode.h"
-
-#include <cbor.h>
+#include "../cbor/info.h"
 
 /*
 HKDF = composition of HKDF-Extract and HKDF-Expand (RFC5869)
@@ -34,92 +32,7 @@ output = HKDF(salt, IKM, info, L
          - in bytes
 * https://www.iana.org/assignments/cose/cose.xhtml
 */
-OscoreError hkdf_info_len(struct byte_array *id, struct byte_array *id_context,
-			  enum AEAD_algorithm aead_alg, enum derive_type type,
-			  uint64_t *out)
-{
-	CborEncoder enc;
-	cbor_encoder_init(&enc, NULL, 0, 0);
 
-	CborEncoder array_enc;
-	char type_enc[10];
-	uint64_t len = 0;
-	switch (type) {
-	case KEY:
-		strncpy(type_enc, "Key", 10);
-		len = 16;
-		break;
-	case IV:
-		strncpy(type_enc, "IV", 10);
-		len = 13;
-		break;
-	default:
-		break;
-	}
-
-	cbor_encoder_create_array(&enc, &array_enc, 1);
-
-	cbor_encode_byte_string(&array_enc, id->ptr, id->len);
-
-	if (id_context->len == 0) {
-		cbor_encode_null(&array_enc);
-
-	} else {
-		cbor_encode_byte_string(&array_enc, id_context->ptr,
-					id_context->len);
-	}
-
-	cbor_encode_int(&array_enc, aead_alg);
-	cbor_encode_text_stringz(&array_enc, type_enc);
-	cbor_encode_uint(&array_enc, len);
-	cbor_encoder_close_container(&enc, &array_enc);
-
-	*out = cbor_encoder_get_extra_bytes_needed(&enc);
-
-	return OscoreNoError;
-}
-
-// inline OscoreError create_hkdf_info(struct byte_array *id,
-// 				    struct byte_array *id_context,
-// 				    enum AEAD_algorithm aead_alg,
-// 				    enum derive_type type,
-// 				    struct byte_array *out)
-// {
-// 	CborEncoder enc;
-// 	cbor_encoder_init(&enc, out->ptr, out->len, 0);
-// 	CborEncoder array_enc;
-// 	char type_enc[10];
-// 	uint64_t len = 0;
-// 	switch (type) {
-// 	case KEY:
-// 		strncpy(type_enc, "Key", 10);
-// 		len = 16;
-// 		break;
-// 	case IV:
-// 		strncpy(type_enc, "IV", 10);
-// 		len = 13;
-// 		break;
-// 	default:
-// 		break;
-// 	}
-
-// 	cbor_encoder_create_array(&enc, &array_enc, 5);
-// 	cbor_encode_byte_string(&array_enc, id->ptr, id->len);
-
-// 	if (id_context->len == 0) {
-// 		cbor_encode_null(&array_enc);
-// 	} else {
-// 		cbor_encode_byte_string(&array_enc, id_context->ptr,
-// 					id_context->len);
-// 	}
-
-// 	cbor_encode_int(&array_enc, aead_alg);
-// 	cbor_encode_text_stringz(&array_enc, type_enc);
-// 	cbor_encode_uint(&array_enc, len);
-// 	cbor_encoder_close_container(&enc, &array_enc);
-
-// 	return OscoreNoError;
-// }
 
 inline OscoreError create_hkdf_info(struct byte_array *id,
 				    struct byte_array *id_context,
@@ -127,9 +40,6 @@ inline OscoreError create_hkdf_info(struct byte_array *id,
 				    enum derive_type type,
 				    struct byte_array *out)
 {
-	// CborEncoder enc;
-	// cbor_encoder_init(&enc, out->ptr, out->len, 0);
-	// CborEncoder array_enc;
 	bool success_encoding;
 	struct info info_struct;
 
@@ -165,7 +75,7 @@ inline OscoreError create_hkdf_info(struct byte_array *id,
 	info_struct._info_type.len = strlen(type_enc);
 	info_struct._info_L = len;
 
-	uint64_t payload_len_out;
+	size_t payload_len_out;
 	success_encoding = cbor_encode_info(out->ptr, out->len, &info_struct,
 					    &payload_len_out);
 

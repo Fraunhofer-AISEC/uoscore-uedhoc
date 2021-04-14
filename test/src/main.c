@@ -890,14 +890,14 @@ void test_main(void)
 #endif
 
 #ifdef OSCORE_TESTS
-	// ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
-	// 		 ztest_unit_test(oscore_server_test2),
-	// 		 ztest_unit_test(oscore_client_test3),
-	// 		 ztest_unit_test(oscore_server_test4),
-	// 		 ztest_unit_test(oscore_client_test5),
-	// 		 ztest_unit_test(oscore_server_test6));
+	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
+			 ztest_unit_test(oscore_server_test2),
+			 ztest_unit_test(oscore_client_test3),
+			 ztest_unit_test(oscore_server_test4),
+			 ztest_unit_test(oscore_client_test5),
+			 ztest_unit_test(oscore_server_test6));
 
-	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1));
+	//ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1));
 
 	ztest_run_test_suite(oscore_tests);
 #endif
