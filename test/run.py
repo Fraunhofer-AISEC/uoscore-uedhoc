@@ -165,12 +165,12 @@ def main():
     # test(arc('native_posix', 'x86'))
 
     # x86
-    #run_tests('libuoscore.a', arc('native_posix', 'x86'))
-    run_tests('libuedhoc.a', arc('native_posix', 'x86'))
+    run_tests('libuoscore.a', arc('native_posix', 'x86'))
+    #run_tests('libuedhoc.a', arc('native_posix', 'x86'))
 
     # x86-64
-    #run_tests('libuoscore.a', arc('native_posix_64', 'x86-64'))
-    run_tests('libuedhoc.a', arc('native_posix_64', 'x86-64'))
+    run_tests('libuoscore.a', arc('native_posix_64', 'x86-64'))
+    #run_tests('libuedhoc.a', arc('native_posix_64', 'x86-64'))
 
     # to run the following tests a real hardware must be connect to the PC
     # executing this script. The results of the test can be examined over a serial consol such as GTKterm

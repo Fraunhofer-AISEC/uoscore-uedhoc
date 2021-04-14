@@ -36,6 +36,7 @@ typedef enum OscoreError {
 	DestBufferToSmall = 14,
 	DeltaExtraByteError = 15,
 	LenExtraByteError = 16,
+	NotValidInputPacket = 17,
 } OscoreError;
 
 #endif
