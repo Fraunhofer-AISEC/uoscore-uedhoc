@@ -36,7 +36,7 @@ char buffer[MAXLINE];
 CoapPDU *recvPDU;
 
 /*comment this out to use DH keys from the test vectors*/
-#define USE_RANDOM_EPHEMERAL_DH_KEY
+//#define USE_RANDOM_EPHEMERAL_DH_KEY
 
 #ifdef USE_IPV6
 struct sockaddr_in6 client_addr;

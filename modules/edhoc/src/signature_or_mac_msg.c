@@ -131,16 +131,21 @@ EdhocError signature_or_mac_msg_create(
 		return r;
 	PRINT_ARRAY("A_2m or A_3m", A_m, A_m_len);
 
-	/*calculate MAC_2*/
-	uint8_t in, out;
-	*mac_len = 8;
+	/* === Calculate MAC_2 ===
+	 * We calculate a MAC through a AEAD algorithm.
+	 * The AEAD algorithm AES_CCM_16_64_128 of produces a tag of 8 byte which 
+	 * is appended to the cipher text, therefore the out[] buffer needs to have 
+	 * a length of tag + ciphertext. In our case cipher_text_len = 0 and tag is 
+	 * 8 -> out[8]
+	 */
+	uint8_t in, out[8];
 	if (suite.edhoc_aead == AES_CCM_16_64_128) {
-		*mac_len = 8;
+		*mac_len = 8; /*8 byte tag (64bit)*/
 	} else {
-		*mac_len = 16;
+		return UnsupportedAEADAlgorithm;
 	}
 	r = aead(ENCRYPT, &in, 0, K_m, sizeof(K_m), IV_m, sizeof(IV_m), A_m,
-		 A_m_len, &out, 0, mac, *mac_len);
+		 A_m_len, (uint8_t *)&out, 0, mac, *mac_len);
 	if (r != EdhocNoError)
 		return r;
 	PRINT_ARRAY("MAC (MAC_2 or MAC_3)", mac, *mac_len);

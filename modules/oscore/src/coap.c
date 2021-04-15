@@ -215,6 +215,9 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
 	uint16_t payload_len = in->len;
 
 	/* Read CoAP/OSCORE header (4 bytes)*/
+	if (payload_len < HEADER_LEN) {
+		return NotValidInputPacket;
+	}
 	out->header.ver =
 		((*tmp_p) & HEADER_VERSION_MASK) >> HEADER_VERSION_OFFSET;
 	out->header.type = ((*tmp_p) & HEADER_TYPE_MASK) >> HEADER_TYPE_OFFSET;
@@ -226,47 +229,57 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
 	tmp_p += 4;
 	payload_len -= 4;
 
-	/*Read the token, if it exists*/
-	if (out->header.TKL == 0) {
-		out->token = NULL;
-	} else if (out->header.TKL <= 8) {
-		out->token = tmp_p;
-	} else {
-		/* ERROR: CoAP token length maximal 8 bytes */
-		return OscoreInPktInvalidTKL;
+	if (payload_len != 0) {
+		/*Read the token, if it exists*/
+		if (out->header.TKL == 0) {
+			out->token = NULL;
+		} else if (out->header.TKL <= 8) {
+			out->token = tmp_p;
+		} else {
+			/* ERROR: CoAP token length maximal 8 bytes */
+			return OscoreInPktInvalidTKL;
+		}
+		/* Update pointer and length */
+		tmp_p += out->header.TKL;
+		payload_len -= out->header.TKL;
 	}
-	/* Update pointer and length */
-	tmp_p += out->header.TKL;
-	payload_len -= out->header.TKL;
 
 	/* Options, if any */
-	/* Check if there any options exist*/
-	if (*tmp_p == 0xFF || payload_len == 0) {
-		/* No options*/
-		out->options_cnt = 0;
-	} else {
-		/* Length of options byte string */
-		uint16_t options_len = 0;
-		uint8_t *temp_option_ptr = tmp_p;
-
-		/* Move tmp_p to the payload to get the length of options byte string*/
-		while (*tmp_p != 0xFF && payload_len != 0) {
-			payload_len--;
-			tmp_p++;
-			options_len++;
-		}
-
-		/* Parser all options */
-		if (options_len > 0) {
-			r = buf2options(temp_option_ptr, options_len,
-					out->options, &(out->options_cnt));
-			if (r != OscoreNoError)
-				return r;
-		} else {
+	if (payload_len != 0) {
+		/* Check if there any options exist*/
+		if (*tmp_p == 0xFF) {
+			/* No options*/
 			out->options_cnt = 0;
+		} else {
+			/* Length of options byte string */
+			uint16_t options_len = 0;
+			uint8_t *temp_option_ptr = tmp_p;
+
+			/* Move tmp_p to the payload to get the length of options byte string*/
+
+			if (payload_len != 0) {
+				while (*tmp_p != 0xFF) {
+					payload_len--;
+					tmp_p++;
+					options_len++;
+					if(payload_len == 0){
+						break;
+					}
+				}
+			}
+
+			/* Parser all options */
+			if (options_len > 0) {
+				r = buf2options(temp_option_ptr, options_len,
+						out->options,
+						&(out->options_cnt));
+				if (r != OscoreNoError)
+					return r;
+			} else {
+				out->options_cnt = 0;
+			}
 		}
 	}
-
 	/* Payload, if any */
 	++tmp_p;
 	if (payload_len == 0) {

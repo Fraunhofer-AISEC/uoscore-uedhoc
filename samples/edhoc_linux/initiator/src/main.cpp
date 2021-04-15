@@ -30,7 +30,7 @@ extern "C" {
 #define USE_IPV4
 
 /*comment this out to use DH keys from the test vectors*/
-#define USE_RANDOM_EPHEMERAL_DH_KEY
+//#define USE_RANDOM_EPHEMERAL_DH_KEY
 
 /**
  * @brief	Initializes sockets for CoAP client.
@@ -88,6 +88,8 @@ void send_coap(uint8_t *msg, uint32_t msg_len)
 	pdu->setPayload(msg, msg_len);
 
 	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
+
+	delete pdu;
 }
 
 /**
@@ -116,6 +118,8 @@ void recv_coap(uint8_t **msg, uint32_t *msg_len)
 
 	*msg = recvPDU->getPayloadPointer();
 	*msg_len = recvPDU->getPayloadLength();
+
+	delete recvPDU;
 }
 
 int main()

@@ -114,7 +114,6 @@ def save(name, arc):
     if (name == 'libuedhoc.a'):
         t.add('../modules/edhoc/edhoc.h', arcname='edhoc.h')
 
-
     if (name == 'libuoscore.a'):
         t.add('../modules/oscore/oscore.h', arcname='oscore.h')
 
@@ -162,15 +161,23 @@ def main():
     """
     clean_all()
 
+<<<<<<< HEAD
     build('libuedhoc.a', '-O0', arc('native_posix', 'x86'))
     test(arc('native_posix', 'x86'))
 
     # x86
     #run_tests('libuoscore.a', arc('native_posix', 'x86'))
+=======
+    # build('libuedhoc.a', '-O0', arc('native_posix', 'x86'))
+    # test(arc('native_posix', 'x86'))
+
+    # x86
+    run_tests('libuoscore.a', arc('native_posix', 'x86'))
+>>>>>>> sanitizer
     #run_tests('libuedhoc.a', arc('native_posix', 'x86'))
 
     # x86-64
-    #run_tests('libuoscore.a', arc('native_posix_64', 'x86-64'))
+    run_tests('libuoscore.a', arc('native_posix_64', 'x86-64'))
     #run_tests('libuedhoc.a', arc('native_posix_64', 'x86-64'))
 
     # to run the following tests a real hardware must be connect to the PC
@@ -198,9 +205,12 @@ def main():
     #run_tests('libuoscore.a', arc('hifive1', 'risc-v-rv32imac'))
     #run_tests('libuedhoc.a', arc('hifive1', 'risc-v-rv32imac'))   
 
+<<<<<<< HEAD
     # Xtensa
     #run_tests('libuoscore.a', arc('esp32', 'xtensa-esp32'))
     #run_tests('libuedhoc.a', arc('esp32', 'xtensa-esp32'))   
 
+=======
+>>>>>>> sanitizer
 if __name__ == "__main__":
     main()

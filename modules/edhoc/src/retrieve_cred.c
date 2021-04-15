@@ -187,20 +187,22 @@ EdhocError retrieve_cred(bool static_dh_auth,
 
 	/*check first if the credential is preestablished (RPK)*/
 	for (uint16_t i = 0; i < cred_num; i++) {
-		if (0 ==
-		    memcmp(cred_array[i].id_cred.ptr, id_cred, id_cred_len)) {
-			*cred = cred_array[i].cred.ptr;
-			*cred_len = cred_array[i].cred.len;
-			if (static_dh_auth) {
-				*pk_len = 0;
-				*g = cred_array[i].g.ptr;
-				*g_len = cred_array[i].g.len;
-			} else {
-				*g_len = 0;
-				*pk = cred_array[i].pk.ptr;
-				*pk_len = cred_array[i].pk.len;
+		if (cred_array[i].id_cred.len == id_cred_len) {
+			if (0 == memcmp(cred_array[i].id_cred.ptr, id_cred,
+					id_cred_len)) {
+				*cred = cred_array[i].cred.ptr;
+				*cred_len = cred_array[i].cred.len;
+				if (static_dh_auth) {
+					*pk_len = 0;
+					*g = cred_array[i].g.ptr;
+					*g_len = cred_array[i].g.len;
+				} else {
+					*g_len = 0;
+					*pk = cred_array[i].pk.ptr;
+					*pk_len = cred_array[i].pk.len;
+				}
+				return EdhocNoError;
 			}
-			return EdhocNoError;
 		}
 	}
 

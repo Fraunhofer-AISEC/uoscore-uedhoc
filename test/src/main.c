@@ -878,6 +878,7 @@ static void oscore_server_test6(void)
 void test_main(void)
 {
 #ifdef EDHOC_TESTS
+
 	ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1),
 			 ztest_unit_test(test_initiator2),
 			 ztest_unit_test(test_initiator3),

@@ -37,6 +37,7 @@ typedef enum OscoreError {
 	DeltaExtraByteError = 15,
 	LenExtraByteError = 16,
 	cbor_encoding_error = 17,
+	NotValidInputPacket = 18,
 } OscoreError;
 
 #endif

@@ -25,6 +25,7 @@
 #define MAX_INFO_LEN 50
 
 /* Mask and offset for first byte in CoAP/OSCORE header*/
+#define HEADER_LEN 4
 #define HEADER_VERSION_MASK 0xC0
 #define HEADER_VERSION_OFFSET 6
 #define HEADER_TYPE_MASK 0x30

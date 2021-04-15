@@ -294,19 +294,19 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		return r;
 	PRINT_ARRAY("PRK_2e", PRK_2e, sizeof(PRK_2e));
 
-	/*Calculate K_2e*/
-	uint64_t K_2e_len = ciphertext2_len;
-	uint8_t K_2e[K_2e_len];
-	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "K_2e",
+	/*Derive KEYSTREAM_2*/
+	uint64_t KEYSTREAM_2_len = ciphertext2_len;
+	uint8_t KEYSTREAM_2[KEYSTREAM_2_len];
+	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "KEYSTREAM_2",
 		     (uint8_t *)&PRK_2e, sizeof(PRK_2e), (uint8_t *)&th2,
-		     sizeof(th2), K_2e, K_2e_len);
+		     sizeof(th2), KEYSTREAM_2, KEYSTREAM_2_len);
 	if (r != EdhocNoError)
 		return r;
-	PRINT_ARRAY("K_2e", K_2e, sizeof(K_2e));
+	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
 
 	uint8_t P_2e[ciphertext2_len];
-	for (uint16_t i = 0; i < K_2e_len; i++) {
-		P_2e[i] = ciphertext2[i] ^ K_2e[i];
+	for (uint16_t i = 0; i < KEYSTREAM_2_len; i++) {
+		P_2e[i] = ciphertext2[i] ^ KEYSTREAM_2[i];
 	}
 
 	PRINT_ARRAY("P_2e", P_2e, sizeof(P_2e));
@@ -514,10 +514,12 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		mac_len = 16;
 	}
 	uint8_t tag[mac_len];
-	uint8_t ciphertext_3[P_3ae_len + mac_len];
+	uint32_t ciphertext_3_len = P_3ae_len;
+	uint8_t ciphertext_3[ciphertext_3_len + mac_len];
+	
 	r = aead(ENCRYPT, P_3ae, P_3ae_len, K_3ae, sizeof(K_3ae), IV_3ae,
 		 sizeof(IV_3ae), A_3ae, A_3ae_len, ciphertext_3,
-		 sizeof(ciphertext_3), tag, mac_len);
+		 ciphertext_3_len, tag, mac_len);
 	if (r != EdhocNoError)
 		return r;
 
