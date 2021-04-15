@@ -1,1 +1,1 @@
-#define OSCORE_TESTS
+#define EDHOC_TESTS
