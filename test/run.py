@@ -162,11 +162,11 @@ def main():
     """
     clean_all()
 
-    # build('libuoscore.a', '-O0', arc('native_posix', 'x86'))
-    # test(arc('native_posix', 'x86'))
+    build('libuedhoc.a', '-O0', arc('native_posix', 'x86'))
+    test(arc('native_posix', 'x86'))
 
     # x86
-    run_tests('libuoscore.a', arc('native_posix', 'x86'))
+    #run_tests('libuoscore.a', arc('native_posix', 'x86'))
     #run_tests('libuedhoc.a', arc('native_posix', 'x86'))
 
     # x86-64
@@ -194,7 +194,13 @@ def main():
     #run_tests('libuoscore.a', arc('nrf9160dk_nrf9160', 'cortex-m33'))
     #run_tests('libuedhoc.a', arc('nrf9160dk_nrf9160', 'cortex-m33'))
 
+    # RISC-V
+    #run_tests('libuoscore.a', arc('hifive1', 'risc-v-rv32imac'))
+    #run_tests('libuedhoc.a', arc('hifive1', 'risc-v-rv32imac'))   
 
+    # Xtensa
+    #run_tests('libuoscore.a', arc('esp32', 'xtensa-esp32'))
+    #run_tests('libuedhoc.a', arc('esp32', 'xtensa-esp32'))   
 
 if __name__ == "__main__":
     main()

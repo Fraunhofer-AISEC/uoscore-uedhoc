@@ -29,6 +29,7 @@
 #include "../inc/suites.h"
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
+#include "../cbor/message_1.h"
 
 /**
  * @brief   Encodes a connection identifier C_x of length one byte to 
@@ -139,70 +140,59 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 static inline EdhocError msg1_encode(const struct edhoc_initiator_context *c,
 				     uint8_t *msg1, uint32_t *msg1_len)
 {
-	CborEncoder msg1_enc, enc;
-	CborError r;
-	uint32_t tmp_len = *msg1_len;
-	cbor_encoder_init(&msg1_enc, msg1, *msg1_len, 0);
+	bool success;
+	struct message_1 m1;
 
 	/*METHOD_CORR*/
-	r = cbor_encode_int(&msg1_enc, (4 * c->method_type + c->corr));
-	if (r != CborNoError)
-		return CborEncodingError;
+	m1._message_1_METHOD_CORR = (4 * c->method_type + c->corr);
 
 	/*SUITES_I*/
 	if (c->suites_i.len == 1) {
 		/* only one suite, encode into int */
-		r = cbor_encode_int(&msg1_enc, c->suites_i.ptr[0]);
-		if (r != CborNoError)
-			return CborEncodingError;
-
-	} else {
+		m1._message_1_SUITES_I_choice = _message_1_SUITES_I_int;
+		m1._message_1_SUITES_I_int = c->suites_i.ptr[0];
+	} else if (c->suites_i.len > 1) {
 		/* more than one suites, encode into array */
-		CborEncoder suites_array_enc;
-		r = cbor_encoder_create_array(&msg1_enc, &suites_array_enc,
-					      c->suites_i.len);
-		if (r != CborNoError)
-			return CborEncodingError;
-		for (uint8_t i = 0; i < c->suites_i.len; i++) {
-			r = cbor_encode_int(&suites_array_enc,
-					    c->suites_i.ptr[i]);
-			if (r != CborNoError)
-				return CborEncodingError;
+		m1._message_1_SUITES_I_choice = _message_1_SUITES_I__selected;
+		m1._message_1_SUITES_I__selected_selected = c->suites_i.ptr[0];
+		for (uint32_t i = 0; i < c->suites_i.len; i++) {
+			m1._message_1_SUITES_I__selected_supported[i] =
+				c->suites_i.ptr[i];
 		}
-		cbor_encoder_close_container(&msg1_enc, &suites_array_enc);
-		if (r != CborNoError)
-			return CborEncodingError;
+	} else {
+		return at_least_one_suite_needed;
 	}
 
-	/* G_X ephemeral public key, bstr */
-	r = cbor_encode_byte_string(&msg1_enc, c->g_x.ptr, c->g_x.len);
-	if (r != CborNoError)
-		return CborEncodingError;
+	/* G_X ephemeral public key */
+	m1._message_1_G_X.value = c->g_x.ptr;
+	m1._message_1_G_X.len = c->g_x.len;
 
 	/* C_I connection id, encoded as  bstr_identifier */
 	if (c->c_i.len == 1) {
-		r = cbor_encode_int(&msg1_enc, (*c->c_i.ptr - 24));
-		if (r != CborNoError)
-			return CborEncodingError;
+		m1._message_1_C_I_choice = _message_1_C_I_int;
+		m1._message_1_C_I_int = (*c->c_i.ptr - 24);
 	} else {
-		r = cbor_encode_byte_string(&msg1_enc, c->c_i.ptr, c->c_i.len);
-		if (r != CborNoError)
-			return CborEncodingError;
+		m1._message_1_C_I_choice = _message_1_C_I_bstr;
+		m1._message_1_C_I_bstr.value = c->c_i.ptr;
+		m1._message_1_C_I_bstr.len = c->c_i.len;
 	}
 
-	*msg1_len = cbor_encoder_get_buffer_size(&msg1_enc, msg1);
 	if (c->ad_1.len != 0) {
 		/* AD_1 unprotected opaque auxiliary data */
-		tmp_len -= *msg1_len;
-		cbor_encoder_init(&enc, (msg1 + *msg1_len), tmp_len, 0);
-		r = cbor_encode_byte_string(&enc, c->ad_1.ptr, c->ad_1.len);
-		if (r != CborNoError)
-			return CborEncodingError;
-		*msg1_len += cbor_encoder_get_buffer_size(&enc, msg1);
+		m1._message_1_AD_1.value = c->ad_1.ptr;
+		m1._message_1_AD_1.len = c->ad_1.len;
+		m1._message_1_AD_1_present = c->ad_1.len;
 	} else {
-		/* Get the CBOR length */
-		*msg1_len = cbor_encoder_get_buffer_size(&msg1_enc, msg1);
+		m1._message_1_AD_1_present = 0;
 	}
+
+	size_t payload_len_out;
+	success = cbor_encode_message_1(msg1, *msg1_len, &m1, &payload_len_out);
+
+	if (!success) {
+		return cbor_encoding_error;
+	}
+	*msg1_len = payload_len_out;
 
 	PRINT_ARRAY("message_1 (CBOR Sequence)", msg1, *msg1_len);
 	return EdhocNoError;
@@ -221,8 +211,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	struct suite suite;
 	bool auth_method_static_dh_i = false, auth_method_static_dh_r = false;
 	r = get_suite((enum suite_label)c->suites_i.ptr[0], &suite);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	authentication_type_get(c->method_type, &auth_method_static_dh_i,
 				&auth_method_static_dh_r);
@@ -245,15 +236,19 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint8_t ciphertext2[CIPHERTEXT2_DEFAULT_SIZE];
 	uint64_t ciphertext2_len = sizeof(ciphertext2);
 
+	/************************ encode and send message 1************************/
+
 	r = msg1_encode(c, (uint8_t *)&msg1, &msg1_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	r = tx(msg1, msg1_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
-	/**********************receive and process msg2 ***************************/
+	/**********************receive and process message 2***********************/
 
 	r = rx(msg2, &msg2_len);
 	if (r != EdhocNoError)

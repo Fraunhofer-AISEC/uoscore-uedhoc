@@ -46,6 +46,7 @@ DO_NOT_COMPILE_SOURCES = \
 
 ifeq	($(LIB_NAME), libuedhoc.a) 
 	C_SOURCES = $(wildcard ../../modules/edhoc/src/*.c)
+	C_SOURCES += $(wildcard ../../modules/edhoc/cbor/*.c)
 	C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
 	C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
 	C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycbor/src/*.c))
@@ -63,21 +64,17 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 
 ################################################################################
 # C includes
+C_INCLUDES = -I../../externals/tinycrypt/lib/include
+C_INCLUDES += -I../../externals/cddl-gen/include
+
 ifeq	($(LIB_NAME), libuedhoc.a) 
-	C_INCLUDES =  \
-	-I../../externals/tinycbor/src/ \
-	-I../../externals/compact25519/src/c25519/ \
-	-I../../externals/compact25519/src/ \
-	-I../../externals/tinycrypt/lib/include
+	C_INCLUDES += -I../../externals/tinycbor/src/ 
+	C_INCLUDES += -I../../externals/compact25519/src/c25519/ 
+	C_INCLUDES += -I../../externals/compact25519/src/ 
 endif 
 
 ifeq	($(LIB_NAME), libuoscore.a) 
-	C_INCLUDES =  \
-	-I../../externals/tinycrypt/lib/include \
-	-I../../externals/cddl-gen/include  
-	
-	#-I../../externals/tinycbor/src/ \
-
+	C_INCLUDES += -I../../externals/cddl-gen/include  
 endif 
 
 ################################################################################
@@ -93,10 +90,13 @@ CFLAGS1 += $(OPT)
 CFLAGS1 += $(C_INCLUDES)
 
 #generate debug symbols
-#CFLAGS1 += -g -gdwarf-2
+CFLAGS1 += -g -gdwarf-2
 
 # Generate dependency information
-#CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
+CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
+
+# required for gddl-gen library
+CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 
 ifeq	($(LIB_NAME), libuedhoc.a) 
 	#use tyncrypt + ed25519
@@ -108,7 +108,6 @@ ifeq	($(LIB_NAME), libuoscore.a)
 	#use tyncrypt 
 	CFLAGS1 += -DOSCORE_WITH_TINYCRYPT
 	#CFLAGS1 += -DOSCORE_DEBUG_PRINT
-	CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 endif 
 
 #$(info    CFLAGS1 is $(CFLAGS1))

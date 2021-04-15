@@ -495,6 +495,9 @@ static void test_edhoc(enum party_type p, enum test t)
 					err_msg, &err_msg_len, ad_2, &ad_2_len,
 					PRK_4x3m, sizeof(PRK_4x3m), th4,
 					sizeof(th4));
+		if (r != EdhocNoError) {
+			printf("error initiator run (Error Code %d)\n", r);
+		}
 	} else {
 		const uint16_t num_cred_i_elements = 1;
 		struct other_party_cred cred_i;
@@ -507,9 +510,10 @@ static void test_edhoc(enum party_type p, enum test t)
 					&ad_1_len, (uint8_t *)&ad_3, &ad_3_len,
 					PRK_4x3m, sizeof(PRK_4x3m), th4,
 					sizeof(th4));
+		if (r != EdhocNoError) {
+			printf("error responder run (Error Code %d)\n", r);
+		}
 	}
-	if (r != EdhocNoError)
-		printf("error responder run (Error Code %d)\n", r);
 
 	edhoc_exporter(SHA_256, AES_CCM_16_64_128, PRK_4x3m, sizeof(PRK_4x3m),
 		       th4, sizeof(th4), "OSCORE Master Secret",
@@ -890,6 +894,7 @@ void test_main(void)
 #endif
 
 #ifdef OSCORE_TESTS
+	printk("test");
 	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
 			 ztest_unit_test(oscore_server_test2),
 			 ztest_unit_test(oscore_client_test3),
