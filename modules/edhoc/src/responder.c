@@ -29,6 +29,7 @@
 #include "../inc/suites.h"
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
+#include "../cbor/d_message_1.h"
 
 /**
  * @brief   Parses message 1
@@ -52,66 +53,63 @@ static inline EdhocError msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 				    uint64_t *c_i_len, uint8_t *ad1,
 				    uint64_t *ad1_len)
 {
-	EdhocError r;
-	uint8_t *temp_ptr = msg1;
-	uint8_t *next_temp_ptr;
-	uint32_t temp_len = msg1_len;
-	uint64_t method_len;
-	CborType ignore;
+	uint32_t i;
+	bool success;
+	struct message_1 m;
+	size_t decode_len = 0;
 
-	int tmp;
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, &tmp, &method_len,
-			 &ignore);
-	*method_corr = tmp;
-	if (r != EdhocNoError)
-		return r;
-	temp_len -= (next_temp_ptr - temp_ptr);
-	temp_ptr = next_temp_ptr;
-	PRINT_ARRAY("msg1 METHOD_CORR", method_corr, method_len);
+	success = cbor_decode_message_1(msg1, msg1_len, &m, &decode_len);
+	if (!success) {
+		return cbor_decoding_error;
+	}
 
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, suites_i,
-			 suites_i_len, &ignore);
-	if (r != EdhocNoError)
-		return r;
-	temp_len -= (next_temp_ptr - temp_ptr);
-	temp_ptr = next_temp_ptr;
+	/*METHOD_CORR*/
+	*method_corr = m._message_1_METHOD_CORR;
+	PRINT_ARRAY("msg1 METHOD_CORR", method_corr, 1);
 
+	/*SUITES_I*/
+	if (m._message_1_SUITES_I_choice == _message_1_SUITES_I_int) {
+		/*the initiator supports only one suite*/
+		suites_i[0] = m._message_1_SUITES_I_int;
+		*suites_i_len = 1;
+	} else {
+		/*the initiator supports more than one suite*/
+		if (m._message_1_SUITES_I__selected_supported_count >
+		    *suites_i_len) {
+			return suites_i_list_to_long;
+		}
+		suites_i[0] = m._message_1_SUITES_I__selected_selected;
+
+		for (i = 1; i < m._message_1_SUITES_I__selected_supported_count;
+		     i++) {
+			suites_i[i] =
+				m._message_1_SUITES_I__selected_supported[i - 1];
+		}
+		*suites_i_len = 1 + i; /*the selected + all other suites*/
+	}
 	PRINT_ARRAY("msg1 SUITES_I", suites_i, *suites_i_len);
 
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, g_x, g_x_len,
-			 &ignore);
-	if (r != EdhocNoError)
-		return r;
-	temp_len -= (next_temp_ptr - temp_ptr);
-	temp_ptr = next_temp_ptr;
+	/*G_X*/
+	_memcpy_s(g_x, *g_x_len, m._message_1_G_X.value, m._message_1_G_X.len);
+	*g_x_len = m._message_1_G_X.len;
 	PRINT_ARRAY("msg1 G_X", g_x, *g_x_len);
 
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, c_i, c_i_len,
-			 &ignore);
-	if (r != EdhocNoError)
-		return r;
-
-	if (c_i_len[0] == 1) {
-		/*C_I is encoded as bstr_identifier*/
-		int t;
-		uint64_t t_len = sizeof(t);
-		r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, &t, &t_len,
-				 &ignore);
-		if (r != EdhocNoError)
-			return r;
-		*c_i = t + 24;
+	/*C_I*/
+	if (m._message_1_C_I_choice == _message_1_C_I_int) {
+		*c_i = m._message_1_C_I_int + 24;
+		*c_i_len = 1;
+	} else {
+		_memcpy_s(c_i, *c_i_len, m._message_1_C_I_bstr.value,
+			  m._message_1_C_I_bstr.len);
+		*c_i_len = m._message_1_C_I_bstr.len;
 	}
-	temp_len -= (next_temp_ptr - temp_ptr);
-	temp_ptr = next_temp_ptr;
 	PRINT_ARRAY("msg1 C_I", c_i, *c_i_len);
 
-	if (temp_len) {
-		r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, ad1,
-				 ad1_len, &ignore);
-		if (r != EdhocNoError)
-			return r;
-		temp_len -= (next_temp_ptr - temp_ptr);
-		temp_ptr = next_temp_ptr;
+	/*AD_1*/
+	if (m._message_1_AD_1_present) {
+		_memcpy_s(ad1, *ad1_len, m._message_1_AD_1.value,
+			  m._message_1_AD_1.len);
+		*ad1_len = m._message_1_AD_1.len;
 		PRINT_ARRAY("msg1 AD_1", ad1, *ad1_len);
 	}
 	return EdhocNoError;

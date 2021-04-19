@@ -29,7 +29,9 @@
 #include "../inc/suites.h"
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
-#include "../cbor/message_1.h"
+#include "../cbor/e_message_1.h"
+#include "../cbor/d_message_2.h"
+#include "../cbor/d_message_2_c_i.h"
 
 /**
  * @brief   Encodes a connection identifier C_x of length one byte to 
@@ -62,74 +64,129 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	   uint64_t *g_y_len, uint8_t *c_r, uint64_t *c_r_len,
 	   uint8_t *ciphertext2, uint64_t *ciphertext2_len)
 {
-	uint8_t *temp_ptr = msg2;
-	uint8_t *next_temp_ptr;
-	uint32_t temp_len = msg2_len;
+	bool success;
+	size_t decode_len = 0;
 	EdhocError r;
-	CborType cbor_type;
 
+	/*C_I*/
 	if (!(c->corr == 1 || c->corr == 3)) {
-		/*C_I (the connection identifier of the initiator) is present*/
-		r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, c_i,
-				 c_i_len, &cbor_type);
-		if (r != EdhocNoError)
-			return r;
-		temp_len -= (next_temp_ptr - temp_ptr);
-		temp_ptr = next_temp_ptr;
-		PRINT_ARRAY("msg2 C_I", c_i, *c_i_len);
-	} else {
-		*c_i_len = 0;
-	}
+		struct m2ci m;
 
-	/*get the ephemeral public key of the responder (G_Y) or ERR_MSG*/
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, g_y, g_y_len,
-			 &cbor_type);
-	if (r != EdhocNoError)
-		return r;
-	temp_len -= (next_temp_ptr - temp_ptr);
-	temp_ptr = next_temp_ptr;
-	PRINT_ARRAY("msg2 G_Y", g_y, *g_y_len);
-
-	if (cbor_type == CborTextStringType) {
-		/*the error message and message 2 differ in the type of the second 
-        element. In the error message the second element is DIAG_MSG : tstr and 
-        in message 2 it is G_Y : bstr*/
-		return ErrorMessageReceived;
-	} else {
-		/*get the connection identifier of the responder C_R */
-		/*c_r is encoded as bstr_identifier, i.e., byte string of length 1 is
-		 * encoded as integer -24, else c_r is a byte string.
-		 * On different platforms int has different size so we dump c_r first
-		 * in a int buffer and then we check if it is string or int*/
-
-		if (*c_r_len > 1) {
-			r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-					 c_r, c_r_len, &cbor_type);
-			if (r != EdhocNoError)
-				return r;
-		} else {
-			int buf;
-			r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-					 &buf, c_r_len, &cbor_type);
-			if (r != EdhocNoError)
-				return r;
-			if (*c_r_len > 1)
-				return C_R_lengthtosmall;
-			*c_r = buf + 24;
+		success = cbor_decode_m2ci(msg2, msg2_len, &m, &decode_len);
+		if (!success) {
+			return cbor_decoding_error;
 		}
 
-		PRINT_ARRAY("msg2 C_R", c_r, *c_r_len);
-		temp_len -= (next_temp_ptr - temp_ptr);
-		temp_ptr = next_temp_ptr;
+		if (m._m2ci_C_I_choice == _m2ci_C_I_int) {
+			*c_i = m._m2ci_C_I_int;
+			/*here intentially we are not adding 24 since C_I is used after that again as bstrident*/
+			*c_i_len = 1;
+		} else {
+			r = _memcpy_s(c_i, *c_i_len, m._m2ci_C_I_bstr.value,
+				      m._m2ci_C_I_bstr.len);
+			if (r != EdhocNoError) {
+				return r;
+			}
+			*c_i_len = m._m2ci_C_I_bstr.len;
+		}
+		PRINT_ARRAY("msg2 C_I", c_i, *c_i_len);
 
-		/*get ciphertext_2*/
-		r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-				 ciphertext2, ciphertext2_len, &cbor_type);
-		if (r != EdhocNoError)
-			return r;
-		PRINT_ARRAY("msg2 CIPHERTEXT_2", ciphertext2, *ciphertext2_len);
-		return EdhocNoError;
+		/*G_Y or DIAG_MSG*/
+		if (m._m2ci_G_Y_choice == _m2ci_G_Y_tstr) {
+			/*the error message and message 2 differ in the type of the second
+	    element. In the error message the second element is DIAG_MSG : tstr and
+	    in message 2 it is G_Y : bstr --> we have here a error message*/
+			PRINTF("Error message received with DIAG_MSG: %s",
+			       m._m2ci_G_Y_tstr.value);
+			return ErrorMessageReceived;
+		} else {
+			/*get G_Y*/
+			r = _memcpy_s(g_y, *g_y_len, m._m2ci_G_Y_bstr.value,
+				      m._m2ci_G_Y_bstr.len);
+			if (r != EdhocNoError) {
+				return r;
+			}
+			/* C_R */
+			if (m._m2ci_C_R_choice == _m2ci_C_R_int) {
+				*c_r = m._m2ci_C_R_int + 24;
+				*c_r_len = 1;
+			} else {
+				r = _memcpy_s(c_r, *c_r_len,
+					      m._m2ci_C_R_bstr.value,
+					      m._m2ci_C_R_bstr.len);
+				if (r != EdhocNoError) {
+					return r;
+				}
+				*c_r_len = m._m2ci_C_R_bstr.len;
+			}
+			PRINT_ARRAY("msg2 C_R", c_r, *c_r_len);
+
+			/*get ciphertext_2*/
+			r = _memcpy_s(ciphertext2, *ciphertext2_len,
+				      m._m2ci_CIPHERTEXT_2.value,
+				      m._m2ci_CIPHERTEXT_2.len);
+			if (r != EdhocNoError) {
+				return r;
+			}
+			*ciphertext2_len = m._m2ci_CIPHERTEXT_2.len;
+			PRINT_ARRAY("msg2 CIPHERTEXT_2", ciphertext2,
+				    *ciphertext2_len);
+			return EdhocNoError;
+		}
+	} else {
+		struct m2 m;
+
+		success = cbor_decode_m2(msg2, msg2_len, &m, &decode_len);
+		if (!success) {
+			return cbor_decoding_error;
+		}
+		/*No C_I*/
+		*c_i_len = 0;
+		/*G_Y or DIAG_MSG*/
+		if (m._m2_G_Y_choice == _m2_G_Y_tstr) {
+			/*the error message and message 2 differ in the type of the second
+	    element. In the error message the second element is DIAG_MSG : tstr and
+	    in message 2 it is G_Y : bstr --> we have here a error message*/
+			PRINTF("Error message received with DIAG_MSG: %s",
+			       m._m2_G_Y_tstr.value);
+			return ErrorMessageReceived;
+		} else {
+			/*get G_Y*/
+			r = _memcpy_s(g_y, *g_y_len, m._m2_G_Y_bstr.value,
+				      m._m2_G_Y_bstr.len);
+			if (r != EdhocNoError) {
+				return r;
+			}
+			/* C_R */
+			if (m._m2_C_R_choice == _m2_C_R_int) {
+				*c_r = m._m2_C_R_int + 24;
+				*c_r_len = 1;
+			} else {
+				r = _memcpy_s(c_r, *c_r_len,
+					      m._m2_C_R_bstr.value,
+					      m._m2_C_R_bstr.len);
+				if (r != EdhocNoError) {
+					return r;
+				}
+				*c_r_len = m._m2_C_R_bstr.len;
+			}
+			PRINT_ARRAY("msg2 C_R", c_r, *c_r_len);
+
+			/*get ciphertext_2*/
+			r = _memcpy_s(ciphertext2, *ciphertext2_len,
+				      m._m2_CIPHERTEXT_2.value,
+				      m._m2_CIPHERTEXT_2.len);
+			if (r != EdhocNoError) {
+				return r;
+			}
+			*ciphertext2_len = m._m2_CIPHERTEXT_2.len;
+			PRINT_ARRAY("msg2 CIPHERTEXT_2", ciphertext2,
+				    *ciphertext2_len);
+			return EdhocNoError;
+		}
 	}
+
+	return EdhocNoError;
 }
 /**
  * @brief   Encodes message 1
@@ -516,7 +573,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint8_t tag[mac_len];
 	uint32_t ciphertext_3_len = P_3ae_len;
 	uint8_t ciphertext_3[ciphertext_3_len + mac_len];
-	
+
 	r = aead(ENCRYPT, P_3ae, P_3ae_len, K_3ae, sizeof(K_3ae), IV_3ae,
 		 sizeof(IV_3ae), A_3ae, A_3ae_len, ciphertext_3,
 		 ciphertext_3_len, tag, mac_len);

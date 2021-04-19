@@ -42,8 +42,10 @@ typedef enum EdhocError {
 	ErrorDuringCborDecoding = 20,
 	UnsupportedEcdhCurve = 21,
 	cbor_encoding_error = 22,
-	at_least_one_suite_needed = 23,
-	UnsupportedAEADAlgorithm = 24,
+	cbor_decoding_error = 23,
+	at_least_one_suite_needed = 24,
+	suites_i_list_to_long = 25,
+	UnsupportedAEADAlgorithm = 26,
 } EdhocError;
 
 #endif

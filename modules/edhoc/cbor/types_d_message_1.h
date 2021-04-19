@@ -3,14 +3,14 @@
  * Generated with a default_maxq of 3
  */
 
-#ifndef TYPES_MESSAGE_1_H__
-#define TYPES_MESSAGE_1_H__
+#ifndef TYPES_D_MESSAGE_1_H__
+#define TYPES_D_MESSAGE_1_H__
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_encode.h"
+#include "cbor_decode.h"
 
 #define DEFAULT_MAXQ 3
 
@@ -42,4 +42,4 @@ struct message_1 {
 };
 
 
-#endif /* TYPES_MESSAGE_1_H__ */
+#endif /* TYPES_D_MESSAGE_1_H__ */

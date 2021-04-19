@@ -3,25 +3,25 @@
  * Generated with a default_maxq of 3
  */
 
-#ifndef SIG_STRUCTURE_H__
-#define SIG_STRUCTURE_H__
+#ifndef E_MESSAGE_1_H__
+#define E_MESSAGE_1_H__
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include "cbor_encode.h"
-#include "types_sig_structure.h"
+#include "types_e_message_1.h"
 
 #if DEFAULT_MAXQ != 3
 #error "The type file was generated with a different default_maxq than this file"
 #endif
 
 
-bool cbor_encode_sig_structure(
+bool cbor_encode_message_1(
 		uint8_t *payload, size_t payload_len,
-		const struct sig_structure *input,
+		const struct message_1 *input,
 		size_t *payload_len_out);
 
 
-#endif /* SIG_STRUCTURE_H__ */
+#endif /* E_MESSAGE_1_H__ */

@@ -162,7 +162,7 @@ def main():
     clean_all()
 
     build('libuedhoc.a', '-O0', arc('native_posix', 'x86'))
-    test(arc('native_posix', 'x86'))
+    #test(arc('native_posix', 'x86'))
 
     # x86
     #run_tests('libuoscore.a', arc('native_posix', 'x86'))
