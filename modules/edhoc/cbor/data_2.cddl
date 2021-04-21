@@ -9,6 +9,5 @@
 
 ; This file should be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
-message_4 = ( data_4, MAC_4: bstr, )
-
-data_4 = ( ? C_I: bstr / int, )
+;we use data_2 only for encoding. Decoding with first element ? does not work 
+data_2 = ( ? C_I: int / bstr, G_Y: bstr, C_R: int / bstr, )

@@ -16,15 +16,6 @@
 
 #include "error.h"
 
-/**
- * @brief   Encodes kid as ID_CRED
- * @param   _kid pointer to kid
- * @param   kid_len length of the kid
- * @param   id_cred output pointer 
- * @param   id_cred_len length of id_cred
- */
-EdhocError kid2id_cred(const void *_kid, uint8_t kid_len, uint8_t *id_cred_x,
-		       uint64_t *id_cred_x_len);
 
 /**
  * @brief   decodes id_cred to kid

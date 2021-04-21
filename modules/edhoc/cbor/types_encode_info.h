@@ -3,8 +3,8 @@
  * Generated with a default_maxq of 3
  */
 
-#ifndef TYPES_INFO_H__
-#define TYPES_INFO_H__
+#ifndef TYPES_ENCODE_INFO_H__
+#define TYPES_ENCODE_INFO_H__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -29,4 +29,4 @@ struct info {
 };
 
 
-#endif /* TYPES_INFO_H__ */
+#endif /* TYPES_ENCODE_INFO_H__ */

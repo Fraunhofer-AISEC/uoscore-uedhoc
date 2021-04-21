@@ -3,8 +3,8 @@
  * Generated with a default_maxq of 3
  */
 
-#ifndef TYPES_E_MESSAGE_1_H__
-#define TYPES_E_MESSAGE_1_H__
+#ifndef TYPES_ENCODE_MESSAGE_1_H__
+#define TYPES_ENCODE_MESSAGE_1_H__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -42,4 +42,4 @@ struct message_1 {
 };
 
 
-#endif /* TYPES_E_MESSAGE_1_H__ */
+#endif /* TYPES_ENCODE_MESSAGE_1_H__ */

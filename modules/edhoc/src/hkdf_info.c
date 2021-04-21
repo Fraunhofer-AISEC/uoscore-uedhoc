@@ -15,7 +15,7 @@
 #include "../inc/byte_array.h"
 #include "../inc/error.h"
 #include "../inc/suites.h"
-#include "../cbor/info.h"
+#include "../cbor/encode_info.h"
 
 EdhocError create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
 			    uint8_t th_len, const char *label, uint64_t okm_len,

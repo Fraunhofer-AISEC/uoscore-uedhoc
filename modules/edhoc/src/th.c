@@ -17,6 +17,7 @@
 #include "../inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
+#include "../cbor/encode_data_2.h"
 
 /**
  * @brief   Setups a data structure used as input for th2
@@ -33,42 +34,55 @@ th2_input_encode(uint8_t *msg1, uint32_t msg1_len, uint8_t *c_i,
 		 uint32_t c_i_len, uint8_t *g_y, uint32_t g_y_len, uint8_t *c_r,
 		 uint32_t c_r_len, uint8_t *th2_input, uint16_t *th2_input_len)
 {
-	CborEncoder enc;
-	CborError r;
 	EdhocError err;
+	bool success;
+	size_t payload_len_out;
+	struct data_2 data_2;
 
 	err = _memcpy_s(th2_input, *th2_input_len, msg1, msg1_len);
-	if (err != EdhocNoError)
+	if (err != EdhocNoError) {
 		return err;
-
-	cbor_encoder_init(&enc, (th2_input + msg1_len),
-			  (*th2_input_len - msg1_len), 0);
+	}
 
 	/*Encode C_I if present*/
-	if (c_i_len) {
-		r = cbor_encode_byte_string(&enc, c_i, c_i_len);
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
+	if (c_i_len != 0) {
+		data_2._data_2_C_I_present = true;
+		if (c_i_len == 1) {
+			data_2._data_2_C_I._data_2_C_I_choice = _data_2_C_I_int;
+			data_2._data_2_C_I._data_2_C_I_int = *c_i - 24;
+		} else {
+			data_2._data_2_C_I._data_2_C_I_choice =
+				_data_2_C_I_bstr;
+			data_2._data_2_C_I._data_2_C_I_bstr.value = c_i;
+			data_2._data_2_C_I._data_2_C_I_bstr.len = c_i_len;
+		}
+	} else {
+		data_2._data_2_C_I_present = false;
 	}
 
 	/*Encode G_Y*/
-	r = cbor_encode_byte_string(&enc, g_y, g_y_len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
+	data_2._data_2_G_Y.value = g_y;
+	data_2._data_2_G_Y.len = g_y_len;
 
 	/*Encode C_R as bstr_identifier*/
 	if (c_r_len == 1) {
-		r = cbor_encode_int(&enc, (*c_r - 24));
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
+		data_2._data_2_C_R_choice = _data_2_C_R_int;
+		data_2._data_2_C_R_int = *c_r - 24;
 	} else {
-		r = cbor_encode_byte_string(&enc, c_r, c_r_len);
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
+		data_2._data_2_C_R_choice = _data_2_C_R_bstr;
+		data_2._data_2_C_R_bstr.value = c_r;
+		data_2._data_2_C_R_bstr.len = c_r_len;
+	}
+	success = cbor_encode_data_2((th2_input + msg1_len),
+				     (*th2_input_len - msg1_len), &data_2,
+				     &payload_len_out);
+
+	if (!success) {
+		return cbor_encoding_error;
 	}
 
-	/* Get the CBOR length */
-	*th2_input_len = cbor_encoder_get_buffer_size(&enc, th2_input);
+	/* Get the the total th2 length */
+	*th2_input_len = payload_len_out + msg1_len;
 
 	PRINT_ARRAY("Input to calculate TH_2 (CBOR Sequence)", th2_input,
 		    *th2_input_len);
@@ -174,8 +188,6 @@ EdhocError th2_calculate(enum hash_alg alg, uint8_t *msg1, uint32_t msg1_len,
 
 	PRINT_ARRAY("msg1", msg1, msg1_len);
 	PRINT_ARRAY("c_r", c_r, c_r_len);
-	PRINT_ARRAY("msg1", msg1, 37);
-	PRINT_ARRAY("c_r", c_r, 1);
 
 	r = th2_input_encode(msg1, msg1_len, c_i, c_i_len, g_y, g_y_len, c_r,
 			     c_r_len, th2_input, &th2_input_len);

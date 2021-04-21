@@ -127,6 +127,7 @@ uint32_t T1I__AD_1_LEN = 0;
 uint8_t *T1I__AD_3 = NULL;
 uint32_t T1I__AD_3_LEN = 0;
 
+/*{34: [-15, h'705D5845F36FC6A6']} x5t*/
 uint8_t T1I__ID_CRED_I[] = { 0xa1, 0x18, 0x22, 0x82, 0x2e, 0x48, 0x70,
 			     0x5d, 0x58, 0x45, 0xf3, 0x6f, 0xc6, 0xa6 };
 uint32_t T1I__ID_CRED_I_LEN = sizeof(T1I__ID_CRED_I);
@@ -163,6 +164,7 @@ uint8_t T1I__PK_I[] = { 0x38, 0xe5, 0xd5, 0x45, 0x63, 0xc2, 0xb6, 0xa4,
 uint32_t T1I__PK_I_LEN = sizeof(T1I__PK_I);
 
 /*other party credentials*/
+/*{34: [-15, h'6844078A53F312F5']} x5t*/
 uint8_t T1I__ID_CRED_R[] = { 0xa1, 0x18, 0x22, 0x82, 0x2e, 0x48, 0x68,
 			     0x44, 0x07, 0x8a, 0x53, 0xf3, 0x12, 0xf5 };
 uint32_t T1I__ID_CRED_R_LEN = sizeof(T1I__ID_CRED_R);
@@ -217,6 +219,7 @@ uint32_t T1R__Y_LEN = sizeof(T1R__Y);
 uint8_t T1R__C_R[] = { 0x00 };
 uint32_t T1R__C_R_LEN = sizeof(T1R__C_R);
 
+/*{34: [-15, h'6844078A53F312F5']} x5t*/
 uint8_t T1R__ID_CRED_R[] = { 0xa1, 0x18, 0x22, 0x82, 0x2e, 0x48, 0x68,
 			     0x44, 0x07, 0x8a, 0x53, 0xf3, 0x12, 0xf5 };
 uint32_t T1R__ID_CRED_R_LEN = sizeof(T1R__ID_CRED_R);
@@ -256,6 +259,7 @@ uint8_t *T1R__R = NULL;
 uint32_t T1R__R_LEN = 0;
 
 /*other party credentials*/
+/*{34: [-15, h'705D5845F36FC6A6']} x5t*/
 uint8_t T1R__ID_CRED_I[] = { 0xa1, 0x18, 0x22, 0x82, 0x2e, 0x48, 0x70,
 			     0x5d, 0x58, 0x45, 0xf3, 0x6f, 0xc6, 0xa6 };
 uint32_t T1R__ID_CRED_I_LEN = sizeof(T1R__ID_CRED_I);
@@ -389,6 +393,7 @@ uint32_t T2I__AD_1_LEN = 0;
 uint8_t *T2I__AD_3 = NULL;
 uint32_t T2I__AD_3_LEN = 0;
 
+/*{4: h'23'} kid*/
 uint8_t T2I__ID_CRED_I[] = { 0xa1, 0x04, 0x41, 0x23 };
 uint32_t T2I__ID_CRED_I_LEN = sizeof(T2I__ID_CRED_I);
 
@@ -420,6 +425,7 @@ uint8_t *T2I__PK_I = NULL;
 uint32_t T2I__PK_I_LEN = 0;
 
 /*other party credentials*/
+/*{4: h'05'} kid*/
 uint8_t T2I__ID_CRED_R[] = { 0xa1, 0x04, 0x41, 0x05 };
 uint32_t T2I__ID_CRED_R_LEN = sizeof(T2I__ID_CRED_R);
 
@@ -469,6 +475,7 @@ uint32_t T2R__Y_LEN = sizeof(T2R__Y);
 uint8_t T2R__C_R[] = { 0x00 };
 uint32_t T2R__C_R_LEN = sizeof(T2R__C_R);
 
+/*{4: h'05'}kid*/
 uint8_t T2R__ID_CRED_R[] = { 0xa1, 0x04, 0x41, 0x05 };
 uint32_t T2R__ID_CRED_R_LEN = sizeof(T2R__ID_CRED_R);
 
@@ -503,6 +510,7 @@ uint8_t T2R__G_R[] = { 0xa3, 0xff, 0x26, 0x35, 0x95, 0xbe, 0xb3, 0x77,
 uint32_t T2R__G_R_LEN = sizeof(T2R__G_R);
 
 /*other party credentials*/
+/*{4: h'23'}kid*/
 uint8_t T2R__ID_CRED_I[] = { 0xa1, 0x04, 0x41, 0x23 };
 uint32_t T2R__ID_CRED_I_LEN = sizeof(T2R__ID_CRED_I);
 
@@ -662,6 +670,7 @@ uint32_t T3I__AD_1_LEN = 0;
 uint8_t *T3I__AD_3 = NULL;
 uint32_t T3I__AD_3_LEN = 0;
 
+/*x5chain*/
 uint8_t T3I__ID_CRED_I[] = {
 	0xa1, 0x18, 0x21, 0x58, 0x87, 0x00, 0x43, 0x12, 0x82, 0x69, 0x6b, 0x52,
 	0x46, 0x43, 0x20, 0x74, 0x65, 0x73, 0x74, 0x20, 0x43, 0x41, 0x1a, 0x5e,

@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "cbor_decode.h"
-#include "d_message_2_c_i.h"
+#include "decode_message_2_c_i.h"
 
 #if DEFAULT_MAXQ != 3
 #error "The type file was generated with a different default_maxq than this file"

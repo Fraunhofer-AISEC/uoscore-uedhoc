@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "cbor_encode.h"
-#include "info.h"
+#include "encode_info.h"
 
 #if DEFAULT_MAXQ != 3
 #error "The type file was generated with a different default_maxq than this file"

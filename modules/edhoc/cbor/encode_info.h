@@ -3,25 +3,25 @@
  * Generated with a default_maxq of 3
  */
 
-#ifndef D_MESSAGE_2_H__
-#define D_MESSAGE_2_H__
+#ifndef ENCODE_INFO_H__
+#define ENCODE_INFO_H__
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_decode.h"
-#include "types_d_message_2.h"
+#include "cbor_encode.h"
+#include "types_encode_info.h"
 
 #if DEFAULT_MAXQ != 3
 #error "The type file was generated with a different default_maxq than this file"
 #endif
 
 
-bool cbor_decode_m2(
-		const uint8_t *payload, size_t payload_len,
-		struct m2 *result,
+bool cbor_encode_info(
+		uint8_t *payload, size_t payload_len,
+		const struct info *input,
 		size_t *payload_len_out);
 
 
-#endif /* D_MESSAGE_2_H__ */
+#endif /* ENCODE_INFO_H__ */

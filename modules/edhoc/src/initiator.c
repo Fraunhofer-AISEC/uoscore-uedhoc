@@ -29,9 +29,9 @@
 #include "../inc/suites.h"
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
-#include "../cbor/e_message_1.h"
-#include "../cbor/d_message_2.h"
-#include "../cbor/d_message_2_c_i.h"
+#include "../cbor/encode_message_1.h"
+#include "../cbor/decode_message_2.h"
+#include "../cbor/decode_message_2_c_i.h"
 
 /**
  * @brief   Encodes a connection identifier C_x of length one byte to 
@@ -78,8 +78,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 		}
 
 		if (m._m2ci_C_I_choice == _m2ci_C_I_int) {
-			*c_i = m._m2ci_C_I_int;
-			/*here intentially we are not adding 24 since C_I is used after that again as bstrident*/
+			*c_i = m._m2ci_C_I_int + 24;
 			*c_i_len = 1;
 		} else {
 			r = _memcpy_s(c_i, *c_i_len, m._m2ci_C_I_bstr.value,
@@ -308,8 +307,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	/**********************receive and process message 2***********************/
 
 	r = rx(msg2, &msg2_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, msg2_len);
 
 	/* If an error message is received msg2_parse will return 
@@ -321,34 +321,39 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	if (r == ErrorMessageReceived) {
 		/*provide the error message to the caller*/;
 		r = _memcpy_s(err_msg, *err_msg_len, msg2, msg2_len);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		*err_msg_len = msg2_len;
 		return ErrorMessageReceived;
 	}
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	/*calculate the DH shared secret*/
 	uint8_t g_xy[ECDH_SECRET_DEFAULT_SIZE];
 	r = shared_secret_derive(suite.edhoc_ecdh_curve, c->x.ptr, c->x.len,
 				 g_y, g_y_len, g_xy);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("G_XY (ECDH shared secret) ", g_xy, sizeof(g_xy));
 
 	/*calculate th2*/
 	uint8_t th2[SHA_DEFAULT_SIZE];
 	r = th2_calculate(suite.edhoc_hash, msg1, msg1_len, c_i, c_i_len, g_y,
 			  sizeof(g_y), c_r, c_r_len, th2);
-	if (r != 0)
+	if (r != 0) {
 		return r;
+	}
 
 	/*calculate PRK_2e*/
 	uint8_t PRK_2e[PRK_DEFAULT_SIZE];
 	r = hkdf_extract(suite.edhoc_hash, NULL, 0, g_xy, sizeof(g_xy), PRK_2e);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("PRK_2e", PRK_2e, sizeof(PRK_2e));
 
 	/*Derive KEYSTREAM_2*/
@@ -357,15 +362,15 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "KEYSTREAM_2",
 		     (uint8_t *)&PRK_2e, sizeof(PRK_2e), (uint8_t *)&th2,
 		     sizeof(th2), KEYSTREAM_2, KEYSTREAM_2_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
 
 	uint8_t P_2e[ciphertext2_len];
 	for (uint16_t i = 0; i < KEYSTREAM_2_len; i++) {
 		P_2e[i] = ciphertext2[i] ^ KEYSTREAM_2[i];
 	}
-
 	PRINT_ARRAY("P_2e", P_2e, sizeof(P_2e));
 
 	uint8_t sign_or_mac[SGN_OR_MAC_DEFAULT_SIZE];
@@ -375,8 +380,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	r = plaintext_split(P_2e, sizeof(P_2e), id_cred_r, &id_cred_r_len,
 			    sign_or_mac, &sign_or_mac_len, ad_2, ad_2_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("ID_CRED_R", id_cred_r, id_cred_r_len);
 	PRINT_ARRAY("sign_or_mac", sign_or_mac, sign_or_mac_len);
 	if (*ad_2_len) {

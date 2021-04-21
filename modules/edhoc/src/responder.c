@@ -29,7 +29,7 @@
 #include "../inc/suites.h"
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
-#include "../cbor/d_message_1.h"
+#include "../cbor/decode_message_1.h"
 
 /**
  * @brief   Parses message 1

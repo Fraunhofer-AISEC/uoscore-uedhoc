@@ -3,8 +3,8 @@
  * Generated with a default_maxq of 3
  */
 
-#ifndef TYPES_D_MESSAGE_2_H__
-#define TYPES_D_MESSAGE_2_H__
+#ifndef TYPES_DECODE_MESSAGE_2_H__
+#define TYPES_DECODE_MESSAGE_2_H__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -35,4 +35,4 @@ struct m2 {
 };
 
 
-#endif /* TYPES_D_MESSAGE_2_H__ */
+#endif /* TYPES_DECODE_MESSAGE_2_H__ */

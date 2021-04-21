@@ -7,7 +7,7 @@
 ; option. This file may not be copied, modified, or distributed
 ; except according to those terms.
 
-; This file shold be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
+; This file should be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
 
 
@@ -19,11 +19,6 @@ m2ci = (
 )
 
 m2 = ( G_Y: tstr / bstr, C_R: int / bstr, CIPHERTEXT_2: bstr, )
-
-; data_2ci = ( C_I: int / bstr, G_Y: tstr / bstr, C_R: int / bstr, )
-
-; data_2 = ( G_Y: tstr / bstr, C_R: int / bstr, )
-
 
 
 
