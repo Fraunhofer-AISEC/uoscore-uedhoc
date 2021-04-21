@@ -18,10 +18,24 @@
 #include "../inc/okm.h"
 #include "../inc/print_util.h"
 #include "../inc/suites.h"
+#include "../inc/cose.h"
+#include "../cbor/encode_enc_structure.h"
+#include "../cbor/encode_sig_structure.h"
+//#include "../cbor/encode_byte_string.h"
 
 EdhocError encode_byte_string(const uint8_t *in, const uint8_t in_len,
 			      uint8_t *out, uint16_t *out_len)
 {
+	// bool success;
+	// size_t payload_len_out;
+	// success = cbor_encode_b_str(out, *out_len, in, &payload_len_out);
+	// if (!success) {
+	// 	return cbor_encoding_error;
+	// }
+	// *out_len = payload_len_out;
+
+	// Todo fix this when bug in cddl-gen is fixed
+
 	int r;
 	CborEncoder enc;
 	cbor_encoder_init(&enc, out, *out_len, 0);
@@ -29,32 +43,29 @@ EdhocError encode_byte_string(const uint8_t *in, const uint8_t in_len,
 	if (r == CborErrorOutOfMemory)
 		return CborEncodingBufferToSmall;
 	*out_len = cbor_encoder_get_buffer_size(&enc, out);
+
 	return EdhocNoError;
 }
 
 /**
  * @brief   Encodes data to be signed or macked
  */
-static EdhocError m_encode(char *str, uint8_t str_len, const uint8_t *id_cred,
-			   const uint8_t id_cred_len, const uint8_t *th2,
-			   const uint8_t th_len, const uint8_t *cred,
-			   const uint8_t cred_len, const uint8_t *ad,
-			   const uint8_t ad_len, const uint8_t *mac,
-			   const uint8_t mac_len, uint8_t *out,
-			   uint16_t *out_len)
+static EdhocError m_encode(enum cose_context cose_context,
+			   const uint8_t *id_cred, const uint8_t id_cred_len,
+			   const uint8_t *th2, const uint8_t th_len,
+			   const uint8_t *cred, const uint8_t cred_len,
+			   const uint8_t *ad, const uint8_t ad_len,
+			   const uint8_t *mac, const uint8_t mac_len,
+			   uint8_t *out, uint16_t *out_len)
 {
-	CborEncoder enc;
-	cbor_encoder_init(&enc, out, *out_len, 0);
-	CborEncoder array_enc;
-	char str1[] = { "Signature1" };
-	CborError r;
-	EdhocError r1;
+	EdhocError r;
 
 	uint8_t th_enc[th_len + 2];
 	uint16_t th_enc_len = sizeof(th_enc);
-	r1 = encode_byte_string(th2, th_len, th_enc, &th_enc_len);
-	if (r1 != EdhocNoError)
-		return r1;
+	r = encode_byte_string(th2, th_len, th_enc, &th_enc_len);
+	if (r != EdhocNoError) {
+		return r;
+	}
 
 	uint8_t tmp[th_enc_len + cred_len + ad_len];
 	memcpy(tmp, th_enc, th_enc_len);
@@ -63,34 +74,53 @@ static EdhocError m_encode(char *str, uint8_t str_len, const uint8_t *id_cred,
 		memcpy(tmp + th_enc_len + cred_len, ad, ad_len);
 	}
 
-	if (strcmp(str1, str) == 0) {
-		cbor_encoder_create_array(&enc, &array_enc, 4);
-	} else {
-		cbor_encoder_create_array(&enc, &array_enc, 3);
+	if (cose_context == Encrypt0) {
+		bool success_encoding;
+		struct enc_structure enc_structure;
+
+		uint8_t context_str[] = { "Encrypt0" };
+		enc_structure._enc_structure_context.value = context_str;
+		enc_structure._enc_structure_context.len = strlen(context_str);
+		enc_structure._enc_structure_protected.value = id_cred;
+		enc_structure._enc_structure_protected.len = id_cred_len;
+		enc_structure._enc_structure_external_aad.value = tmp;
+		enc_structure._enc_structure_external_aad.len = sizeof(tmp);
+
+		size_t payload_len_out;
+		success_encoding = cbor_encode_enc_structure(
+			out, *out_len, &enc_structure, &payload_len_out);
+
+		if (!success_encoding) {
+			return cbor_encoding_error;
+		}
+		*out_len = payload_len_out;
+		return EdhocNoError;
 	}
 
-	r = cbor_encode_text_string(&array_enc, str, str_len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
+	if (cose_context == Signature1) {
+		bool success_encoding;
+		struct sig_structure sig_structure;
 
-	r = cbor_encode_byte_string(&array_enc, id_cred, id_cred_len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
+		uint8_t context_str[] = { "Signature1" };
+		sig_structure._sig_structure_context.value = context_str;
+		sig_structure._sig_structure_context.len = strlen(context_str);
+		sig_structure._sig_structure_protected.value = id_cred;
+		sig_structure._sig_structure_protected.len = id_cred_len;
+		sig_structure._sig_structure_external_aad.value = tmp;
+		sig_structure._sig_structure_external_aad.len = sizeof(tmp);
+		sig_structure._sig_structure_payload.value = mac;
+		sig_structure._sig_structure_payload.len = mac_len;
 
-	r = cbor_encode_byte_string(&array_enc, tmp, sizeof(tmp));
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
+		size_t payload_len_out;
+		success_encoding = cbor_encode_sig_structure(
+			out, *out_len, &sig_structure, &payload_len_out);
 
-	if (strcmp(str1, str) == 0) {
-		r = cbor_encode_byte_string(&array_enc, mac, mac_len);
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
+		if (!success_encoding) {
+			return cbor_encoding_error;
+		}
+		*out_len = payload_len_out;
+		return EdhocNoError;
 	}
-
-	cbor_encoder_close_container(&enc, &array_enc);
-
-	/* Get the CBOR length */
-	*out_len = cbor_encoder_get_buffer_size(&enc, out);
 
 	return EdhocNoError;
 }
@@ -109,26 +139,30 @@ EdhocError signature_or_mac_msg_create(
 	uint8_t K_m[AEAD_KEY_DEFAULT_SIZE];
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, label_k, prk, prk_len,
 		     th, th_len, K_m, sizeof(K_m));
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("inner MAC key (K_2m or K_3m)", K_m, sizeof(K_m));
 
 	/*calculate IV_2m*/
 	uint8_t IV_m[AEAD_IV_DEFAULT_SIZE];
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, label_iv, prk, prk_len,
 		     th, th_len, IV_m, sizeof(IV_m));
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("inner MAC IV (IV_2m or IV_3m)", IV_m, sizeof(IV_m));
 
 	/*A_2m or A_3m encode (additional data for msg2 msg3)*/
 	uint8_t A_m[A_2M_DEFAULT_SIZE];
 	uint16_t A_m_len = sizeof(A_m);
-	char str[] = { "Encrypt0" };
-	r = m_encode(str, (sizeof(str) - 1), id_cred, id_cred_len, th, th_len,
-		     cred, cred_len, ad, ad_len, NULL, 0, A_m, &A_m_len);
-	if (r != EdhocNoError)
+
+	r = m_encode(Encrypt0, id_cred, id_cred_len, th, th_len, cred, cred_len,
+		     ad, ad_len, NULL, 0, A_m, &A_m_len);
+
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("A_2m or A_3m", A_m, A_m_len);
 
 	/* === Calculate MAC_2 ===
@@ -152,10 +186,8 @@ EdhocError signature_or_mac_msg_create(
 
 	if (!static_dh_auth) {
 		/*Encode M_2 structure to be signed or macked*/
-		char str[] = { "Signature1" };
-		r = m_encode(str, (sizeof(str) - 1), id_cred, id_cred_len, th,
-			     th_len, cred, cred_len, ad, ad_len, mac, *mac_len,
-			     m, m_len);
+		r = m_encode(Signature1, id_cred, id_cred_len, th, th_len, cred,
+			     cred_len, ad, ad_len, mac, *mac_len, m, m_len);
 		if (r != EdhocNoError)
 			return r;
 		PRINT_ARRAY("data to be signed (M_2 or M_3)", m, *m_len);

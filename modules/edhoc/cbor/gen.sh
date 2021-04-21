@@ -44,13 +44,16 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -
 
 # ###   cose   ###
 
-# python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c enc_structure.cddl code -e -t enc_structure --oc enc_structure.c --oh enc_structure.h
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t enc_structure --oc encode_enc_structure.c --oh encode_enc_structure.h
 
-# python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c sig_structure.cddl code -e -t sig_structure --oc sig_structure.c --oh sig_structure.h
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t sig_structure --oc encode_sig_structure.c --oh encode_sig_structure.h
 
 
 
 ###   other  ###
+
+#encode byte_string
+#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t byte_string --oc encode_byte_string.c --oh encode_byte_string.h
 
 # encode data_2 
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c data_2.cddl code -e -t data_2 --oc encode_data_2.c --oh encode_data_2.h

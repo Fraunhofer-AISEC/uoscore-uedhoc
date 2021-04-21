@@ -9,7 +9,26 @@
 
 ; This file shold be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
+
+; ========== COSE Enc_structure and Sig_structure ============
+;                          see RFC8152
+
+cose_struct = ( s: enc_structure / sig_structure )
+
 ; context can be one of "Encrypt" / "Encrypt0" / "Enc_Recipient" /
 ;           "Mac_Recipient" / "Rec_Recipient"
 
-enc_structure = [ context: tstr, protected: bstr, external_aad: bstr, ]
+enc_structure = [ context: tstr, protected: bstr, external_aad: bstr ]
+
+
+
+; context can be one of "Signature" / "Signature1" / "CounterSignature"
+
+sig_structure = [
+	context: tstr,
+	protected: bstr,
+	external_aad: bstr,
+	payload: bstr
+]
+
+byte_string = ( b_str: bstr )
