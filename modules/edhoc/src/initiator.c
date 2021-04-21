@@ -398,8 +398,8 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint16_t g_r_len = sizeof(g_r);
 
 	r = retrieve_cred(auth_method_static_dh_r, cred_r_array, num_cred_r,
-			  id_cred_r, id_cred_r_len, cred_r, &cred_r_len, &pk,
-			  &pk_len, &g_r, &g_r_len);
+			  id_cred_r, id_cred_r_len, cred_r, &cred_r_len, pk,
+			  &pk_len, g_r, &g_r_len);
 	if (r != EdhocNoError)
 		return r;
 

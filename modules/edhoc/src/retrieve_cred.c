@@ -30,7 +30,7 @@
  * @param   pk_len the length pk
  * @param   verified true if verification successfull
  */
-static EdhocError cert_verify(uint8_t *cert, uint16_t cert_len,
+static EdhocError cert_verify(const uint8_t *cert, uint16_t cert_len,
 			      const struct other_party_cred *cred_array,
 			      uint16_t cred_num, uint8_t *pk, uint16_t *pk_len,
 			      bool *verified)
@@ -98,15 +98,30 @@ EdhocError retrieve_cred(bool static_dh_auth,
 		if (cred_array[i].id_cred.len == id_cred_len) {
 			if (0 == memcmp(cred_array[i].id_cred.ptr, id_cred,
 					id_cred_len)) {
-				*cred = cred_array[i].cred.ptr;
+				r = _memcpy_s(cred, *cred_len,
+					      cred_array[i].cred.ptr,
+					      cred_array[i].cred.len);
+				if (r != EdhocNoError) {
+					return r;
+				}
 				*cred_len = cred_array[i].cred.len;
 				if (static_dh_auth) {
 					*pk_len = 0;
-					*g = cred_array[i].g.ptr;
+					r = _memcpy_s(g, *g_len,
+						      cred_array[i].g.ptr,
+						      cred_array[i].g.len);
+					if (r != EdhocNoError) {
+						return r;
+					}
 					*g_len = cred_array[i].g.len;
 				} else {
 					*g_len = 0;
-					*pk = cred_array[i].pk.ptr;
+					r = _memcpy_s(pk, *pk_len,
+						      cred_array[i].pk.ptr,
+						      cred_array[i].pk.len);
+					if (r != EdhocNoError) {
+						return r;
+					}
 					*pk_len = cred_array[i].pk.len;
 				}
 				return EdhocNoError;

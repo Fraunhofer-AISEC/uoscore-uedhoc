@@ -101,7 +101,7 @@ CFLAGS1 += -DCDDL_CBOR_CANONICAL
 ifeq	($(LIB_NAME), libuedhoc.a) 
 	#use tyncrypt + ed25519
 	CFLAGS1 += -DEDHOC_WITH_TINYCRYPT_AND_C25519
-	CFLAGS1 += -DEDHOC_DEBUG_PRINT
+	#CFLAGS1 += -DEDHOC_DEBUG_PRINT
 endif 
 
 ifeq	($(LIB_NAME), libuoscore.a) 

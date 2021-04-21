@@ -62,6 +62,7 @@
 #define G_Y_DEFAULT_SIZE 32
 #define G_X_DEFAULT_SIZE 32
 #define G_R_DEFAULT_SIZE 32
+#define G_I_DEFAULT_SIZE 32
 #define PK_DEFAULT_SIZE 32
 #define DATA_2_DEFAULT_SIZE                                                    \
 	(C_I_DEFAULT_SIZE + G_Y_DEFAULT_SIZE + C_R_DEFAULT_SIZE)
