@@ -38,8 +38,8 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -
 
 # python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_4.cddl code -e -t message_4 --oc message_4.c --oh message_4.h
 
-
-# python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_error.cddl code -e -t message_error --oc message_error.c --oh message_error.h
+# encode error message
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_error.cddl code -e -t message_error --oc encode_message_error.c --oh encode_message_error.h
 
 
 # ###   cose   ###
@@ -72,3 +72,9 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c plaintext.cddl code -
 
 # decode Native CBOR certificate
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cert.cddl code -d -t cert --oc decode_cert.c --oh decode_cert.h
+
+# encode th3
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c th.cddl code -e -t th3 --oc encode_th3.c --oh encode_th3.h
+
+# encode th4
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c th.cddl code -e -t th4 --oc encode_th4.c --oh encode_th4.h

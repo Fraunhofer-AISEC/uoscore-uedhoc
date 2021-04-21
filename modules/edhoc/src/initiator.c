@@ -400,8 +400,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = retrieve_cred(auth_method_static_dh_r, cred_r_array, num_cred_r,
 			  id_cred_r, id_cred_r_len, cred_r, &cred_r_len, pk,
 			  &pk_len, g_r, &g_r_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	PRINT_ARRAY("CRED_R", cred_r, cred_r_len);
 	PRINT_ARRAY("pk", pk, pk_len);
@@ -411,8 +412,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	/*derive prk_3e2m*/
 	r = prk_derive(auth_method_static_dh_r, suite, PRK_2e, sizeof(PRK_2e),
 		       g_r, g_r_len, c->x.ptr, c->x.len, PRK_3e2m);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("prk_3e2m", PRK_3e2m, sizeof(PRK_3e2m));
 
 	uint8_t m_2[A_2M_DEFAULT_SIZE];
@@ -425,17 +427,20 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 					sizeof(th2), id_cred_r, id_cred_r_len,
 					cred_r, cred_r_len, ad_2, *ad_2_len,
 					m_2, &m_2_len, mac_2, &mac_2_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
+	uint8_t diag_msg[] = { "Responder authentication FIALED!\n" };
 	if (auth_method_static_dh_r) {
 		if (!memcmp(mac_2, sign_or_mac, mac_2_len)) {
 			PRINT_MSG("Responder authentication successful!\n");
 		} else {
-			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len, NULL,
-				       0, NULL, 0);
-			if (r != EdhocNoError)
+			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
+				       diag_msg, strlen(diag_msg), NULL, 0);
+			if (r != EdhocNoError) {
 				return r;
+			}
 			return ResponderAuthenticationFailed;
 		}
 	} else {
@@ -447,8 +452,8 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		if (verified) {
 			PRINT_MSG("Responder authentication successful!\n");
 		} else {
-			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len, NULL,
-				       0, NULL, 0);
+			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
+				       diag_msg, strlen(diag_msg), NULL, 0);
 			if (r != EdhocNoError)
 				return r;
 			return ResponderAuthenticationFailed;

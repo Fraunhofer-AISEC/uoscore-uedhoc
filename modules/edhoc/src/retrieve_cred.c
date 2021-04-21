@@ -58,7 +58,7 @@ static EdhocError cert_verify(const uint8_t *cert, uint16_t cert_len,
 		    c._cert_signature.len);
 
 	/*get the CAs public key*/
-	uint8_t *root_pk;
+	uint8_t *root_pk = NULL;
 	uint8_t root_pk_len = 0;
 	for (uint16_t i = 0; i < cred_num; i++) {
 		if (memcmp(cred_array[i].ca.ptr, c._cert_issuer.value,

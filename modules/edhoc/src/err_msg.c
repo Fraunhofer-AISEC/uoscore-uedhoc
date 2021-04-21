@@ -10,7 +10,6 @@
 */
 #include "../inc/err_msg.h"
 
-#include <cbor.h>
 #include <stdint.h>
 
 #include "../edhoc.h"
@@ -18,7 +17,7 @@
 #include "../inc/messages.h"
 #include "../inc/print_util.h"
 #include "../inc/txrx_wrapper.h"
-
+#include "../cbor/encode_message_error.h"
 /**
  * @brief   encodes an error message
  * @param   msg_struct contains all messsage fields
@@ -27,35 +26,65 @@
 static inline EdhocError err_msg_crate(struct error_msg *msg_struct,
 				       struct byte_array *msg)
 {
-	CborEncoder err_msg_enc;
-	CborError r;
-	cbor_encoder_init(&err_msg_enc, msg->ptr, msg->len, 0);
+	bool success;
+	struct message_error mr;
 
 	/*Encode C_x if present*/
 	if (msg_struct->c_x.len) {
-		r = cbor_encode_byte_string(&err_msg_enc, msg_struct->c_x.ptr,
-					    msg_struct->c_x.len);
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
+		mr._message_error_C_x_present = true;
+		if (msg_struct->c_x.len == 1) {
+			mr._message_error_C_x._message_error_C_x_choice =
+				_message_error_C_x_int;
+			mr._message_error_C_x._message_error_C_x_int =
+				*(msg_struct->c_x.ptr) - 24;
+		} else {
+			mr._message_error_C_x._message_error_C_x_choice =
+				_message_error_C_x_bstr;
+			mr._message_error_C_x._message_error_C_x_bstr.value =
+				msg_struct->c_x.ptr;
+			mr._message_error_C_x._message_error_C_x_bstr.len =
+				msg_struct->c_x.len;
+		}
 	}
 
-	/*Encode ERR_MSG*/
-	r = cbor_encode_byte_string(&err_msg_enc, msg_struct->err_msg.ptr,
-				    msg_struct->err_msg.len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
+	/*Encode DIAG_MSG*/
+	mr._message_error_DIAG_MSG.value = msg_struct->diag_msg.ptr;
+	mr._message_error_DIAG_MSG.len = msg_struct->diag_msg.len;
 
 	/*Encode SUITES_R if present*/
 	if (msg_struct->suites_r.len) {
-		r = cbor_encode_byte_string(&err_msg_enc,
-					    msg_struct->suites_r.ptr,
-					    msg_struct->suites_r.len);
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
+		mr._message_error_SUITES_R_present = true;
+		if (msg_struct->suites_r.len == 1) {
+			mr._message_error_SUITES_R
+				._message_error_SUITES_R_choice =
+				_message_error_SUITES_R_int;
+			mr._message_error_SUITES_R._message_error_SUITES_R_int =
+				msg_struct->suites_r.ptr[0];
+		} else {
+			mr._message_error_SUITES_R
+				._message_error_SUITES_R_choice =
+				_message_error_SUITES_R__supported;
+			uint32_t i;
+			for (i = 0; i < msg_struct->suites_r.len; i++) {
+				mr._message_error_SUITES_R
+					._message_error_SUITES_R__supported_supported
+						[i] =
+					msg_struct->suites_r.ptr[i];
+			}
+			mr._message_error_SUITES_R
+				._message_error_SUITES_R__supported_supported_count =
+				i - 1;
+		}
 	}
 
-	/* Get the CBOR length */
-	msg->len = cbor_encoder_get_buffer_size(&err_msg_enc, msg->ptr);
+	size_t payload_len_out;
+	success = cbor_encode_message_error(msg->ptr, msg->len, &mr,
+					    &payload_len_out);
+
+	if (!success) {
+		return cbor_encoding_error;
+	}
+	msg->len = payload_len_out;
 
 	PRINT_ARRAY("Error message (CBOR Sequence)", msg->ptr, msg->len);
 	return EdhocNoError;
@@ -74,8 +103,8 @@ EdhocError tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 	};
 
 	struct error_msg err_struct = {
-		.err_msg.ptr = err_msg_str,
-		.err_msg.len = err_msg_str_len,
+		.diag_msg.ptr = err_msg_str,
+		.diag_msg.len = err_msg_str_len,
 		.suites_r.ptr = suites,
 		.suites_r.len = suites_len,
 	};
@@ -90,7 +119,8 @@ EdhocError tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 	}
 
 	r = err_msg_crate(&err_struct, &err_msg);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	return tx(err_msg.ptr, err_msg.len);
 }

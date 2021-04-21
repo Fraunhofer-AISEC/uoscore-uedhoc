@@ -31,7 +31,7 @@ struct msg_2 {
 
 struct error_msg {
 	struct byte_array c_x;
-	struct byte_array err_msg;
+	struct byte_array diag_msg;
 	struct byte_array suites_r;
 };
 
