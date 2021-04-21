@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void print_array(uint8_t *in_data, uint16_t in_len)
+void print_array(const uint8_t *in_data, uint16_t in_len)
 {
 	//fflush(stdout);
 	printf(" (size %u):", in_len);

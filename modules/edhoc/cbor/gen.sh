@@ -66,3 +66,6 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c plaintext.cddl code -
 
 # decode ID_CRED_x
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c plaintext.cddl code -d -t id_cred_x_map --oc decode_id_cred_x.c --oh decode_id_cred_x.h
+
+# decode Native CBOR certificate
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cert.cddl code -d -t cert --oc decode_cert.c --oh decode_cert.h
