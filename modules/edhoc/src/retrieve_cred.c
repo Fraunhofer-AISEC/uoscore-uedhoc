@@ -19,6 +19,8 @@
 #include "../inc/crypto_wrapper.h"
 #include "../inc/error.h"
 #include "../inc/print_util.h"
+#include "../inc/memcpy_s.h"
+#include "../cbor/decode_id_cred_x.h"
 
 /**
  * @brief   Verifies an certificate
@@ -172,18 +174,14 @@ static EdhocError cert_verify(uint8_t *cert, uint16_t cert_len,
 
 EdhocError retrieve_cred(bool static_dh_auth,
 			 struct other_party_cred *cred_array, uint16_t cred_num,
-			 uint8_t *id_cred, uint8_t id_cred_len, uint8_t **cred,
+			 uint8_t *id_cred, uint8_t id_cred_len, uint8_t *cred,
 			 uint16_t *cred_len, uint8_t **pk, uint16_t *pk_len,
 			 uint8_t **g, uint16_t *g_len)
 {
-	EdhocError r1;
-	CborParser parser;
-	CborValue value;
-	CborType type, ignore;
-	CborError err;
-	uint8_t *next_temp_ptr;
-	uint8_t *temp_ptr;
-	uint32_t temp_len;
+	EdhocError r;
+	bool success, verified;
+	size_t decode_len = 0;
+	struct id_cred_x_map map;
 
 	/*check first if the credential is preestablished (RPK)*/
 	for (uint16_t i = 0; i < cred_num; i++) {
@@ -206,70 +204,117 @@ EdhocError retrieve_cred(bool static_dh_auth,
 		}
 	}
 
-	/* if the credential is not preestablished a certificate may be contained in the ID_CRED_x */
+	/* Check if ID_CRED_x contains a certificate*/
+	success = cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
+					    &decode_len);
+	if (!success) {
+		return cbor_decoding_error;
+	}
+	if (map._id_cred_x_map_x5chain_present != 0) {
+		PRINT_ARRAY(
+			"ID_CRED_x contains a certificate",
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len);
+		r = _memcpy_s(
+			cred, *cred_len,
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len);
+		if (r != EdhocNoError) {
+			return r;
+		}
+		*cred_len =
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len;
+		if (static_dh_auth) {
+			*pk_len = 0;
+			r = cert_verify(map._id_cred_x_map_x5chain
+						._id_cred_x_map_x5chain.value,
+					map._id_cred_x_map_x5chain
+						._id_cred_x_map_x5chain.len,
+					cred_array, cred_num, g, g_len,
+					&verified);
+		} else {
+			*g_len = 0;
+			r = cert_verify(map._id_cred_x_map_x5chain
+						._id_cred_x_map_x5chain.value,
+					map._id_cred_x_map_x5chain
+						._id_cred_x_map_x5chain.len,
+					cred_array, cred_num, pk, pk_len,
+					&verified);
+		}
 
-	/* Initialization */
-	err = cbor_parser_init(id_cred, id_cred_len, 0, &parser, &value);
-	if (err != CborNoError)
-		return ErrorDuringCborDecoding;
-	/* Get type of input CBOR object */
-	type = cbor_value_get_type(&value);
+		if (r != EdhocNoError)
+			return r;
 
-	if (type == CborMapType) {
-		/*the first element in plaintext is a ID_CRED_x, which starts with a map */
-		/*we move to the label of the map*/
-		temp_ptr = id_cred + 1;
-		temp_len = id_cred_len - 1;
-
-		int map_label;
-		uint64_t map_label_len;
-
-		r1 = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-				  &map_label, &map_label_len, &ignore);
-		temp_len -= (next_temp_ptr - temp_ptr);
-		temp_ptr = next_temp_ptr;
-
-		uint8_t cert[CERT_DEFAUT_SIZE];
-		uint64_t cert_len = sizeof(cert);
-		switch (map_label) {
-		case x5bag:
-			/*implement the x5bag parsing here*/
-			break;
-		case x5chain:
-			r1 = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-					  cert, &cert_len, &ignore);
-			if (r1 != EdhocNoError)
-				return r1;
-			PRINT_ARRAY("ID_CRED_x contains certificate", cert,
-				    cert_len);
-			*cred = temp_ptr + 2;
-			*cred_len = cert_len;
-			bool verified;
-
-			if (static_dh_auth) {
-				*pk_len = 0;
-				r1 = cert_verify(*cred, *cred_len, cred_array,
-						 cred_num, g, g_len, &verified);
-			} else {
-				*g_len = 0;
-				r1 = cert_verify(*cred, *cred_len, cred_array,
-						 cred_num, pk, pk_len,
-						 &verified);
-			}
-
-			if (r1 != EdhocNoError)
-				return r1;
-
-			if (verified) {
-				PRINT_MSG(
-					"Certificate verification successful!\n");
-				return EdhocNoError;
-			} else {
-				return CertificateAuthenticationFailed;
-			}
-			break;
+		if (verified) {
+			PRINT_MSG("Certificate verification successful!\n");
+			return EdhocNoError;
+		} else {
+			return CertificateAuthenticationFailed;
 		}
 	}
+
+	// /* Initialization */
+	// err = cbor_parser_init(id_cred, id_cred_len, 0, &parser, &value);
+	// if (err != CborNoError)
+	// 	return ErrorDuringCborDecoding;
+	// /* Get type of input CBOR object */
+	// type = cbor_value_get_type(&value);
+
+	// if (type == CborMapType) {
+	// 	/*the first element in plaintext is a ID_CRED_x, which starts with a map */
+	// 	/*we move to the label of the map*/
+	// 	temp_ptr = id_cred + 1;
+	// 	temp_len = id_cred_len - 1;
+
+	// 	int map_label;
+	// 	uint64_t map_label_len;
+
+	// 	r1 = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
+	// 			  &map_label, &map_label_len, &ignore);
+	// 	temp_len -= (next_temp_ptr - temp_ptr);
+	// 	temp_ptr = next_temp_ptr;
+
+	// 	uint8_t cert[CERT_DEFAUT_SIZE];
+	// 	uint64_t cert_len = sizeof(cert);
+	// 	switch (map_label) {
+	// 	case x5bag:
+	// 		/*implement the x5bag parsing here*/
+	// 		break;
+	// 	case x5chain:
+	// 		r1 = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
+	// 				  cert, &cert_len, &ignore);
+	// 		if (r1 != EdhocNoError)
+	// 			return r1;
+	// 		PRINT_ARRAY("ID_CRED_x contains certificate", cert,
+	// 			    cert_len);
+	// 		*cred = temp_ptr + 2;
+	// 		*cred_len = cert_len;
+	// 		bool verified;
+
+	// 		if (static_dh_auth) {
+	// 			*pk_len = 0;
+	// 			r1 = cert_verify(*cred, *cred_len, cred_array,
+	// 					 cred_num, g, g_len, &verified);
+	// 		} else {
+	// 			*g_len = 0;
+	// 			r1 = cert_verify(*cred, *cred_len, cred_array,
+	// 					 cred_num, pk, pk_len,
+	// 					 &verified);
+	// 		}
+
+	// 		if (r1 != EdhocNoError)
+	// 			return r1;
+
+	// 		if (verified) {
+	// 			PRINT_MSG(
+	// 				"Certificate verification successful!\n");
+	// 			return EdhocNoError;
+	// 		} else {
+	// 			return CertificateAuthenticationFailed;
+	// 		}
+	// 		break;
+	// 	}
+	// }
 
 	return CredentialNotFound;
 }

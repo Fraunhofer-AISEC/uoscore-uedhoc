@@ -61,5 +61,8 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c info.cddl code -e -t 
 # plaintext
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c plaintext.cddl code -d -t plaintext --oc decode_plaintext.c --oh decode_plaintext.h
 
-# ID_CRED_x
+# encode ID_CRED_x
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c plaintext.cddl code -e -t id_cred_x_map --oc encode_id_cred_x.c --oh encode_id_cred_x.h
+
+# decode ID_CRED_x
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c plaintext.cddl code -d -t id_cred_x_map --oc decode_id_cred_x.c --oh decode_id_cred_x.h

@@ -22,8 +22,6 @@
 #include "../cbor/decode_plaintext.h"
 #include "../cbor/encode_id_cred_x.h"
 
-
-
 /**
  * @brief 	Encodes IS_CRED_x as a CBOR map
  * @param	label the map label
@@ -82,9 +80,9 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 			   uint8_t *sign_or_mac, uint64_t *sign_or_mac_len,
 			   uint8_t *ad, uint64_t *ad_len)
 {
+	EdhocError r;
 	bool success;
 	size_t decode_len = 0;
-	EdhocError r;
 	struct plaintext p;
 
 	success = cbor_decode_plaintext(ptxt, ptxt_len, &p, &decode_len);
