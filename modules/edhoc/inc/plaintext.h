@@ -59,4 +59,5 @@ EdhocError plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
 			    const uint8_t *ad, uint16_t ad_len,
 			    uint8_t *plaintext, uint16_t *plaintext_len);
 
+
 #endif

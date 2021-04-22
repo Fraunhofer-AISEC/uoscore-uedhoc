@@ -9,7 +9,6 @@
    except according to those terms.
 */
 
-#include <cbor.h>
 #include <stdint.h>
 
 #include "../edhoc.h"
@@ -164,103 +163,6 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 	} else {
 		*ad_len = 0;
 	}
-
-	return EdhocNoError;
-}
-
-EdhocError id_cred2kid(uint8_t *id_cred, uint8_t id_cred_len, uint8_t *_kid,
-		       uint32_t *kid_len)
-{
-	CborParser parser;
-	CborValue value;
-	CborError err;
-	uint8_t *next_temp_ptr;
-	uint8_t *temp_ptr;
-	uint32_t temp_len;
-	CborType ignore;
-	EdhocError r;
-
-	/* Initialization */
-	err = cbor_parser_init(id_cred, id_cred_len, 0, &parser, &value);
-	if (err != CborNoError)
-		return ErrorDuringCborDecoding;
-
-	/*the first element in plaintext is a ID_CRED_x, which starts with a map */
-	/*we move to the label of the map*/
-	temp_ptr = id_cred + 1;
-	temp_len = id_cred_len - 1;
-
-	int map_label;
-	uint64_t map_label_len;
-
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, &map_label,
-			 &map_label_len, &ignore);
-	if (r != EdhocNoError)
-		return r;
-	temp_len -= (next_temp_ptr - temp_ptr);
-	temp_ptr = next_temp_ptr;
-
-	if (map_label == kid) {
-		uint8_t kid_str[KID_DEFAULT_SIZE];
-		uint64_t kid_str_len = sizeof(kid_str);
-		r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, &kid_str,
-				 &kid_str_len, &ignore);
-		if (r != EdhocNoError)
-			return r;
-
-		if (kid_str_len == 1) {
-			int64_t t = kid_str[0] - 24;
-			CborEncoder enc;
-			CborError r;
-			cbor_encoder_init(&enc, _kid, *kid_len, 0);
-			r = cbor_encode_int(&enc, t);
-			if (r == CborErrorOutOfMemory)
-				return CborEncodingBufferToSmall;
-			*kid_len = 1;
-		}
-
-	} else {
-		*kid_len = 0;
-	}
-	return EdhocNoError;
-}
-
-EdhocError plaintext_encode(uint8_t *id_cred, uint8_t id_cred_len,
-			    const uint8_t *sgn_or_mac, uint8_t sgn_or_mac_len,
-			    const uint8_t *ad, uint16_t ad_len,
-			    uint8_t *plaintext, uint16_t *plaintext_len)
-{
-	EdhocError r;
-
-	uint16_t l, enc_sgn_or_mac_len = sgn_or_mac_len + 2;
-	uint8_t kid_buf[KID_DEFAULT_SIZE];
-	uint32_t kid_len = sizeof(kid_buf);
-	id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len);
-
-	if (kid_len != 0) {
-		/*id cred contains a kid*/
-		r = _memcpy_s(plaintext, *plaintext_len, kid_buf, kid_len);
-		if (r != EdhocNoError)
-			return r;
-		l = kid_len;
-	} else {
-		r = _memcpy_s(plaintext, *plaintext_len, id_cred, id_cred_len);
-		if (r != EdhocNoError)
-			return r;
-		l = id_cred_len;
-	}
-
-	r = encode_byte_string(sgn_or_mac, sgn_or_mac_len, plaintext + l,
-			       &enc_sgn_or_mac_len);
-	if (r != EdhocNoError)
-		return r;
-
-	r = _memcpy_s(plaintext + l + enc_sgn_or_mac_len,
-		      *plaintext_len - l - enc_sgn_or_mac_len, ad, ad_len);
-	if (r != EdhocNoError)
-		return r;
-
-	*plaintext_len = l + enc_sgn_or_mac_len + ad_len;
 
 	return EdhocNoError;
 }

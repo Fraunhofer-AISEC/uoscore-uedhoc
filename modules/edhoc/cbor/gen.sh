@@ -52,9 +52,6 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t 
 
 ###   other  ###
 
-#encode byte_string
-#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t byte_string --oc encode_byte_string.c --oh encode_byte_string.h
-
 # encode data_2 
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c data_2.cddl code -e -t data_2 --oc encode_data_2.c --oh encode_data_2.h
 
@@ -78,3 +75,11 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c th.cddl code -e -t th
 
 # encode th4
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c th.cddl code -e -t th4 --oc encode_th4.c --oh encode_th4.h
+
+
+### primitive types ###
+#encode byte_string
+#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t byte_string --oc encode_byte_string.c --oh encode_byte_string.h
+
+#encode byte_string
+#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c primitive_types.cddl code -e -t int_type --oc encode_int_type.c --oh encode_int_type.h

@@ -10,8 +10,6 @@
 */
 #include "../inc/th.h"
 
-#include <cbor.h>
-
 #include "../edhoc.h"
 #include "../inc/crypto_wrapper.h"
 #include "../inc/error.h"

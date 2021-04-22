@@ -884,14 +884,14 @@ void test_main(void)
 			 ztest_unit_test(test_initiator3),
 			 ztest_unit_test(test_initiator4));
 
-	//ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1));
+	//ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator2));
 
 	ztest_test_suite(responder_tests, ztest_unit_test(test_responder1),
 			 ztest_unit_test(test_responder2),
 			 ztest_unit_test(test_responder3),
 			 ztest_unit_test(test_responder4));
 
-	//ztest_test_suite(responder_tests, ztest_unit_test(test_responder1));
+	//ztest_test_suite(responder_tests, ztest_unit_test(test_responder2));
 
 	ztest_run_test_suite(initiator_tests);
 	ztest_run_test_suite(responder_tests);

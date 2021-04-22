@@ -34,7 +34,7 @@ EdhocError encode_byte_string(const uint8_t *in, const uint8_t in_len,
 	// }
 	// *out_len = payload_len_out;
 
-	// Todo fix this when bug in cddl-gen is fixed
+	// todo fix this when bug in cddl-gen is fixed
 
 	int r;
 	CborEncoder enc;
@@ -75,51 +75,24 @@ static EdhocError m_encode(enum cose_context cose_context,
 	}
 
 	if (cose_context == Encrypt0) {
-		bool success_encoding;
-		struct enc_structure enc_structure;
-
 		uint8_t context_str[] = { "Encrypt0" };
-		enc_structure._enc_structure_context.value = context_str;
-		enc_structure._enc_structure_context.len = strlen(context_str);
-		enc_structure._enc_structure_protected.value = id_cred;
-		enc_structure._enc_structure_protected.len = id_cred_len;
-		enc_structure._enc_structure_external_aad.value = tmp;
-		enc_structure._enc_structure_external_aad.len = sizeof(tmp);
-
-		size_t payload_len_out;
-		success_encoding = cbor_encode_enc_structure(
-			out, *out_len, &enc_structure, &payload_len_out);
-
-		if (!success_encoding) {
-			return cbor_encoding_error;
+		r = cose_enc_structure_encode(context_str, strlen(context_str),
+					      id_cred, id_cred_len, tmp,
+					      sizeof(tmp), out, out_len);
+		if (r != EdhocNoError) {
+			return r;
 		}
-		*out_len = payload_len_out;
-		return EdhocNoError;
 	}
 
 	if (cose_context == Signature1) {
-		bool success_encoding;
-		struct sig_structure sig_structure;
-
 		uint8_t context_str[] = { "Signature1" };
-		sig_structure._sig_structure_context.value = context_str;
-		sig_structure._sig_structure_context.len = strlen(context_str);
-		sig_structure._sig_structure_protected.value = id_cred;
-		sig_structure._sig_structure_protected.len = id_cred_len;
-		sig_structure._sig_structure_external_aad.value = tmp;
-		sig_structure._sig_structure_external_aad.len = sizeof(tmp);
-		sig_structure._sig_structure_payload.value = mac;
-		sig_structure._sig_structure_payload.len = mac_len;
-
-		size_t payload_len_out;
-		success_encoding = cbor_encode_sig_structure(
-			out, *out_len, &sig_structure, &payload_len_out);
-
-		if (!success_encoding) {
-			return cbor_encoding_error;
+		r = cose_sig_structure_encode(context_str, strlen(context_str),
+					      id_cred, id_cred_len, tmp,
+					      sizeof(tmp), mac, mac_len, out,
+					      out_len);
+		if (r != EdhocNoError) {
+			return r;
 		}
-		*out_len = payload_len_out;
-		return EdhocNoError;
 	}
 
 	return EdhocNoError;

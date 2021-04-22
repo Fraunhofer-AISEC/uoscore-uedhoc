@@ -17,4 +17,25 @@ enum cose_context {
 	Signature1,
 };
 
+/**
+ * 
+ * 
+ * 
+ */
+EdhocError cose_enc_structure_encode(
+	const uint8_t *context, uint16_t context_len, const uint8_t *protected,
+	uint16_t protected_len, const uint8_t *external_aad,
+	uint16_t external_aad_len, uint8_t *out, uint16_t *out_len);
+
+/**
+ * 
+ * 
+ * 
+ */
+EdhocError cose_sig_structure_encode(
+	const uint8_t *context, uint16_t context_len, const uint8_t *protected,
+	uint16_t protected_len, const uint8_t *external_aad,
+	uint16_t external_aad_len, const uint8_t *payload, uint16_t payload_len,
+	uint8_t *out, uint16_t *out_len);
+
 #endif

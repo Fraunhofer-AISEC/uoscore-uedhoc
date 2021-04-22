@@ -454,8 +454,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
 				       diag_msg, strlen(diag_msg), NULL, 0);
-			if (r != EdhocNoError)
+			if (r != EdhocNoError) {
 				return r;
+			}
 			return ResponderAuthenticationFailed;
 		}
 	}
@@ -475,15 +476,17 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = th3_calculate(suite.edhoc_hash, (uint8_t *)&th2, sizeof(th2),
 			  ciphertext2, ciphertext2_len, data_3, data_3_len,
 			  th3);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	/*derive prk_4x3m*/
 	r = prk_derive(auth_method_static_dh_i, suite, (uint8_t *)&PRK_3e2m,
 		       sizeof(PRK_3e2m), g_y, sizeof(g_y), c->i.ptr, c->i.len,
 		       prk_4x3m);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
 	uint8_t m_3[M_3_DEFAULT_SIZE];
@@ -496,8 +499,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len, c->ad_3.ptr,
 		c->ad_3.len, m_3, &m_3_len, sign_or_mac_3,
 		(uint8_t *)&sign_or_mac_3_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	/*Calculate signature if the initiator authenticates with signature*/
 	if (!auth_method_static_dh_i) {
@@ -506,8 +510,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		r = sign(suite.edhoc_sign_curve, c->sk_i.ptr, c->sk_i.len,
 			 c->pk_i.ptr, c->pk_i.len, m_3, m_3_len, sign_or_mac_3,
 			 &sign_or_mac_3_len);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		PRINT_ARRAY("Signature_or_MAC_3", sign_or_mac_3,
 			    sign_or_mac_3_len);
 	}
@@ -517,35 +522,44 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint16_t sign_or_mac_3_enc_len = sizeof(sign_or_mac_3_enc);
 	r = encode_byte_string(sign_or_mac_3, sign_or_mac_3_len,
 			       sign_or_mac_3_enc, &sign_or_mac_3_enc_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	uint8_t kid_buf[KID_DEFAULT_SIZE];
 	uint32_t kid_len = sizeof(kid_buf);
-	id_cred2kid(c->id_cred_i.ptr, c->id_cred_i.len, kid_buf, &kid_len);
+	r = id_cred2kid(c->id_cred_i.ptr, c->id_cred_i.len, kid_buf, &kid_len);
+	if (r != EdhocNoError) {
+		return r;
+	}
+	PRINT_ARRAY("kid", kid_buf, kid_len);
 
 	uint8_t P_3ae[PRK_3AE_DEFAULT_SIZE];
 	uint32_t P_3ae_len = sizeof(P_3ae);
 
 	if (kid_len != 0) {
 		r = _memcpy_s(P_3ae, P_3ae_len, kid_buf, kid_len);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		r = _memcpy_s(P_3ae + kid_len, P_3ae_len - kid_len,
 			      sign_or_mac_3_enc, sign_or_mac_3_enc_len);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		P_3ae_len = sign_or_mac_3_enc_len + kid_len;
 	} else {
 		r = _memcpy_s(P_3ae, P_3ae_len, c->id_cred_i.ptr,
 			      c->id_cred_i.len);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		r = _memcpy_s(P_3ae + c->id_cred_i.len,
 			      P_3ae_len - c->id_cred_i.len, sign_or_mac_3_enc,
 			      sign_or_mac_3_enc_len);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		P_3ae_len = c->id_cred_i.len + sign_or_mac_3_enc_len;
 	}
 	PRINT_ARRAY("P_3ae", P_3ae, P_3ae_len);
@@ -555,8 +569,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "K_3ae", PRK_3e2m,
 		     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), K_3ae,
 		     sizeof(K_3ae));
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("K_3ae", K_3ae, sizeof(K_3ae));
 
 	/*Calculate IV_3ae*/
@@ -564,16 +579,18 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "IV_3ae", PRK_3e2m,
 		     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), IV_3ae,
 		     sizeof(IV_3ae));
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("IV_3ae", IV_3ae, sizeof(IV_3ae));
 
 	/*Associated data A_3ae*/
 	uint8_t A_3ae[A_3AE_DEFAULT_SIZE];
 	uint32_t A_3ae_len = sizeof(A_3ae);
 	r = a_Xae_encode(th3, sizeof(th3), (uint8_t *)&A_3ae, &A_3ae_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 	PRINT_ARRAY("A_3ae", A_3ae, A_3ae_len);
 
 	/*Ciphertext 3 calculate*/
@@ -588,8 +605,9 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = aead(ENCRYPT, P_3ae, P_3ae_len, K_3ae, sizeof(K_3ae), IV_3ae,
 		 sizeof(IV_3ae), A_3ae, A_3ae_len, ciphertext_3,
 		 ciphertext_3_len, tag, mac_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	PRINT_ARRAY("ciphertext_3", ciphertext_3, sizeof(ciphertext_3));
 
@@ -598,16 +616,19 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint16_t ciphertext_3_enc_len = sizeof(ciphertext_3_enc);
 	r = encode_byte_string(ciphertext_3, sizeof(ciphertext_3),
 			       ciphertext_3_enc, &ciphertext_3_enc_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
+	//todo use here cbor encoding 
 	uint16_t msg3_len = ciphertext_3_enc_len + c_r_len;
 	uint8_t msg3[msg3_len];
 	if (c_r_len == 1) {
 		uint8_t c_r_bstr_ident;
 		r = c_x_bstr_identifier_encode(c_r[0], &c_r_bstr_ident);
-		if (r != EdhocNoError)
+		if (r != EdhocNoError) {
 			return r;
+		}
 		memcpy(msg3, &c_r_bstr_ident, 1);
 		memcpy(msg3 + 1, ciphertext_3_enc, ciphertext_3_enc_len);
 		msg3_len = ciphertext_3_enc_len + 1;
@@ -619,14 +640,16 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	PRINT_ARRAY("msg3", msg3, msg3_len);
 
 	r = tx(msg3, msg3_len);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	/*TH4*/
 	r = th4_calculate(suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
 			  sizeof(ciphertext_3), th4);
-	if (r != EdhocNoError)
+	if (r != EdhocNoError) {
 		return r;
+	}
 
 	return EdhocNoError;
 }

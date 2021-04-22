@@ -142,6 +142,7 @@ static inline bool selected_suite_is_supported(uint8_t selected,
  * @param   ciphertext_3 ciphertext 3
  * @param   ciphertext_3_len length of ciphertext_3
  */
+//todo migrate when the error in cddl gen is fixed
 static inline EdhocError msg3_parse(uint8_t corr, uint8_t *msg3,
 				    uint16_t msg3_len, uint8_t *c_r,
 				    uint64_t *c_r_len, uint8_t *ciphertext_3,

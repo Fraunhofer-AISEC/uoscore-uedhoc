@@ -31,4 +31,3 @@ sig_structure = [
 	payload: bstr
 ]
 
-byte_string = ( b_str: bstr )
