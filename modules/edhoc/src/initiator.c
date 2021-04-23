@@ -437,7 +437,8 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			PRINT_MSG("Responder authentication successful!\n");
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
-				       diag_msg, strlen(diag_msg), NULL, 0);
+				       diag_msg, strlen((char *)diag_msg), NULL,
+				       0);
 			if (r != edhoc_no_error) {
 				return r;
 			}
@@ -453,7 +454,8 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			PRINT_MSG("Responder authentication successful!\n");
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
-				       diag_msg, strlen(diag_msg), NULL, 0);
+				       diag_msg, strlen((char *)diag_msg), NULL,
+				       0);
 			if (r != edhoc_no_error) {
 				return r;
 			}

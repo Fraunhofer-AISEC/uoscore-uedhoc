@@ -31,7 +31,7 @@ enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
 	info._info_transcript_hash.value = th;
 	info._info_transcript_hash.len = th_len;
 
-	info._info_label.value = label;
+	info._info_label.value = (uint8_t *)label;
 	info._info_label.len = strlen(label);
 
 	info._info_length = okm_len;

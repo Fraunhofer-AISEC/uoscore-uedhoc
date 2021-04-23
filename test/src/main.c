@@ -875,7 +875,25 @@ static void oscore_server_test6(void)
 }
 
 #endif
-
+/**
+ * Main function for the tests.
+ *
+ * EDHOC Tests
+ * ----------------------------------------------------------------------------
+ * |test	    |Suite/Method			|ID_CRED_I|ID_CRED_R|
+ * ----------------------------------------------------------------------------
+ * |test_initiator1 |0/0-INITIATOR_SK_RESPONDER_SK	|x5t	  |x5t	    |
+ * |test_responder1 |0/0-INITIATOR_SK_RESPONDER_SK	|x5t	  |x5t	    |
+ * ----------------------------------------------------------------------------
+ * |test_initiator2 |0/0-INITIATOR_DH_RESPONDER_DH	|kid	  |kid	    |
+ * |test_responder2 |0/0-INITIATOR_DH_RESPONDER_DH	|kid	  |kid	    |
+ * ----------------------------------------------------------------------------
+ * |test_initiator3 |0/3-INITIATOR_SK_RESPONDER_SK	|x5chain  |x5chain  |
+ * |test_responder3 |0/3-INITIATOR_SK_RESPONDER_SK	|x5chain  |x5chain  |
+ * ----------------------------------------------------------------------------
+ * |test_initiator4 |0/3-INITIATOR_DH_RESPONDER_DH	|x5chain  |x5chain  |
+ * |test_responder4 |0/3-INITIATOR_DH_RESPONDER_Dh	|x5chain  |x5chain  |
+ */
 void test_main(void)
 {
 #ifdef EDHOC_TESTS

@@ -20,8 +20,8 @@ enum edhoc_error a_Xae_encode(uint8_t *thX, const uint16_t thX_len,
 {
 	enum edhoc_error r;
 	uint8_t context_str[] = { "Encrypt0" };
-	r = cose_enc_structure_encode(context_str, strlen(context_str), NULL, 0,
-				      thX, thX_len, out, out_len);
+	r = cose_enc_structure_encode(context_str, strlen((char *)context_str),
+				      NULL, 0, thX, thX_len, out, out_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}

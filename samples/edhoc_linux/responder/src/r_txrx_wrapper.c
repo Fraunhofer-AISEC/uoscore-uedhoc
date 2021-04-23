@@ -26,13 +26,13 @@ static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
 	return 0;
 }
 
-edhoc_error tx(uint8_t *data, uint32_t data_len)
+enum edhoc_error tx(uint8_t *data, uint32_t data_len)
 {
 	send_coap(data, data_len);
 	return edhoc_no_error;
 }
 
-edhoc_error rx(uint8_t *data, uint32_t *data_len)
+enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
 	uint8_t *data_p;
 	uint32_t data_buf_capacity = *data_len;

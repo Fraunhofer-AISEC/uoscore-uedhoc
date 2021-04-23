@@ -178,7 +178,7 @@ int main()
 	uint64_t ad_1_len = sizeof(ad_1);
 	uint8_t ad_3[AD_DEFAULT_SIZE];
 	uint64_t ad_3_len = sizeof(ad_1);
-	edhoc_error r;
+	enum edhoc_error r;
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
 	uint32_t seed;

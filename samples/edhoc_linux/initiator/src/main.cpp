@@ -133,7 +133,7 @@ int main()
 	uint32_t err_msg_len = sizeof(err_msg);
 	uint8_t ad_2[AD_DEFAULT_SIZE];
 	uint64_t ad_2_len = sizeof(ad_2);
-	edhoc_error r;
+	enum edhoc_error r;
 	int err;
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY

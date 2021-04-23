@@ -84,7 +84,8 @@ m_encode(enum cose_context cose_context, const uint8_t *id_cred,
 
 	if (cose_context == Encrypt0) {
 		uint8_t context_str[] = { "Encrypt0" };
-		r = cose_enc_structure_encode(context_str, strlen(context_str),
+		r = cose_enc_structure_encode(context_str,
+					      strlen((char *)context_str),
 					      id_cred, id_cred_len, tmp,
 					      sizeof(tmp), out, out_len);
 		if (r != edhoc_no_error) {
@@ -94,7 +95,8 @@ m_encode(enum cose_context cose_context, const uint8_t *id_cred,
 
 	if (cose_context == Signature1) {
 		uint8_t context_str[] = { "Signature1" };
-		r = cose_sig_structure_encode(context_str, strlen(context_str),
+		r = cose_sig_structure_encode(context_str,
+					      strlen((char *)context_str),
 					      id_cred, id_cred_len, tmp,
 					      sizeof(tmp), mac, mac_len, out,
 					      out_len);

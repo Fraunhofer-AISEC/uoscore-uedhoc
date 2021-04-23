@@ -16,6 +16,11 @@ TARGET = responder
 ######################################
 # building variables
 ######################################
+# 32bit build
+CFLAGS = -m32
+CXXFLAGS = -m32
+LDFLAGS = -m32
+
 # debug build?
 DEBUG = 1
 # optimization
@@ -60,9 +65,11 @@ DO_NOT_COMPILE_SOURCES = \
 C_SOURCES = $(wildcard src/*.c)
 C_SOURCES += $(wildcard ../../common/*.c) 
 C_SOURCES += $(wildcard ../../../modules/edhoc/src/*.c)
+C_SOURCES += $(wildcard ../../../modules/edhoc/cbor/*.c)
 C_SOURCES += ../../../modules/edhoc/crypto_wrapper.c
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
+C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycbor/src/*.c))
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycrypt/lib/source/*.c))
 
@@ -82,7 +89,8 @@ C_INCLUDES =  \
 -I../../../externals/tinycbor/src/ \
 -I../../../externals/compact25519/src/c25519/ \
 -I../../../externals/compact25519/src/\
--I../../../externals/tinycrypt/lib/include
+-I../../../externals/tinycrypt/lib/include \
+-I../../../externals/cddl-gen/include
 
 
 #########################################
@@ -106,8 +114,8 @@ SZ = size
 # CFLAGS
 ##########################################
 #general c flags
-CFLAGS =  $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall 
-CXXFLAGS = $(C_DEFS) $(C_INCLUDES) $(OPT) 
+CFLAGS +=  $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall
+CXXFLAGS += $(C_DEFS) $(C_INCLUDES) $(OPT)
 
 # have dubug information
 CFLAGS += -g -gdwarf-2
