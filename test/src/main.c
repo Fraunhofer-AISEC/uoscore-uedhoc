@@ -592,7 +592,7 @@ static void test_responder4(void)
  */
 static void oscore_client_test1(void)
 {
-	OscoreError r;
+	enum oscore_error r;
 	struct context c_client;
 	struct oscore_init_params params = {
 		.dev_type = CLIENT,
@@ -612,7 +612,8 @@ static void oscore_client_test1(void)
 
 	r = oscore_context_init(&params, &c_client);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init (%d)", r);
+	zassert_equal(r, oscore_no_error, "Error in oscore_context_init (%d)",
+		      r);
 
 	/* 
     required only for the test vector.
@@ -626,7 +627,7 @@ static void oscore_client_test1(void)
 
 	r = coap2oscore(T1__COAP_REQ, T1__COAP_REQ_LEN, (uint8_t *)&buf_oscore,
 			&buf_oscore_len, &c_client);
-	zassert_equal(r, OscoreNoError, "Error in coap2oscore!");
+	zassert_equal(r, oscore_no_error, "Error in coap2oscore!");
 
 	zassert_mem_equal__(c_client.sc.sender_key.ptr, T1__SENDER_KEY,
 			    c_client.sc.sender_key.len,
@@ -651,7 +652,7 @@ static void oscore_client_test1(void)
  */
 static void oscore_client_test3(void)
 {
-	OscoreError r;
+	enum oscore_error r;
 	struct context c_client;
 	struct oscore_init_params params = {
 		.dev_type = CLIENT,
@@ -671,7 +672,7 @@ static void oscore_client_test3(void)
 
 	r = oscore_context_init(&params, &c_client);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init");
+	zassert_equal(r, oscore_no_error, "Error in oscore_context_init");
 
 	/* 
     required only for the test vector.
@@ -686,7 +687,7 @@ static void oscore_client_test3(void)
 	r = coap2oscore(T3__COAP_REQ, T3__COAP_REQ_LEN, (uint8_t *)&buf_oscore,
 			&buf_oscore_len, &c_client);
 
-	zassert_equal(r, OscoreNoError, "Error in coap2oscore!");
+	zassert_equal(r, oscore_no_error, "Error in coap2oscore!");
 
 	zassert_mem_equal__(&buf_oscore, T3__OSCORE_REQ, T3__OSCORE_REQ_LEN,
 			    "coap2oscore failed");
@@ -699,7 +700,7 @@ static void oscore_client_test3(void)
  */
 static void oscore_client_test5(void)
 {
-	OscoreError r;
+	enum oscore_error r;
 	struct context c_client;
 	struct oscore_init_params params = {
 		.dev_type = CLIENT,
@@ -719,7 +720,7 @@ static void oscore_client_test5(void)
 
 	r = oscore_context_init(&params, &c_client);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init");
+	zassert_equal(r, oscore_no_error, "Error in oscore_context_init");
 
 	/* 
     required only for the test vector.
@@ -734,7 +735,7 @@ static void oscore_client_test5(void)
 	r = coap2oscore(T5__COAP_REQ, T5__COAP_REQ_LEN, (uint8_t *)&buf_oscore,
 			&buf_oscore_len, &c_client);
 
-	zassert_equal(r, OscoreNoError, "Error in coap2oscore!");
+	zassert_equal(r, oscore_no_error, "Error in coap2oscore!");
 
 	zassert_mem_equal__(&buf_oscore, T5__OSCORE_REQ, buf_oscore_len,
 			    "coap2oscore failed");
@@ -747,7 +748,7 @@ static void oscore_client_test5(void)
  */
 static void oscore_server_test2(void)
 {
-	OscoreError r;
+	enum oscore_error r;
 	struct context c_server;
 	struct oscore_init_params params_server = {
 		.dev_type = SERVER,
@@ -767,7 +768,7 @@ static void oscore_server_test2(void)
 
 	r = oscore_context_init(&params_server, &c_server);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init");
+	zassert_equal(r, oscore_no_error, "Error in oscore_context_init");
 
 	/*Test decrypting of an incoming request*/
 	uint8_t buf_coap[256];
@@ -777,7 +778,7 @@ static void oscore_server_test2(void)
 	r = oscore2coap(T2__OSCORE_REQ, T2__OSCORE_REQ_LEN, buf_coap,
 			&buf_coap_len, &oscore_present_flag, &c_server);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore2coap!");
+	zassert_equal(r, oscore_no_error, "Error in oscore2coap!");
 	zassert_true(oscore_present_flag, "The packet is not OSCORE packet");
 	zassert_mem_equal__(&buf_coap, T2__COAP_REQ, buf_coap_len,
 			    "oscore2coap failed");
@@ -789,7 +790,7 @@ static void oscore_server_test2(void)
 	r = coap2oscore(T2__COAP_RESPONSE, T2__COAP_RESPONSE_LEN,
 			(uint8_t *)&buf_oscore, &buf_oscore_len, &c_server);
 
-	zassert_equal(r, OscoreNoError, "Error in coap2oscore");
+	zassert_equal(r, oscore_no_error, "Error in coap2oscore");
 
 	zassert_mem_equal__(&buf_oscore, T2__OSCORE_RESP, buf_oscore_len,
 			    "coap2oscore failed");
@@ -797,7 +798,7 @@ static void oscore_server_test2(void)
 
 static void oscore_server_test4(void)
 {
-	OscoreError r;
+	enum oscore_error r;
 	struct context c_server;
 	struct oscore_init_params params_server = {
 		.dev_type = SERVER,
@@ -817,7 +818,7 @@ static void oscore_server_test4(void)
 
 	r = oscore_context_init(&params_server, &c_server);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init");
+	zassert_equal(r, oscore_no_error, "Error in oscore_context_init");
 
 	zassert_mem_equal__(c_server.sc.sender_key.ptr, T4__SENDER_KEY,
 			    c_server.sc.sender_key.len,
@@ -838,7 +839,7 @@ static void oscore_server_test4(void)
  */
 static void oscore_server_test6(void)
 {
-	OscoreError r;
+	enum oscore_error r;
 	struct context c_server;
 	struct oscore_init_params params_server = {
 		.dev_type = SERVER,
@@ -858,7 +859,7 @@ static void oscore_server_test6(void)
 
 	r = oscore_context_init(&params_server, &c_server);
 
-	zassert_equal(r, OscoreNoError, "Error in oscore_context_init");
+	zassert_equal(r, oscore_no_error, "Error in oscore_context_init");
 
 	zassert_mem_equal__(c_server.sc.sender_key.ptr, T6__SENDER_KEY,
 			    c_server.sc.sender_key.len,

@@ -14,12 +14,12 @@
 #include "../inc/print_util.h"
 #include "../cbor/aad_array.h"
 
-
-OscoreError create_aad(struct o_coap_option *options, uint16_t opt_num,
-		       enum AEAD_algorithm aead_alg, struct byte_array *kid,
-		       struct byte_array *piv, struct byte_array *out)
+enum oscore_error create_aad(struct o_coap_option *options, uint16_t opt_num,
+			     enum AEAD_algorithm aead_alg,
+			     struct byte_array *kid, struct byte_array *piv,
+			     struct byte_array *out)
 {
-	OscoreError r;
+	enum oscore_error r;
 
 	bool success_encoding;
 	struct aad_array aad_array;
@@ -43,7 +43,7 @@ OscoreError create_aad(struct o_coap_option *options, uint16_t opt_num,
 	};
 	r = encode_options(options, opt_num, CLASS_I, &opts_i.ptr[0],
 			   encoded_opt_i_len);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 
 	aad_array._aad_array_options.len = opts_i.len;
@@ -58,5 +58,5 @@ OscoreError create_aad(struct o_coap_option *options, uint16_t opt_num,
 	}
 	out->len = payload_len_out;
 	PRINT_ARRAY("AAD", out->ptr, out->len);
-	return OscoreNoError;
+	return oscore_no_error;
 }

@@ -30,13 +30,14 @@ enum aes_operation {
  * @param   aad data which is only authenticated not encrypted
  * @param   tag outputs the authentication tag in case of encryption. 
  *          In case of decryption the it is an input parameter.
- * @retval  OscoreAuthenticationError if the authentication fails 
- *          else OscoreNoError
+ * @retval  oscore_authentication_error if the authentication fails
+ *          else oscore_no_error
  */
-OscoreError aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
-			      struct byte_array *out, struct byte_array *key,
-			      struct byte_array *nonce, struct byte_array *aad,
-			      struct byte_array *tag);
+enum oscore_error
+aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
+		  struct byte_array *out, struct byte_array *key,
+		  struct byte_array *nonce, struct byte_array *aad,
+		  struct byte_array *tag);
 
 /**
  * @brief   HKDF funcion used for the derivation of the Common IV, 
@@ -46,8 +47,8 @@ OscoreError aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
  * @param   info a CBOR structure containing id, id_context, alg_aead, type, L 
  * @param   out the derived Common IV, Recipient/Sender keys
  */
-OscoreError hkdf_sha_256(struct byte_array *master_secret,
-			 struct byte_array *master_salt,
-			 struct byte_array *info, struct byte_array *out);
+enum oscore_error hkdf_sha_256(struct byte_array *master_secret,
+			       struct byte_array *master_salt,
+			       struct byte_array *info, struct byte_array *out);
 
 #endif

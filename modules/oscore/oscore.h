@@ -53,10 +53,10 @@ struct oscore_init_params {
  * 
  * @param 	params a struct containing the initialization parameters
  * @param	context a struct containing the contexts
- * @return  OscoreError
+ * @return  oscore_error
  */
-OscoreError oscore_context_init(struct oscore_init_params *params,
-				struct context *c);
+enum oscore_error oscore_context_init(struct oscore_init_params *params,
+				      struct context *c);
 
 /**
  * @brief  	Checks if the packet in buf_in is a OSCORE packet.
@@ -74,11 +74,11 @@ OscoreError oscore_context_init(struct oscore_init_params *params,
  *          packet was CoAP false
  * @param 	c pointer to a security context
  * @param 	oscore_pkg indicates if an incoming packet is OSCORE
- * @return 	OscoreError
+ * @return	oscore_error
  */
-OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
-			uint16_t *buf_out_len, bool *oscore_pkg_flag,
-			struct context *c);
+enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
+			      uint8_t *buf_out, uint16_t *buf_out_len,
+			      bool *oscore_pkg_flag, struct context *c);
 
 /**
  *@brief 	Converts a CoAP packet to OSCORE packet
@@ -88,10 +88,10 @@ OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
  *@param	buf_oscore a buffer where the OSCORE packet will be written
  *@param	buf_oscore_len length of the OSCORE packet
  *@param	c a struct containing the OSCORE context
- *@return 	OscoreError
+ *@return	oscore_error
  */
-OscoreError coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
-			uint8_t *buf_oscore, uint16_t *buf_oscore_len,
-			struct context *c);
+enum oscore_error coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
+			      uint8_t *buf_oscore, uint16_t *buf_oscore_len,
+			      struct context *c);
 
 #endif

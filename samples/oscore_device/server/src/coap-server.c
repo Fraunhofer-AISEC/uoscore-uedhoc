@@ -601,7 +601,7 @@ void main(void)
 
 	r = oscore_context_init(&params, &c);
 
-	if (r != OscoreNoError) {
+	if (r != oscore_no_error) {
 		LOG_DBG("Error during establishing an OSCORE security context!\n");
 		goto quit;
 	} else {

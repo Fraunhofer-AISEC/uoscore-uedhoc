@@ -95,7 +95,7 @@ struct context {
  * @param   ssn the sender sequence number
  * @param   piv Partial IV
  */
-OscoreError sender_seq_num2piv(uint64_t ssn, struct byte_array *piv);
+enum oscore_error sender_seq_num2piv(uint64_t ssn, struct byte_array *piv);
 
 /**
  * @brief   Updates runtime parameter of the context
@@ -106,9 +106,10 @@ OscoreError sender_seq_num2piv(uint64_t ssn, struct byte_array *piv);
  * @param   new_kid_context 
  * @param   c oscore context
  */
-OscoreError context_update(enum dev_type dev, struct o_coap_option *options,
-			   uint16_t opt_num, struct byte_array *new_piv,
-			   struct byte_array *new_kid_context,
-			   struct context *c);
+enum oscore_error context_update(enum dev_type dev,
+				 struct o_coap_option *options,
+				 uint16_t opt_num, struct byte_array *new_piv,
+				 struct byte_array *new_kid_context,
+				 struct context *c);
 
 #endif

@@ -24,10 +24,10 @@
  * @brief Encode the input AAD to defined COSE structure
  * @param external_aad: input aad to form COSE structure
  * @param out: output encoded COSE byte string
- * @return OscoreError
+ * @return oscore_error
  */
-static OscoreError create_enc_structure(struct byte_array *external_aad,
-					struct byte_array *out)
+static enum oscore_error create_enc_structure(struct byte_array *external_aad,
+					      struct byte_array *out)
 {
 	bool success_encoding;
 	struct enc_structure enc_structure;
@@ -48,17 +48,17 @@ static OscoreError create_enc_structure(struct byte_array *external_aad,
 		return cbor_encoding_error;
 	}
 	out->len = payload_len_out;
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
-OscoreError cose_decrypt(struct byte_array *in_ciphertext,
-			 struct byte_array *out_plaintext,
-			 struct byte_array *nonce,
-			 struct byte_array *recipient_aad,
-			 struct byte_array *key)
+enum oscore_error cose_decrypt(struct byte_array *in_ciphertext,
+			       struct byte_array *out_plaintext,
+			       struct byte_array *nonce,
+			       struct byte_array *recipient_aad,
+			       struct byte_array *key)
 {
 	/* get enc_structure */
-	OscoreError r;
+	enum oscore_error r;
 	uint32_t aad_len = recipient_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
 	struct byte_array aad = {
@@ -66,7 +66,7 @@ OscoreError cose_decrypt(struct byte_array *in_ciphertext,
 		.ptr = aad_bytes,
 	};
 	r = create_enc_structure(recipient_aad, &aad);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 	PRINT_ARRAY("AAD encoded", aad.ptr, aad.len);
 
@@ -79,7 +79,7 @@ OscoreError cose_decrypt(struct byte_array *in_ciphertext,
 	r = aes_ccm_16_64_128(DECRYPT, in_ciphertext, out_plaintext, key, nonce,
 			      &aad, &tag);
 
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 
 	PRINT_ARRAY("Decrypted plaintext", out_plaintext->ptr,
@@ -87,13 +87,13 @@ OscoreError cose_decrypt(struct byte_array *in_ciphertext,
 	return r;
 }
 
-OscoreError cose_encrypt(struct byte_array *in_plaintext,
-			 uint8_t *out_ciphertext, uint32_t out_ciphertext_len,
-			 struct byte_array *nonce,
-			 struct byte_array *sender_aad, struct byte_array *key)
+enum oscore_error
+cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
+	     uint32_t out_ciphertext_len, struct byte_array *nonce,
+	     struct byte_array *sender_aad, struct byte_array *key)
 {
 	/* get enc_structure  */
-	OscoreError r;
+	enum oscore_error r;
 
 	uint32_t aad_len = sender_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
@@ -102,7 +102,7 @@ OscoreError cose_encrypt(struct byte_array *in_plaintext,
 		.ptr = aad_bytes,
 	};
 	r = create_enc_structure(sender_aad, &aad);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 	struct byte_array tag = {
 		.len = 8,
@@ -115,9 +115,9 @@ OscoreError cose_encrypt(struct byte_array *in_plaintext,
 	};
 	r = aes_ccm_16_64_128(ENCRYPT, in_plaintext, &ctxt, key, nonce, &aad,
 			      &tag);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 
 	PRINT_ARRAY("Ciphertext", out_ciphertext, out_ciphertext_len);
-	return OscoreNoError;
+	return oscore_no_error;
 }

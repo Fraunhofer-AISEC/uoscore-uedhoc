@@ -75,10 +75,11 @@ bool (*class_to_condition(enum option_class class))(uint16_t code);
  * @param   out Out-array. Must be at least `num_options(...)` long or NULL.
  * @param   offset_out Pointer to write byte-length of options into. 
  *          Can be NULL.
- * @return  OscoreError
+ * @return  oscore_error
  */
-OscoreError decode_options(struct byte_array options, struct o_coap_option *out,
-			   uint16_t *offset_out);
+enum oscore_error decode_options(struct byte_array options,
+				 struct o_coap_option *out,
+				 uint16_t *offset_out);
 
 /**
  * @brief   Returns the length in bytes of the serialized options 
@@ -101,10 +102,10 @@ uint32_t encoded_option_len(struct o_coap_option *options, uint16_t opt_num,
  * @param   out out-pointer. Must be at least `encoded_option_len(...)` 
  *          bytes long.
  * @param   out_buf_len the length of of the out buffer
- * @return  OscoreError
+ * @return  oscore_error
  */
-OscoreError encode_options(struct o_coap_option *options, uint16_t opt_num,
-			   enum option_class class, uint8_t *out,
-			   uint8_t out_buf_len);
+enum oscore_error encode_options(struct o_coap_option *options,
+				 uint16_t opt_num, enum option_class class,
+				 uint8_t *out, uint8_t out_buf_len);
 
 #endif

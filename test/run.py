@@ -86,11 +86,12 @@ def build(name, opt, arc):
     f.close()
 
     m = open("src/main.h", "w+")
+    m.write("/* SPDX-License-Identifier: Apache-2.0 or MIT at your option */\n")
     if (name == 'libuoscore.a'):
-        m.write("#define OSCORE_TESTS")
+        m.write("#define OSCORE_TESTS\n")
 
     if (name == 'libuedhoc.a'):
-        m.write("#define EDHOC_TESTS")
+        m.write("#define EDHOC_TESTS\n")
     m.close
 
     # build with west
@@ -161,7 +162,7 @@ def main():
     """
     clean_all()
 
-    build('libuedhoc.a', '-O0', arc('native_posix', 'x86'))
+    build('libuoscore.a', '-O0', arc('native_posix', 'x86'))
     test(arc('native_posix', 'x86'))
 
     # x86
@@ -195,11 +196,12 @@ def main():
 
     # RISC-V
     #run_tests('libuoscore.a', arc('hifive1', 'risc-v-rv32imac'))
-    #run_tests('libuedhoc.a', arc('hifive1', 'risc-v-rv32imac'))   
+    #run_tests('libuedhoc.a', arc('hifive1', 'risc-v-rv32imac'))
 
     # Xtensa
     #run_tests('libuoscore.a', arc('esp32', 'xtensa-esp32'))
-    #run_tests('libuedhoc.a', arc('esp32', 'xtensa-esp32'))   
+    #run_tests('libuedhoc.a', arc('esp32', 'xtensa-esp32'))
+
 
 if __name__ == "__main__":
     main()

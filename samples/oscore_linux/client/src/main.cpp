@@ -32,7 +32,7 @@ struct context c_client;
 int main()
 {
 	setbuf(stdout, NULL); //disable printf buffereing
-	OscoreError r;
+	oscore_error r;
 	int err;
 	char buffer[MAXLINE];
 
@@ -77,7 +77,7 @@ int main()
 	};
 	r = oscore_context_init(&params, &c_client);
 
-	if (r != OscoreNoError) {
+	if (r != oscore_no_error) {
 		printf("Error during establishing an OSCORE security context!\n");
 	}
 
@@ -113,7 +113,7 @@ int main()
 			r = coap2oscore(protected_pdu->getPDUPointer(),
 					(uint16_t)protected_pdu->getPDULength(),
 					buf_oscore, &buf_oscore_len, &c_client);
-			if (r != OscoreNoError) {
+			if (r != oscore_no_error) {
 				printf("Error in coap2oscore (Error code %d)!\n",
 				       r);
 			}
@@ -133,7 +133,7 @@ int main()
 						coap_rx_buf, &coap_rx_buf_len,
 						&oscore_flag, &c_client);
 
-				if (r != OscoreNoError) {
+				if (r != oscore_no_error) {
 					printf("Error in oscore2coap (Error code %d)!\n",
 					       r);
 				}

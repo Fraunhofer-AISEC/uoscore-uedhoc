@@ -15,29 +15,29 @@
 /**
  * Error type used throughout the whole oscore implementation.
  *
- * Every function that might error returns an OscoreError and writes its 
+ * Every function that might error returns an oscore_error and writes its
  * return value into an out-parameter.
  */
-typedef enum OscoreError {
-	OscoreNoError = 0,
-	OscoreTinyCryptError = 1,
-	OscoreUnknownHkdf = 2,
-	OscoreOutTooLong = 3,
-	OscoreInvalidAlgorithmAEAD = 4,
-	OscoreInvalidAlgorithmHKDF = 5,
-	OscoreKidRecipentIdMismatch = 6,
-	OscoreAuthenticationError = 7,
-	OscoreValueLenToLongError = 8,
-	OscoreInPktInvalidTKL = 9,
-	OscoreInPktInvalidOptionDelta = 10,
-	OscoreInPktInvalidOptionLen = 11,
-	OscoreInPktInvalidPiv = 12,
-	OscoreInfoToLong = 13,
+enum oscore_error {
+	oscore_no_error = 0,
+	oscore_tiny_crypt_error = 1,
+	oscore_unknown_hkdf = 2,
+	oscore_out_too_long = 3,
+	oscore_invalid_algorithm_aead = 4,
+	oscore_invalid_algorithm_hkdf = 5,
+	oscore_kid_recipent_id_mismatch = 6,
+	oscore_authentication_error = 7,
+	oscore_valuelen_to_long_error = 8,
+	oscore_inpkt_invalid_tkl = 9,
+	oscore_inpkt_invalid_option_delta = 10,
+	oscore_inpkt_invalid_optionlen = 11,
+	oscore_inpkt_invalid_piv = 12,
+	//oscore_info_to_long = 13,
 	dest_buffer_to_small = 14,
-	DeltaExtraByteError = 15,
-	LenExtraByteError = 16,
+	delta_extra_byte_error = 15,
+	len_extra_byte_error = 16,
 	cbor_encoding_error = 17,
-	NotValidInputPacket = 18,
-} OscoreError;
+	not_valid_input_packet = 18,
+};
 
 #endif

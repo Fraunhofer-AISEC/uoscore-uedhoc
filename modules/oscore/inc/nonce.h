@@ -22,8 +22,9 @@
  * @param   common_iv MUST be 13 bytes long
  * @param   out MUST be 13 bytes long
  */
-OscoreError create_nonce(struct byte_array *id_piv, struct byte_array *piv,
-			 struct byte_array *common_iv,
-			 struct byte_array *nonce);
+enum oscore_error create_nonce(struct byte_array *id_piv,
+			       struct byte_array *piv,
+			       struct byte_array *common_iv,
+			       struct byte_array *nonce);
 
 #endif

@@ -25,7 +25,7 @@
 	do {                                                                   \
 		int res = (e);                                                 \
 		if (res != TC_CRYPTO_SUCCESS) {                                \
-			return OscoreTinyCryptError;                           \
+			return oscore_tiny_crypt_error;                        \
 		}                                                              \
 	} while (0)
 
@@ -33,7 +33,7 @@
 
 #endif
 
-OscoreError __attribute__((weak))
+enum oscore_error __attribute__((weak))
 aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
 		  struct byte_array *out, struct byte_array *key,
 		  struct byte_array *nonce, struct byte_array *aad,
@@ -48,7 +48,7 @@ aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
 
 	result = tc_ccm_config(&c, &sched, nonce->ptr, nonce->len, 8);
 	if (result == 0) {
-		return OscoreTinyCryptError;
+		return oscore_tiny_crypt_error;
 	}
 
 	if (op == DECRYPT) {
@@ -57,7 +57,7 @@ aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
 							in->ptr, in->len, &c);
 
 		if (result == 0) {
-			return OscoreAuthenticationError;
+			return oscore_authentication_error;
 		}
 
 	} else {
@@ -66,16 +66,16 @@ aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
 						      in->ptr, in->len, &c);
 
 		if (result == 0) {
-			return OscoreTinyCryptError;
+			return oscore_tiny_crypt_error;
 		}
 	}
 
 #endif /* TINYCRYPT */
 
-	return OscoreNoError;
+	return oscore_no_error;
 };
 
-OscoreError __attribute__((weak))
+enum oscore_error __attribute__((weak))
 hkdf_sha_256(struct byte_array *master_secret, struct byte_array *master_salt,
 	     struct byte_array *info, struct byte_array *out)
 {
@@ -111,7 +111,7 @@ hkdf_sha_256(struct byte_array *master_secret, struct byte_array *master_salt,
 	size_t iterations = (out->len + 31) / 32;
 	// "L length of output keying material in octets (<= 255*HashLen)"
 	if (iterations > 255) {
-		return OscoreOutTooLong;
+		return oscore_out_too_long;
 	}
 
 	uint8_t t[32] = { 0 };
@@ -132,7 +132,7 @@ hkdf_sha_256(struct byte_array *master_secret, struct byte_array *master_salt,
 		}
 	}
 
-	return OscoreNoError;
+	return oscore_no_error;
 
 #endif /* TINYCRYPT */
 };

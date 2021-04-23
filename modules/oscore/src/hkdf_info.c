@@ -33,12 +33,11 @@ output = HKDF(salt, IKM, info, L
 * https://www.iana.org/assignments/cose/cose.xhtml
 */
 
-
-inline OscoreError create_hkdf_info(struct byte_array *id,
-				    struct byte_array *id_context,
-				    enum AEAD_algorithm aead_alg,
-				    enum derive_type type,
-				    struct byte_array *out)
+inline enum oscore_error create_hkdf_info(struct byte_array *id,
+					  struct byte_array *id_context,
+					  enum AEAD_algorithm aead_alg,
+					  enum derive_type type,
+					  struct byte_array *out)
 {
 	bool success_encoding;
 	struct info info_struct;
@@ -83,5 +82,5 @@ inline OscoreError create_hkdf_info(struct byte_array *id,
 		return cbor_encoding_error;
 	}
 	out->len = payload_len_out;
-	return OscoreNoError;
+	return oscore_no_error;
 }

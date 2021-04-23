@@ -28,9 +28,9 @@
  *          sequence number.
  * @param   out out-array. Must have the exact length as 
  *          provided by `aad_length`.
- * @return OscoreError
+ * @return oscore_error
  */
-OscoreError create_aad(struct o_coap_option *options, uint16_t opt_num,
+enum oscore_error create_aad(struct o_coap_option *options, uint16_t opt_num,
 		       enum AEAD_algorithm aead_alg, struct byte_array *kid,
 		       struct byte_array *piv, struct byte_array *out);
 

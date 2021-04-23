@@ -19,9 +19,9 @@
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 
-OscoreError options_into_byte_string(struct o_coap_option *options,
-				     uint8_t options_cnt,
-				     struct byte_array *out_byte_string)
+enum oscore_error options_into_byte_string(struct o_coap_option *options,
+					   uint8_t options_cnt,
+					   struct byte_array *out_byte_string)
 {
 	uint8_t delta_extra_byte = 0;
 	uint8_t len_extra_byte = 0;
@@ -67,7 +67,7 @@ OscoreError options_into_byte_string(struct o_coap_option *options,
 					(uint8_t)((temp_delta & 0x00FF) >> 0);
 				break;
 			default:
-				return DeltaExtraByteError;
+				return delta_extra_byte_error;
 				break;
 			}
 			switch (len_extra_byte) {
@@ -88,7 +88,7 @@ OscoreError options_into_byte_string(struct o_coap_option *options,
 					(uint8_t)((temp_len & 0x00FF) >> 0);
 				break;
 			default:
-				return LenExtraByteError;
+				return len_extra_byte_error;
 				break;
 			}
 		}
@@ -101,13 +101,13 @@ OscoreError options_into_byte_string(struct o_coap_option *options,
 		/* Copy the byte string of current option into output*/
 		uint64_t dest_size = out_byte_string_capacity -
 				     (temp_ptr - out_byte_string->ptr);
-		OscoreError r = _memcpy_s(temp_ptr, dest_size, options[i].value,
-					  options[i].len);
-		if (r != OscoreNoError)
+		enum oscore_error r = _memcpy_s(
+			temp_ptr, dest_size, options[i].value, options[i].len);
+		if (r != oscore_no_error)
 			return r;
 		temp_ptr += options[i].len;
 	}
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
 /**
@@ -116,11 +116,12 @@ OscoreError options_into_byte_string(struct o_coap_option *options,
  * @param in_data_len: length of input byte string
  * @param out_options: pointer to output options structure array
  * @param out_options_count: count number of output options
- * @return  OscoreError
+ * @return  oscore_error
  */
-static inline OscoreError buf2options(uint8_t *in_data, uint16_t in_data_len,
-				      struct o_coap_option *out_options,
-				      uint8_t *out_options_count)
+static inline enum oscore_error buf2options(uint8_t *in_data,
+					    uint16_t in_data_len,
+					    struct o_coap_option *out_options,
+					    uint8_t *out_options_count)
 {
 	uint8_t *temp_options_ptr = in_data;
 	uint8_t temp_options_count = 0;
@@ -156,7 +157,7 @@ static inline OscoreError buf2options(uint8_t *in_data, uint16_t in_data_len,
 			break;
 		case 15:
 			// ERROR
-			return OscoreInPktInvalidOptionDelta;
+			return oscore_inpkt_invalid_option_delta;
 			break;
 		default:
 			break;
@@ -178,7 +179,7 @@ static inline OscoreError buf2options(uint8_t *in_data, uint16_t in_data_len,
 			break;
 		case 15:
 			/* ERROR */
-			return OscoreInPktInvalidOptionLen;
+			return oscore_inpkt_invalid_optionlen;
 			break;
 		default:
 			break;
@@ -205,18 +206,18 @@ static inline OscoreError buf2options(uint8_t *in_data, uint16_t in_data_len,
 	// Assign options count number
 	*out_options_count = temp_options_count;
 
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
-OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
+enum oscore_error buf2coap(struct byte_array *in, struct o_coap_packet *out)
 {
-	OscoreError r;
+	enum oscore_error r;
 	uint8_t *tmp_p = in->ptr;
 	uint16_t payload_len = in->len;
 
 	/* Read CoAP/OSCORE header (4 bytes)*/
 	if (payload_len < HEADER_LEN) {
-		return NotValidInputPacket;
+		return not_valid_input_packet;
 	}
 	out->header.ver =
 		((*tmp_p) & HEADER_VERSION_MASK) >> HEADER_VERSION_OFFSET;
@@ -237,7 +238,7 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
 			out->token = tmp_p;
 		} else {
 			/* ERROR: CoAP token length maximal 8 bytes */
-			return OscoreInPktInvalidTKL;
+			return oscore_inpkt_invalid_tkl;
 		}
 		/* Update pointer and length */
 		tmp_p += out->header.TKL;
@@ -262,7 +263,7 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
 					payload_len--;
 					tmp_p++;
 					options_len++;
-					if(payload_len == 0){
+					if (payload_len == 0) {
 						break;
 					}
 				}
@@ -273,7 +274,7 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
 				r = buf2options(temp_option_ptr, options_len,
 						out->options,
 						&(out->options_cnt));
-				if (r != OscoreNoError)
+				if (r != oscore_no_error)
 					return r;
 			} else {
 				out->options_cnt = 0;
@@ -290,14 +291,14 @@ OscoreError buf2coap(struct byte_array *in, struct o_coap_packet *out)
 		out->payload = tmp_p;
 	}
 
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
-OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
-		     uint16_t *out_byte_string_len)
+enum oscore_error coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
+			   uint16_t *out_byte_string_len)
 {
 	uint8_t *temp_out_ptr = out_byte_string;
-	OscoreError r;
+	enum oscore_error r;
 
 	/* First byte in header (version + type + token length) */
 	*temp_out_ptr = (in->header.ver << HEADER_VERSION_OFFSET) |
@@ -316,7 +317,7 @@ OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			*out_byte_string_len - (temp_out_ptr - out_byte_string);
 		r = _memcpy_s(temp_out_ptr, dest_size, in->token,
 			      in->header.TKL);
-		if (r != OscoreNoError)
+		if (r != oscore_no_error)
 			return r;
 
 		temp_out_ptr += in->header.TKL;
@@ -337,7 +338,7 @@ OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 	/* Convert all OSCORE U-options structure into byte string*/
 	r = options_into_byte_string(in->options, in->options_cnt,
 				     &option_byte_string);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 	/* Copy options byte string into output*/
 
@@ -345,7 +346,7 @@ OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 		*out_byte_string_len - (temp_out_ptr - out_byte_string);
 	r = _memcpy_s(temp_out_ptr, dest_size, temp_opt_bytes,
 		      option_byte_string.len);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 
 	temp_out_ptr += option_byte_string.len;
@@ -358,7 +359,7 @@ OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			    (temp_out_ptr + 1 - out_byte_string);
 		r = _memcpy_s(++temp_out_ptr, dest_size, in->payload,
 			      in->payload_len);
-		if (r != OscoreNoError)
+		if (r != oscore_no_error)
 			return r;
 	}
 	*out_byte_string_len = 4 + in->header.TKL + option_byte_string.len;
@@ -368,5 +369,5 @@ OscoreError coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 
 	PRINT_ARRAY("Byte string of the converted packet", out_byte_string,
 		    *out_byte_string_len);
-	return OscoreNoError;
+	return oscore_no_error;
 }

@@ -29,7 +29,7 @@
  * @param out: pointer output compressed OSCORE_option
  * @return error types or is or not OSCORE packet
  */
-static inline OscoreError
+static inline enum oscore_error
 oscore_option_parser(struct o_coap_packet *in,
 		     struct compressed_oscore_option *out, bool *oscore_pkt)
 {
@@ -83,7 +83,7 @@ oscore_option_parser(struct o_coap_packet *in,
 				case 6:
 				case 7:
 					/* ERROR: Byte length of PIV not right, max. 5 bytes */
-					return OscoreInPktInvalidPiv;
+					return oscore_inpkt_invalid_piv;
 					break;
 				default:
 					out->piv.ptr =
@@ -124,7 +124,7 @@ oscore_option_parser(struct o_coap_packet *in,
 		}
 	}
 
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
 /**
@@ -134,9 +134,9 @@ oscore_option_parser(struct o_coap_packet *in,
  * @param oscore_packet: complete OSCORE packet which contains the ciphertext to be decrypted
  * @return void
  */
-static inline OscoreError payload_decrypt(struct context *c,
-					  struct byte_array *out_plaintext,
-					  struct o_coap_packet *oscore_packet)
+static inline enum oscore_error
+payload_decrypt(struct context *c, struct byte_array *out_plaintext,
+		struct o_coap_packet *oscore_packet)
 {
 	struct byte_array oscore_ciphertext = {
 		.len = oscore_packet->payload_len,
@@ -276,11 +276,12 @@ void options_from_oscore_reorder(struct o_coap_packet *in_oscore_packet,
  * @param in_data_len: length of input byte string
  * @param out_options: pointer to output options structure array
  * @param out_options_count: count number of output options
- * @return  OscoreError
+ * @return  oscore_error
  */
-OscoreError oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
-					 struct o_coap_option *out_options,
-					 uint8_t *out_options_count)
+enum oscore_error
+oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
+			     struct o_coap_option *out_options,
+			     uint8_t *out_options_count)
 {
 	uint8_t *temp_options_ptr = in_data;
 	uint8_t temp_options_count = 0;
@@ -316,7 +317,7 @@ OscoreError oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 			break;
 		case 15:
 			// ERROR
-			return OscoreInPktInvalidOptionDelta;
+			return oscore_inpkt_invalid_option_delta;
 			break;
 		default:
 			break;
@@ -338,7 +339,7 @@ OscoreError oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 			break;
 		case 15:
 			// ERROR
-			return OscoreInPktInvalidOptionLen;
+			return oscore_inpkt_invalid_optionlen;
 			break;
 		default:
 			break;
@@ -365,7 +366,7 @@ OscoreError oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 	// Assign options count number
 	*out_options_count = temp_options_count;
 
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
 /**
@@ -375,9 +376,9 @@ OscoreError oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
  * @param out_E_options: output pointer to an array of E-options
  * @param E_options_cnt: count number of E-options
  * @param out_o_coap_payload: output pointer original unprotected CoAP payload
- * @return  OscoreError
+ * @return  oscore_error
  */
-OscoreError oscore_decrypted_payload_parser(
+enum oscore_error oscore_decrypted_payload_parser(
 	struct byte_array *in_payload, uint8_t *out_code,
 	struct o_coap_option *out_E_options, uint8_t *E_options_cnt,
 	struct byte_array *out_o_coap_payload)
@@ -411,7 +412,7 @@ OscoreError oscore_decrypted_payload_parser(
 							 options_len,
 							 out_E_options,
 							 E_options_cnt);
-			if (r != OscoreNoError)
+			if (r != oscore_no_error)
 				return r;
 		} else
 			*E_options_cnt = 0;
@@ -428,7 +429,7 @@ OscoreError oscore_decrypted_payload_parser(
 		out_o_coap_payload->ptr = temp_payload_ptr;
 	}
 
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
 /**
@@ -438,12 +439,12 @@ OscoreError oscore_decrypted_payload_parser(
  * @param out_o_coap_packet: pointer to output CoAP packet
  * @return
  */
-static inline OscoreError
+static inline enum oscore_error
 o_coap_pkg_generate(struct byte_array *decrypted_payload,
 		    struct o_coap_packet *in_oscore_packet,
 		    struct o_coap_packet *out_o_coap_packet)
 {
-	OscoreError r;
+	enum oscore_error r;
 	uint8_t code = 0;
 	struct byte_array unprotected_o_coap_payload = {
 		.len = 0,
@@ -456,7 +457,7 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 	r = oscore_decrypted_payload_parser(decrypted_payload, &code, E_options,
 					    &E_options_cnt,
 					    &unprotected_o_coap_payload);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 	/* Copy each items from OSCORE packet to CoAP packet */
 	/* Header */
@@ -482,14 +483,14 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 	/* reorder all options, and copy it to output coap packet */
 	options_from_oscore_reorder(in_oscore_packet, E_options, E_options_cnt,
 				    out_o_coap_packet);
-	return OscoreNoError;
+	return oscore_no_error;
 }
 
-OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
-			uint16_t *buf_out_len, bool *oscore_pkg_flag,
-			struct context *c)
+enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
+			      uint8_t *buf_out, uint16_t *buf_out_len,
+			      bool *oscore_pkg_flag, struct context *c)
 {
-	uint8_t r = OscoreNoError;
+	uint8_t r = oscore_no_error;
 	struct o_coap_packet oscore_packet;
 	struct compressed_oscore_option oscore_option;
 	struct byte_array buf;
@@ -503,13 +504,13 @@ OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
 
 	/*Parse the incoming message (buf_in) into a CoAP struct*/
 	r = buf2coap(&buf, &oscore_packet);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 
 	/* Check if the packet is OSCORE packet and if so parse the OSCORE option */
 	r = oscore_option_parser(&oscore_packet, &oscore_option,
 				 oscore_pkg_flag);
-	if (r != OscoreNoError)
+	if (r != oscore_no_error)
 		return r;
 
 	/* If the incoming packet is OSCORE packet -- analyze and and decrypt it. */
@@ -526,7 +527,7 @@ OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
              belongs.*/
 			if (!array_equals(&c->rc.recipient_id,
 					  &oscore_option.kid)) {
-				return OscoreKidRecipentIdMismatch;
+				return oscore_kid_recipent_id_mismatch;
 			}
 
 			/*If this is a request message we need to calculate the nonce, aad 
@@ -536,7 +537,7 @@ OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
 				(struct o_coap_option *)&oscore_packet.options,
 				oscore_packet.options_cnt, &oscore_option.piv,
 				&oscore_option.kid_context, c);
-			if (r != OscoreNoError)
+			if (r != oscore_no_error)
 				return r;
 		}
 
@@ -550,14 +551,14 @@ OscoreError oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
 
 		/* Decrypt payload */
 		r = payload_decrypt(c, &plaintext, &oscore_packet);
-		if (r != OscoreNoError)
+		if (r != oscore_no_error)
 			return r;
 
 		/* Generate corresponding CoAP packet */
 		struct o_coap_packet o_coap_packet;
 		r = o_coap_pkg_generate(&plaintext, &oscore_packet,
 					&o_coap_packet);
-		if (r != OscoreNoError)
+		if (r != oscore_no_error)
 			return r;
 
 		/*Convert to byte string*/

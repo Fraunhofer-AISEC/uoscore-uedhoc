@@ -15,7 +15,6 @@
 #include "byte_array.h"
 #include "error.h"
 
-
 /**
  * @brief Decrypt the ciphertext
  * @param in_ciphertext: input ciphertext to be decrypted
@@ -23,12 +22,12 @@
  * @param nonce the nonce
  * @param aad the aad
  * @param recipient_key the recipient key
- * @return OscoreError
+ * @return oscore_error
  */
-OscoreError cose_decrypt(struct byte_array *in_ciphertext,
-			 struct byte_array *out_plaintext,
-			 struct byte_array *nonce, struct byte_array *aad,
-			 struct byte_array *recipient_key);
+enum oscore_error cose_decrypt(struct byte_array *in_ciphertext,
+			       struct byte_array *out_plaintext,
+			       struct byte_array *nonce, struct byte_array *aad,
+			       struct byte_array *recipient_key);
 
 /**
  * @brief Encrypt the plaintext
@@ -37,10 +36,10 @@ OscoreError cose_decrypt(struct byte_array *in_ciphertext,
  * @param nonce the nonce
  * @param aad the aad
  * @param sender_key the sender key
- * @return OscoreError
+ * @return oscore_error
  */
-OscoreError cose_encrypt(struct byte_array *in_plaintext,
-			 uint8_t *out_ciphertext, uint32_t out_ciphertext_len,
-			 struct byte_array *nonce,
-			 struct byte_array *sender_aad, struct byte_array *key);
+enum oscore_error
+cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
+	     uint32_t out_ciphertext_len, struct byte_array *nonce,
+	     struct byte_array *sender_aad, struct byte_array *key);
 #endif
