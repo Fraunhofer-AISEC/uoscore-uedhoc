@@ -22,9 +22,9 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_1.cddl code -
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_1.cddl code -d -t message_1 --oc decode_message_1.c --oh decode_message_1.h
 
 #encode message 2
-#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -e -t m2 --oc e_message_2.c --oh e_message_2.h
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -e -t m2 --oc encode_message_2.c --oh encode_message_2.h
 
-#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -e -t m2ci --oc e_message_2_c_i.c --oh e_message_2_c_i.h
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -e -t m2ci --oc encode_message_2_c_i.c --oh encode_message_2_c_i.h
 
 #decode message 2
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -d -t m2 --oc decode_message_2.c --oh decode_message_2.h

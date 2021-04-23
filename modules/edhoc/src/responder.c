@@ -30,7 +30,8 @@
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
 #include "../cbor/decode_message_1.h"
-
+#include "../cbor/encode_message_2_c_i.h"
+#include "../cbor/encode_message_2.h"
 /**
  * @brief   Parses message 1
  * @param   msg1 buffer containing message 1
@@ -209,42 +210,76 @@ msg2_encode(uint8_t corr, const uint8_t *c_i, uint8_t c_i_len,
 	    uint8_t c_r_len, const uint8_t *ciphertext_2,
 	    uint32_t ciphertext_2_len, uint8_t *msg2, uint32_t *msg2_len)
 {
-	CborEncoder enc;
-	CborError r;
-	cbor_encoder_init(&enc, msg2, *msg2_len, 0);
+	bool ok;
+	size_t payload_len_out;
 
 	if (corr != 1 && corr != 3) {
+		/*message 2 contains C_I*/
+		struct m2ci m;
+
+		/*Encode C_I*/
 		if (c_i_len == 1) {
-			r = cbor_encode_int(&enc, (*c_i - 24));
-			if (r == CborErrorOutOfMemory)
-				return CborEncodingBufferToSmall;
+			m._m2ci_C_I_choice = _m2ci_C_I_int;
+			m._m2ci_C_I_int = *c_i - 24;
 		} else {
-			r = cbor_encode_byte_string(&enc, c_i, c_i_len);
-			if (r == CborErrorOutOfMemory)
-				return CborEncodingBufferToSmall;
+			m._m2ci_C_I_choice = _m2ci_C_I_bstr;
+			m._m2ci_C_I_bstr.value = c_i;
+			m._m2ci_C_I_bstr.len = c_i_len;
+		}
+
+		/*Encode G_Y*/
+		m._m2ci_G_Y_choice = _m2ci_G_Y_bstr;
+		m._m2ci_G_Y_bstr.value = g_y;
+		m._m2ci_G_Y_bstr.len = g_y_len;
+
+		/*Encode C_R*/
+		if (c_r_len == 1) {
+			m._m2ci_C_R_choice = _m2ci_C_R_int;
+			m._m2ci_C_R_int = *c_r - 24;
+		} else {
+			m._m2ci_C_R_choice = _m2ci_C_R_bstr;
+			m._m2ci_C_R_bstr.value = c_r;
+			m._m2ci_C_R_bstr.len = c_r_len;
+		}
+
+		/*Encode CIPHERTEXT_2*/
+		m._m2ci_CIPHERTEXT_2.value = ciphertext_2;
+		m._m2ci_CIPHERTEXT_2.len = ciphertext_2_len;
+
+		ok = cbor_encode_m2ci(msg2, *msg2_len, &m, &payload_len_out);
+		if (!ok) {
+			return cbor_encoding_error;
+		}
+
+	} else {
+		/*message 2 does not contains C_I*/
+		struct m2 m;
+
+		/*Encode G_Y*/
+		m._m2_G_Y_choice = _m2ci_G_Y_bstr;
+		m._m2_G_Y_bstr.value = g_y;
+		m._m2_G_Y_bstr.len = g_y_len;
+
+		/*Encode C_R*/
+		if (c_r_len == 1) {
+			m._m2_C_R_choice = _m2_C_R_int;
+			m._m2_C_R_int = *c_r - 24;
+		} else {
+			m._m2_C_R_choice = _m2ci_C_R_bstr;
+			m._m2_C_R_bstr.value = c_r;
+			m._m2_C_R_bstr.len = c_r_len;
+		}
+
+		/*Encode CIPHERTEXT_2*/
+		m._m2_CIPHERTEXT_2.value = ciphertext_2;
+		m._m2_CIPHERTEXT_2.len = ciphertext_2_len;
+
+		ok = cbor_encode_m2(msg2, *msg2_len, &m, &payload_len_out);
+		if (!ok) {
+			return cbor_encoding_error;
 		}
 	}
-
-	r = cbor_encode_byte_string(&enc, g_y, g_y_len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
-
-	if (c_r_len == 1) {
-		r = cbor_encode_int(&enc, (*c_r - 24));
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
-	} else {
-		r = cbor_encode_byte_string(&enc, c_r, c_i_len);
-		if (r == CborErrorOutOfMemory)
-			return CborEncodingBufferToSmall;
-	}
-
-	r = cbor_encode_byte_string(&enc, ciphertext_2, ciphertext_2_len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
-
-	/* Get the CBOR length */
-	*msg2_len = cbor_encoder_get_buffer_size(&enc, msg2);
+	*msg2_len = payload_len_out;
 
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, *msg2_len);
 	return EdhocNoError;
