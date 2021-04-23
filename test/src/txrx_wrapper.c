@@ -33,7 +33,7 @@ static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
 	return 0;
 }
 
-EdhocError rx(uint8_t *data, uint32_t *data_len)
+enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
 	int r;
 	if (rx_initiator_switch) {
@@ -41,7 +41,7 @@ EdhocError rx(uint8_t *data, uint32_t *data_len)
 		/*The sender must get msg2*/
 		r = _memcpy_s(data, *data_len, M2.ptr, M2.len);
 		if (r != 0)
-			return MessageBuffToSmall;
+			return message_buff_to_small;
 		*data_len = M2.len;
 
 	} else {
@@ -52,22 +52,22 @@ EdhocError rx(uint8_t *data, uint32_t *data_len)
 			/*message 1 */
 			r = _memcpy_s(data, *data_len, M1.ptr, M1.len);
 			if (r != 0)
-				return MessageBuffToSmall;
+				return message_buff_to_small;
 			*data_len = M1.len;
 			msg_cnt++;
 		} else {
 			/*message 2*/
 			r = _memcpy_s(data, *data_len, M3.ptr, M3.len);
 			if (r != 0)
-				return MessageBuffToSmall;
+				return message_buff_to_small;
 			*data_len = M3.len;
 			msg_cnt = 1;
 		}
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError tx(uint8_t *data, uint32_t data_len)
+enum edhoc_error tx(uint8_t *data, uint32_t data_len)
 {
-	return EdhocNoError;
+	return edhoc_no_error;
 }

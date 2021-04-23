@@ -12,7 +12,7 @@
 
 #include "../inc/error.h"
 
-EdhocError get_suite(enum suite_label label, struct suite *suite)
+enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
 {
 	switch (label) {
 	case SUITE_0:
@@ -56,8 +56,8 @@ EdhocError get_suite(enum suite_label label, struct suite *suite)
 		suite->app_hash = SHA_256;
 		break;
 	default:
-		return UnsupportedCipherSuite;
+		return unsupported_cipher_suite;
 		break;
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }

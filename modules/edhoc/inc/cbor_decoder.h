@@ -24,8 +24,8 @@
  * @param   out_decoded_data the decoded data
  * @param   out_decoded_len the length of the decoded data
  */
-EdhocError cbor_decoder(uint8_t **next_ptr, uint8_t *in_buffer,
-			uint32_t in_size, void *out_decoded_data,
-			uint64_t *out_decoded_len, CborType *type);
+enum edhoc_error cbor_decoder(uint8_t **next_ptr, uint8_t *in_buffer,
+			      uint32_t in_size, void *out_decoded_data,
+			      uint64_t *out_decoded_len, CborType *type);
 
 #endif

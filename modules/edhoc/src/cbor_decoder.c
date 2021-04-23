@@ -13,15 +13,15 @@
 #include "../inc/error.h"
 #include "../inc/memcpy_s.h"
 
-EdhocError cbor_decoder(uint8_t **next_ptr, uint8_t *in_buffer,
-			uint32_t in_size, void *out_decoded_data,
-			uint64_t *out_decoded_len, CborType *type)
+enum edhoc_error cbor_decoder(uint8_t **next_ptr, uint8_t *in_buffer,
+			      uint32_t in_size, void *out_decoded_data,
+			      uint64_t *out_decoded_len, CborType *type)
 {
 	CborParser parser;
 	CborValue value;
 	CborError err;
 	uint64_t len = 0;
-	EdhocError r;
+	enum edhoc_error r;
 
 	/* Initialization */
 	err = cbor_parser_init(in_buffer, in_size, 0, &parser, &value);
@@ -60,7 +60,7 @@ EdhocError cbor_decoder(uint8_t **next_ptr, uint8_t *in_buffer,
 			return ErrorDuringCborDecoding;
 
 		r = _memcpy_s(out_decoded_data, *out_decoded_len, tmp, len);
-		if (r != EdhocNoError)
+		if (r != edhoc_no_error)
 			return r;
 		break;
 	}
@@ -88,10 +88,10 @@ EdhocError cbor_decoder(uint8_t **next_ptr, uint8_t *in_buffer,
 		value.offset++;
 		break;
 	default:
-		return UnsupportedCborType;
+		//return UnsupportedCborType;
 		break;
 	}
 
 	*next_ptr = (uint8_t *)(in_buffer + value.offset);
-	return EdhocNoError;
+	return edhoc_no_error;
 }

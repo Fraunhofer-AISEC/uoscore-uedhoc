@@ -58,7 +58,7 @@ enum dev_type { SERVER, CLIENT };
  */
 void edhoc_initiator_init(void)
 {
-	EdhocError r;
+	edhoc_error r;
 	uint8_t PRK_4x3m[PRK_DEFAULT_SIZE];
 	uint8_t th4[SHA_DEFAULT_SIZE];
 	uint8_t err_msg[ERR_MSG_DEFAULT_SIZE];
@@ -113,7 +113,7 @@ void edhoc_initiator_init(void)
 	r = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, PRK_4x3m, sizeof(PRK_4x3m),
 				th4, sizeof(th4));
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		PRINTK("error initiator run (Error Code %d\n)", r);
 	}
 

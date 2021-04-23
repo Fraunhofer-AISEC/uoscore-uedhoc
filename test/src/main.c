@@ -479,7 +479,7 @@ static void init_edhoc_responder_context(struct edhoc_responder_context *a,
 
 static void test_edhoc(enum party_type p, enum test t)
 {
-	EdhocError r;
+	enum edhoc_error r;
 	init_test_messages(p, t);
 	struct expected_result e;
 	init_expected_result(&e, t);
@@ -495,7 +495,7 @@ static void test_edhoc(enum party_type p, enum test t)
 					err_msg, &err_msg_len, ad_2, &ad_2_len,
 					PRK_4x3m, sizeof(PRK_4x3m), th4,
 					sizeof(th4));
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			printf("error initiator run (Error Code %d)\n", r);
 		}
 	} else {
@@ -510,7 +510,7 @@ static void test_edhoc(enum party_type p, enum test t)
 					&ad_1_len, (uint8_t *)&ad_3, &ad_3_len,
 					PRK_4x3m, sizeof(PRK_4x3m), th4,
 					sizeof(th4));
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			printf("error responder run (Error Code %d)\n", r);
 		}
 	}

@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 #include "../inc/error.h"
-EdhocError authentication_type_get(enum method_type m,
+enum edhoc_error authentication_type_get(enum method_type m,
 				   volatile bool *static_dh_i,
 				   volatile bool *static_dh_r)
 {
@@ -36,5 +36,5 @@ EdhocError authentication_type_get(enum method_type m,
 	default:
 		break;
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }

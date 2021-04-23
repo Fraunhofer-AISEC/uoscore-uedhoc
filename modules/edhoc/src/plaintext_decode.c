@@ -30,9 +30,10 @@
  * @param	id_len length of id
  * @param	
  */
-static EdhocError id_cred_x_encode(enum id_cred_x_label label, int algo,
-				   const void *id, uint64_t id_len,
-				   uint8_t *id_cred_x, uint64_t *id_cred_x_len)
+static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
+					 const void *id, uint64_t id_len,
+					 uint8_t *id_cred_x,
+					 uint64_t *id_cred_x_len)
 {
 	bool success;
 	struct id_cred_x_map map;
@@ -71,15 +72,16 @@ static EdhocError id_cred_x_encode(enum id_cred_x_label label, int algo,
 	}
 	*id_cred_x_len = payload_len_out;
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
-			   uint8_t *id_cred_x, uint64_t *id_cred_x_len,
-			   uint8_t *sign_or_mac, uint64_t *sign_or_mac_len,
-			   uint8_t *ad, uint64_t *ad_len)
+enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
+				 uint8_t *id_cred_x, uint64_t *id_cred_x_len,
+				 uint8_t *sign_or_mac,
+				 uint64_t *sign_or_mac_len, uint8_t *ad,
+				 uint64_t *ad_len)
 {
-	EdhocError r;
+	enum edhoc_error r;
 	bool success;
 	size_t decode_len = 0;
 	struct plaintext p;
@@ -102,7 +104,7 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 					._map_x5chain.len,
 				id_cred_x, id_cred_x_len);
 
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 		}
@@ -118,7 +120,7 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 					._map_x5t_bstr.len,
 				id_cred_x, id_cred_x_len);
 
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 		}
@@ -133,14 +135,14 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 					     p._plaintext_ID_CRED_x_bstr.value,
 					     p._plaintext_ID_CRED_x_bstr.len,
 					     id_cred_x, id_cred_x_len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 		} else {
 			int _kid = p._plaintext_ID_CRED_x_int + 24;
 			r = id_cred_x_encode(kid, 0, &_kid, 1, id_cred_x,
 					     id_cred_x_len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 		}
@@ -149,7 +151,7 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 		      p._plaintext_SGN_or_MAC_x.value,
 		      p._plaintext_SGN_or_MAC_x.len);
 	*sign_or_mac_len = p._plaintext_SGN_or_MAC_x.len;
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -157,12 +159,12 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 		r = _memcpy_s(ad, *ad_len, p._plaintext_AD_x.value,
 			      p._plaintext_AD_x.len);
 		*ad_len = p._plaintext_AD_x.len;
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 	} else {
 		*ad_len = 0;
 	}
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }

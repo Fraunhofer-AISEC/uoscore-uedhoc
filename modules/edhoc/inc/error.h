@@ -15,37 +15,38 @@
 /**
  * Error type used throughout the whole edhoc implementation.
  *
- * Every function that might error returns an EdhocError and writes its 
+ * Every function that might error returns an edhoc_error and writes its
  * return value into an out-parameter.
  */
-typedef enum EdhocError {
-	EdhocNoError = 0,
-	ErrorMessageReceived = 1,
-	ErrorMessageSent = 2,
-	ErrorDuringHKDFCalculation = 3,
-	UnsupportedCipherSuite = 4,
-	ErrorDuringAEAD = 5,
-	CredentialNotFound = 6,
-	ResponderAuthenticationFailed = 7,
-	ErrorDuringA3aeEncoding = 8,
-	AEADAuthenticationFailed = 9,
-	UnknownIdCredMapLabel = 10,
-	CertificateAuthenticationFailed = 11,
-	NoSuchCA = 12,
-	C_R_lengthtosmall = 13,
-	MessageBuffToSmall = 14,
-	DestBufferToSmall = 15,
-	CborEncodingError = 16,
-	UnsupportedCborType = 17,
+enum edhoc_error {
+	edhoc_no_error = 0,
+	error_message_received = 1,
+	error_message_sent = 2,
+
+	hkdf_fialed = 3,
+	aead_failed = 4,
+	unsupported_cipher_suite = 5,
+	unsupported_ecdh_curve = 6,
+	unsupported_aead_algorithm = 7,
+
+	responder_authentication_failed = 8,
+	aead_authentication_failed = 9,
+	certificate_authentication_failed = 10,
+
+	credential_not_found = 11,
+	no_such_ca = 12,
+
+	message_buff_to_small = 13,
+	dest_buffer_to_small = 14,
+
+	cbor_encoding_error = 15,
+	cbor_decoding_error = 16,
+	suites_i_list_to_long = 17,
+
+	//todo to be removed after migration to cddl-gen
 	CborEncodingBufferToSmall = 18,
 	CborByteStringBufferToSmall = 19,
 	ErrorDuringCborDecoding = 20,
-	UnsupportedEcdhCurve = 21,
-	cbor_encoding_error = 22,
-	cbor_decoding_error = 23,
-	at_least_one_suite_needed = 24,
-	suites_i_list_to_long = 25,
-	UnsupportedAEADAlgorithm = 26,
-} EdhocError;
+};
 
 #endif

@@ -33,7 +33,7 @@ typedef enum OscoreError {
 	OscoreInPktInvalidOptionLen = 11,
 	OscoreInPktInvalidPiv = 12,
 	OscoreInfoToLong = 13,
-	DestBufferToSmall = 14,
+	dest_buffer_to_small = 14,
 	DeltaExtraByteError = 15,
 	LenExtraByteError = 16,
 	cbor_encoding_error = 17,

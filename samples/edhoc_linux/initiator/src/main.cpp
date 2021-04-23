@@ -133,7 +133,7 @@ int main()
 	uint32_t err_msg_len = sizeof(err_msg);
 	uint8_t ad_2[AD_DEFAULT_SIZE];
 	uint64_t ad_2_len = sizeof(ad_2);
-	EdhocError r;
+	edhoc_error r;
 	int err;
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
@@ -150,7 +150,7 @@ int main()
 
 	/*create ephemeral DH keys from seed*/
 	r = ephemeral_dh_key_gen(X25519, seed, X_random, G_X_random);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		printf("Error in ephemeral_dh_key_gen, (Error code %d)\n", r);
 	}
 	PRINT_ARRAY("secret ephemeral DH key", X_random, sizeof(X_random));
@@ -193,7 +193,7 @@ int main()
 	r = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, PRK_4x3m, sizeof(PRK_4x3m),
 				th4, sizeof(th4));
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		printf("Error in edhoc_initiator_run, (Error code %d)\n", r);
 	}
 

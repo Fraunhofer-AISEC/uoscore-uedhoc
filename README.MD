@@ -69,7 +69,7 @@ The EDHOC protocol requires the exchange of three messages which is independent 
  * @param   data pointer to the data to be send
  * @param   data_len length of the data
  */
-extern EdhocError tx(uint8_t *data, uint32_t data_len);
+extern edhoc_error tx(uint8_t *data, uint32_t data_len);
 
 /**
  * @brief   The user should call inside this function its receive function.  
@@ -79,7 +79,7 @@ extern EdhocError tx(uint8_t *data, uint32_t data_len);
  * @param   data pointer to a buffer where the edhoc message must be copied in
  * @param   data_len length of the received data
  */
-extern EdhocError rx(uint8_t *data, uint32_t *data_len);
+extern edhoc_error rx(uint8_t *data, uint32_t *data_len);
 ```
 
 

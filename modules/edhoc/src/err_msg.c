@@ -23,8 +23,8 @@
  * @param   msg_struct contains all messsage fields
  * @param   msg the encoded error message
  */
-static inline EdhocError err_msg_crate(struct error_msg *msg_struct,
-				       struct byte_array *msg)
+static inline enum edhoc_error err_msg_crate(struct error_msg *msg_struct,
+					     struct byte_array *msg)
 {
 	bool success;
 	struct message_error mr;
@@ -87,15 +87,15 @@ static inline EdhocError err_msg_crate(struct error_msg *msg_struct,
 	msg->len = payload_len_out;
 
 	PRINT_ARRAY("Error message (CBOR Sequence)", msg->ptr, msg->len);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
-		      uint8_t c_x_len, uint8_t *err_msg_str,
-		      uint8_t err_msg_str_len, uint8_t *suites,
-		      uint8_t suites_len)
+enum edhoc_error tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
+			    uint8_t c_x_len, uint8_t *err_msg_str,
+			    uint8_t err_msg_str_len, uint8_t *suites,
+			    uint8_t suites_len)
 {
-	EdhocError r;
+	enum edhoc_error r;
 	uint8_t err_msg_buf[ERR_MSG_DEFAULT_SIZE];
 	struct byte_array err_msg = {
 		.len = sizeof(err_msg_buf),
@@ -119,7 +119,7 @@ EdhocError tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 	}
 
 	r = err_msg_crate(&err_struct, &err_msg);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	return tx(err_msg.ptr, err_msg.len);

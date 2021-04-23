@@ -16,7 +16,6 @@
 
 #include "error.h"
 
-
 /**
  * @brief   decodes id_cred to kid
  * @param   id_cred ID_CRED_x
@@ -24,8 +23,8 @@
  * @param   _kid output pointer
  * @param   kid_len length of the kid
  */
-EdhocError id_cred2kid(uint8_t *id_cred, uint8_t id_cred_len, uint8_t *_kid,
-		       uint32_t *kid_len);
+enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
+			     uint8_t *_kid, uint32_t *kid_len);
 
 /**
  * @brief   Splits a the plaintext of message 2 to its subfields
@@ -38,10 +37,11 @@ EdhocError id_cred2kid(uint8_t *id_cred, uint8_t id_cred_len, uint8_t *_kid,
  * @param   ad axillary data
  * @param   ad_len length of ad
  */
-EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
-			   uint8_t *id_cred_x, uint64_t *id_cred_x_len,
-			   uint8_t *sign_or_mac, uint64_t *sign_or_mac_len,
-			   uint8_t *ad, uint64_t *ad_len);
+enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
+				 uint8_t *id_cred_x, uint64_t *id_cred_x_len,
+				 uint8_t *sign_or_mac,
+				 uint64_t *sign_or_mac_len, uint8_t *ad,
+				 uint64_t *ad_len);
 
 /**
  * @brief   Encodes a plaintext 
@@ -54,10 +54,10 @@ EdhocError plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
  * @param   paintext pointer to the paintext
  * @param   paintext_len length of paintext
  */
-EdhocError plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
-			    const uint8_t *sgn_or_mac, uint8_t sgn_or_mac_len,
-			    const uint8_t *ad, uint16_t ad_len,
-			    uint8_t *plaintext, uint16_t *plaintext_len);
-
+enum edhoc_error plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
+				  const uint8_t *sgn_or_mac,
+				  uint8_t sgn_or_mac_len, const uint8_t *ad,
+				  uint16_t ad_len, uint8_t *plaintext,
+				  uint16_t *plaintext_len);
 
 #endif

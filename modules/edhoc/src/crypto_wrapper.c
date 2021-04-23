@@ -26,7 +26,7 @@
 #include <tinycrypt/hmac.h>
 #endif
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
      const uint8_t *key, const uint16_t key_len, uint8_t *nonce,
      const uint16_t nonce_len, const uint8_t *aad, const uint16_t aad_len,
@@ -44,7 +44,7 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 			out, out_len, aad, aad_len, in, in_len, &c);
 
 		if (result == 0)
-			return AEADAuthenticationFailed;
+			return aead_authentication_failed;
 
 	} else {
 		result = tc_ccm_generation_encryption(
@@ -53,13 +53,13 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 		memcpy(tag, out + out_len, tag_len);
 
 		if (result != 1)
-			return ErrorDuringAEAD;
+			return aead_failed;
 	}
 #endif
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 sign(enum sign_alg_curve curve, const uint8_t *sk, const uint8_t sk_len,
      const uint8_t *pk, const uint8_t pk_len, const uint8_t *msg,
      const uint16_t msg_len, uint8_t *out, uint32_t *out_len)
@@ -69,10 +69,10 @@ sign(enum sign_alg_curve curve, const uint8_t *sk, const uint8_t sk_len,
 		edsign_sign(out, pk, sk, msg, msg_len);
 #endif
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 verify(enum sign_alg_curve curve, const uint8_t *pk, const uint8_t pk_len,
        const uint8_t *msg, const uint16_t msg_len, const uint8_t *sgn,
        const uint16_t sgn_len, bool *result)
@@ -87,10 +87,10 @@ verify(enum sign_alg_curve curve, const uint8_t *pk, const uint8_t pk_len,
 		}
 #endif
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 	     uint8_t *ikm, uint8_t ikm_len, uint8_t *out)
 {
@@ -116,10 +116,10 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 		tc_hmac_final(out, TC_SHA256_DIGEST_SIZE, &h);
 #endif
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 	    const uint8_t *info, const uint8_t info_len, uint8_t *out,
 	    uint64_t out_len)
@@ -129,7 +129,7 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 		uint32_t iterations = (out_len + 31) / 32;
 		/* "L length of output keying material in octets (<= 255*HashLen)"*/
 		if (iterations > 255) {
-			return ErrorDuringHKDFCalculation;
+			return hkdf_fialed;
 		}
 
 		uint8_t t[32] = { 0 };
@@ -154,10 +154,10 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 		}
 #endif
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
 		     const uint32_t sk_len, const uint8_t *pk,
 		     const uint32_t pk_len, uint8_t *shared_secret)
@@ -171,10 +171,10 @@ shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
 #endif
 	}
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
 		     uint8_t *pk)
 {
@@ -189,12 +189,12 @@ ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
 		compact_x25519_keygen(sk, pk, extended_seed);
 #endif
 	} else {
-		return UnsupportedEcdhCurve;
+		return unsupported_ecdh_curve;
 	}
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError __attribute__((weak))
+enum edhoc_error __attribute__((weak))
 hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 {
 	/*all currently prosed suites use sha256*/
@@ -207,5 +207,5 @@ hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 #endif
 	}
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }

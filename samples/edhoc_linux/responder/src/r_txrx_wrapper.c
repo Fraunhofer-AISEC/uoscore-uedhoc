@@ -26,19 +26,19 @@ static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
 	return 0;
 }
 
-EdhocError tx(uint8_t *data, uint32_t data_len)
+edhoc_error tx(uint8_t *data, uint32_t data_len)
 {
 	send_coap(data, data_len);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError rx(uint8_t *data, uint32_t *data_len)
+edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
 	uint8_t *data_p;
 	uint32_t data_buf_capacity = *data_len;
 	recv_coap(&data_p, data_len);
 	int r = _memcpy_s(data, data_buf_capacity, data_p, *data_len);
 	if (r != 0)
-		return MessageBuffToSmall;
-	return EdhocNoError;
+		return message_buff_to_small;
+	return edhoc_no_error;
 }

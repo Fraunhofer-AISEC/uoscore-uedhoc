@@ -46,7 +46,7 @@ enum id_cred_x_label {
  * @param   g static DH public key
  * @param   g_len length of g
  */
-EdhocError retrieve_cred(bool static_dh_auth,
+enum edhoc_error retrieve_cred(bool static_dh_auth,
 			 struct other_party_cred *cred_array, uint16_t cred_num,
 			 uint8_t *id_cred, uint8_t id_cred_len, uint8_t *cred,
 			 uint16_t *cred_len, uint8_t *pk, uint16_t *pk_len,

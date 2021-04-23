@@ -30,12 +30,12 @@
  * @param   pk_len the length pk
  * @param   verified true if verification successfull
  */
-static EdhocError cert_verify(const uint8_t *cert, uint16_t cert_len,
-			      const struct other_party_cred *cred_array,
-			      uint16_t cred_num, uint8_t *pk, uint16_t *pk_len,
-			      bool *verified)
+static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
+				    const struct other_party_cred *cred_array,
+				    uint16_t cred_num, uint8_t *pk,
+				    uint16_t *pk_len, bool *verified)
 {
-	EdhocError r;
+	enum edhoc_error r;
 	bool success;
 	size_t decode_len = 0;
 	struct cert c;
@@ -68,11 +68,11 @@ static EdhocError cert_verify(const uint8_t *cert, uint16_t cert_len,
 			PRINT_ARRAY("Root PK of the CA", root_pk, root_pk_len);
 			break;
 		}
-		return NoSuchCA;
+		return no_such_ca;
 	}
 
 	r = _memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	*pk_len = c._cert_pk.len;
@@ -82,13 +82,14 @@ static EdhocError cert_verify(const uint8_t *cert, uint16_t cert_len,
 		      c._cert_signature.value, c._cert_signature.len, verified);
 }
 
-EdhocError retrieve_cred(bool static_dh_auth,
-			 struct other_party_cred *cred_array, uint16_t cred_num,
-			 uint8_t *id_cred, uint8_t id_cred_len, uint8_t *cred,
-			 uint16_t *cred_len, uint8_t *pk, uint16_t *pk_len,
-			 uint8_t *g, uint16_t *g_len)
+enum edhoc_error retrieve_cred(bool static_dh_auth,
+			       struct other_party_cred *cred_array,
+			       uint16_t cred_num, uint8_t *id_cred,
+			       uint8_t id_cred_len, uint8_t *cred,
+			       uint16_t *cred_len, uint8_t *pk,
+			       uint16_t *pk_len, uint8_t *g, uint16_t *g_len)
 {
-	EdhocError r;
+	enum edhoc_error r;
 	bool success, verified;
 	size_t decode_len = 0;
 	struct id_cred_x_map map;
@@ -101,7 +102,7 @@ EdhocError retrieve_cred(bool static_dh_auth,
 				r = _memcpy_s(cred, *cred_len,
 					      cred_array[i].cred.ptr,
 					      cred_array[i].cred.len);
-				if (r != EdhocNoError) {
+				if (r != edhoc_no_error) {
 					return r;
 				}
 				*cred_len = cred_array[i].cred.len;
@@ -110,7 +111,7 @@ EdhocError retrieve_cred(bool static_dh_auth,
 					r = _memcpy_s(g, *g_len,
 						      cred_array[i].g.ptr,
 						      cred_array[i].g.len);
-					if (r != EdhocNoError) {
+					if (r != edhoc_no_error) {
 						return r;
 					}
 					*g_len = cred_array[i].g.len;
@@ -119,12 +120,12 @@ EdhocError retrieve_cred(bool static_dh_auth,
 					r = _memcpy_s(pk, *pk_len,
 						      cred_array[i].pk.ptr,
 						      cred_array[i].pk.len);
-					if (r != EdhocNoError) {
+					if (r != edhoc_no_error) {
 						return r;
 					}
 					*pk_len = cred_array[i].pk.len;
 				}
-				return EdhocNoError;
+				return edhoc_no_error;
 			}
 		}
 	}
@@ -144,7 +145,7 @@ EdhocError retrieve_cred(bool static_dh_auth,
 			cred, *cred_len,
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		*cred_len =
@@ -167,16 +168,16 @@ EdhocError retrieve_cred(bool static_dh_auth,
 					&verified);
 		}
 
-		if (r != EdhocNoError)
+		if (r != edhoc_no_error)
 			return r;
 
 		if (verified) {
 			PRINT_MSG("Certificate verification successful!\n");
-			return EdhocNoError;
+			return edhoc_no_error;
 		} else {
-			return CertificateAuthenticationFailed;
+			return aead_authentication_failed;
 		}
 	}
 
-	return CredentialNotFound;
+	return credential_not_found;
 }

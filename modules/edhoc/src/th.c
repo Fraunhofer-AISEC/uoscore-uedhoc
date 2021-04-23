@@ -29,19 +29,19 @@
  * @param   th2_input ouput buffer for the data structure
  * @param   th2_input_len length of th2_input
  */
-static inline EdhocError
+static inline enum edhoc_error
 th2_input_encode(uint8_t *msg1, uint32_t msg1_len, uint8_t *c_i,
 		 uint32_t c_i_len, uint8_t *g_y, uint32_t g_y_len, uint8_t *c_r,
 		 uint32_t c_r_len, uint8_t *th2_input, uint16_t *th2_input_len)
 {
-	EdhocError err;
+	enum edhoc_error r;
 	bool success;
 	size_t payload_len_out;
 	struct data_2 data_2;
 
-	err = _memcpy_s(th2_input, *th2_input_len, msg1, msg1_len);
-	if (err != EdhocNoError) {
-		return err;
+	r = _memcpy_s(th2_input, *th2_input_len, msg1, msg1_len);
+	if (r != edhoc_no_error) {
+		return r;
 	}
 
 	/*Encode C_I if present*/
@@ -86,7 +86,7 @@ th2_input_encode(uint8_t *msg1, uint32_t msg1_len, uint8_t *c_i,
 
 	PRINT_ARRAY("Input to calculate TH_2 (CBOR Sequence)", th2_input,
 		    *th2_input_len);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
 /**
@@ -100,7 +100,7 @@ th2_input_encode(uint8_t *msg1, uint32_t msg1_len, uint8_t *c_i,
  * @param   th3_input ouput buffer for the data structure
  * @param   th3_input_len length of th3_input
  */
-static inline EdhocError
+static inline enum edhoc_error
 th3_input_encode(uint8_t *th2, uint8_t th2_len, uint8_t *ciphertext_2,
 		 uint16_t ciphertext_2_len, uint8_t *data_3, uint8_t data_3_len,
 		 uint8_t *th3_input, uint16_t *th3_input_len)
@@ -140,7 +140,7 @@ th3_input_encode(uint8_t *th2, uint8_t th2_len, uint8_t *ciphertext_2,
 
 	PRINT_ARRAY("Input to calculate TH_3 (CBOR Sequence)", th3_input,
 		    *th3_input_len);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
 /**
@@ -152,11 +152,11 @@ th3_input_encode(uint8_t *th2, uint8_t th2_len, uint8_t *ciphertext_2,
  * @param   th4_input ouput buffer for the data structure
  * @param   th4_input_len length of th4_input
  */
-static inline EdhocError th4_input_encode(uint8_t *th3, uint8_t th3_len,
-					  uint8_t *ciphertext_3,
-					  uint16_t ciphertext_3_len,
-					  uint8_t *th4_input,
-					  uint64_t *th4_input_len)
+static inline enum edhoc_error th4_input_encode(uint8_t *th3, uint8_t th3_len,
+						uint8_t *ciphertext_3,
+						uint16_t ciphertext_3_len,
+						uint8_t *th4_input,
+						uint64_t *th4_input_len)
 {
 	bool success;
 	struct th4 th4;
@@ -180,71 +180,72 @@ static inline EdhocError th4_input_encode(uint8_t *th3, uint8_t th3_len,
 
 	PRINT_ARRAY("Input to calculate TH_4 (CBOR Sequence)", th4_input,
 		    *th4_input_len);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError th2_calculate(enum hash_alg alg, uint8_t *msg1, uint32_t msg1_len,
-			 uint8_t *c_i, uint32_t c_i_len, uint8_t *g_y,
-			 uint32_t g_y_len, uint8_t *c_r, uint32_t c_r_len,
-			 uint8_t *th2)
+enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
+			       uint32_t msg1_len, uint8_t *c_i,
+			       uint32_t c_i_len, uint8_t *g_y, uint32_t g_y_len,
+			       uint8_t *c_r, uint32_t c_r_len, uint8_t *th2)
 {
 	uint8_t th2_input[TH_INPUT_DEFAULT_SIZE];
 	uint16_t th2_input_len = sizeof(th2_input);
-	EdhocError r;
+	enum edhoc_error r;
 
 	PRINT_ARRAY("msg1", msg1, msg1_len);
 	PRINT_ARRAY("c_r", c_r, c_r_len);
 
 	r = th2_input_encode(msg1, msg1_len, c_i, c_i_len, g_y, g_y_len, c_r,
 			     c_r_len, th2_input, &th2_input_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
 	r = hash(alg, th2_input, th2_input_len, th2);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("TH2", th2, SHA_DEFAULT_SIZE);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
-			 uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
-			 uint8_t *data_3, uint8_t data_3_len, uint8_t *th3)
+enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
+			       uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
+			       uint8_t *data_3, uint8_t data_3_len,
+			       uint8_t *th3)
 {
 	uint8_t th3_input[th2_len + ciphertext_2_len + data_3_len + 6];
 	uint16_t th3_input_len = sizeof(th3_input);
-	EdhocError r =
+	enum edhoc_error r =
 		th3_input_encode(th2, th2_len, ciphertext_2, ciphertext_2_len,
 				 data_3, data_3_len, th3_input, &th3_input_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	r = hash(alg, th3_input, th3_input_len, th3);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("TH3", th3, 32);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
-			 uint8_t *ciphertext_3, uint16_t ciphertext_3_len,
-			 uint8_t *th4)
+enum edhoc_error th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
+			       uint8_t *ciphertext_3, uint16_t ciphertext_3_len,
+			       uint8_t *th4)
 {
 	uint8_t th4_input[th3_len + ciphertext_3_len + 4];
 	uint64_t th4_input_len = sizeof(th4_input);
 
-	EdhocError r =
+	enum edhoc_error r =
 		th4_input_encode(th3, th3_len, ciphertext_3, ciphertext_3_len,
 				 th4_input, &th4_input_len);
-	if (r != EdhocNoError)
+	if (r != edhoc_no_error)
 		return r;
 
 	r = hash(alg, th4_input, th4_input_len, th4);
-	if (r != EdhocNoError)
+	if (r != edhoc_no_error)
 		return r;
 	PRINT_ARRAY("TH4", th4, SHA_DEFAULT_SIZE);
-	return EdhocNoError;
+	return edhoc_no_error;
 }

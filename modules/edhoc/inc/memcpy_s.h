@@ -20,7 +20,7 @@
  * implementation 
  * [1]: https://docs.microsoft.com/de-de/cpp/c-runtime-library/reference/memcpy-s-wmemcpy-s?view=msvc-160
  */
-EdhocError _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
+enum edhoc_error _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
 		     uint64_t count);
 
 #endif

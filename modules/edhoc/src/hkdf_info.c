@@ -17,9 +17,10 @@
 #include "../inc/suites.h"
 #include "../cbor/encode_info.h"
 
-EdhocError create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
-			    uint8_t th_len, const char *label, uint64_t okm_len,
-			    uint8_t *out, uint8_t *out_len)
+enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
+				  uint8_t th_len, const char *label,
+				  uint64_t okm_len, uint8_t *out,
+				  uint8_t *out_len)
 {
 	bool success;
 	struct info info;
@@ -43,5 +44,5 @@ EdhocError create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
 	}
 	*out_len = payload_len_out;
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }

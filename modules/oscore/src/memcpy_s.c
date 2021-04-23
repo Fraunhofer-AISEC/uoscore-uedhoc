@@ -17,7 +17,7 @@ OscoreError _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
 		      uint64_t count)
 {
 	if (destSize < count) {
-		return DestBufferToSmall;
+		return dest_buffer_to_small;
 	} else {
 		memcpy(dest, src, count);
 	}

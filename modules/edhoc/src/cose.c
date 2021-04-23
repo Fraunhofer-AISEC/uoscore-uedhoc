@@ -15,7 +15,7 @@
 #include "../cbor/encode_enc_structure.h"
 #include "../cbor/encode_sig_structure.h"
 
-EdhocError cose_enc_structure_encode(
+enum edhoc_error cose_enc_structure_encode(
 	const uint8_t *context, uint16_t context_len, const uint8_t *protected,
 	uint16_t protected_len, const uint8_t *external_aad,
 	uint16_t external_aad_len, uint8_t *out, uint16_t *out_len)
@@ -38,10 +38,10 @@ EdhocError cose_enc_structure_encode(
 		return cbor_encoding_error;
 	}
 	*out_len = payload_len_out;
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError
+enum edhoc_error
 cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 			  const uint8_t *protected, uint16_t protected_len,
 			  const uint8_t *external_aad,
@@ -68,5 +68,5 @@ cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 		return cbor_encoding_error;
 	}
 	*out_len = payload_len_out;
-	return EdhocNoError;
+	return edhoc_no_error;
 }

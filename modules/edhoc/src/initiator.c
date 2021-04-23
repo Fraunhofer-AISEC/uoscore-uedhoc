@@ -39,7 +39,8 @@
  * @param   c_x connection identifier
  * @param   pointer to the output buffer
  */
-static inline EdhocError c_x_bstr_identifier_encode(uint8_t c_x, uint8_t *out)
+static inline enum edhoc_error c_x_bstr_identifier_encode(uint8_t c_x,
+							  uint8_t *out)
 {
 	CborEncoder enc;
 	cbor_encoder_init(&enc, out, 1, 0);
@@ -47,7 +48,7 @@ static inline EdhocError c_x_bstr_identifier_encode(uint8_t c_x, uint8_t *out)
 	CborError r = cbor_encode_int(&enc, t);
 	if (r == CborErrorOutOfMemory)
 		return CborEncodingBufferToSmall;
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
 /**
@@ -58,7 +59,7 @@ static inline EdhocError c_x_bstr_identifier_encode(uint8_t c_x, uint8_t *out)
  * @param   msg2_struct pointer to a structure for the parsed message
  * @param   err_msg pointer to an error message structure
  */
-static inline EdhocError
+static inline enum edhoc_error
 msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	   uint32_t msg2_len, uint8_t *c_i, uint64_t *c_i_len, uint8_t *g_y,
 	   uint64_t *g_y_len, uint8_t *c_r, uint64_t *c_r_len,
@@ -66,7 +67,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 {
 	bool success;
 	size_t decode_len = 0;
-	EdhocError r;
+	enum edhoc_error r;
 
 	/*C_I*/
 	if (!(c->corr == 1 || c->corr == 3)) {
@@ -83,7 +84,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 		} else {
 			r = _memcpy_s(c_i, *c_i_len, m._m2ci_C_I_bstr.value,
 				      m._m2ci_C_I_bstr.len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 			*c_i_len = m._m2ci_C_I_bstr.len;
@@ -97,12 +98,12 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	    in message 2 it is G_Y : bstr --> we have here a error message*/
 			PRINTF("Error message received with DIAG_MSG: %s",
 			       m._m2ci_G_Y_tstr.value);
-			return ErrorMessageReceived;
+			return error_message_received;
 		} else {
 			/*get G_Y*/
 			r = _memcpy_s(g_y, *g_y_len, m._m2ci_G_Y_bstr.value,
 				      m._m2ci_G_Y_bstr.len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 			/* C_R */
@@ -113,7 +114,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 				r = _memcpy_s(c_r, *c_r_len,
 					      m._m2ci_C_R_bstr.value,
 					      m._m2ci_C_R_bstr.len);
-				if (r != EdhocNoError) {
+				if (r != edhoc_no_error) {
 					return r;
 				}
 				*c_r_len = m._m2ci_C_R_bstr.len;
@@ -124,13 +125,13 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 			r = _memcpy_s(ciphertext2, *ciphertext2_len,
 				      m._m2ci_CIPHERTEXT_2.value,
 				      m._m2ci_CIPHERTEXT_2.len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 			*ciphertext2_len = m._m2ci_CIPHERTEXT_2.len;
 			PRINT_ARRAY("msg2 CIPHERTEXT_2", ciphertext2,
 				    *ciphertext2_len);
-			return EdhocNoError;
+			return edhoc_no_error;
 		}
 	} else {
 		struct m2 m;
@@ -148,12 +149,12 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	    in message 2 it is G_Y : bstr --> we have here a error message*/
 			PRINTF("Error message received with DIAG_MSG: %s",
 			       m._m2_G_Y_tstr.value);
-			return ErrorMessageReceived;
+			return error_message_received;
 		} else {
 			/*get G_Y*/
 			r = _memcpy_s(g_y, *g_y_len, m._m2_G_Y_bstr.value,
 				      m._m2_G_Y_bstr.len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 			/* C_R */
@@ -164,7 +165,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 				r = _memcpy_s(c_r, *c_r_len,
 					      m._m2_C_R_bstr.value,
 					      m._m2_C_R_bstr.len);
-				if (r != EdhocNoError) {
+				if (r != edhoc_no_error) {
 					return r;
 				}
 				*c_r_len = m._m2_C_R_bstr.len;
@@ -175,17 +176,17 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 			r = _memcpy_s(ciphertext2, *ciphertext2_len,
 				      m._m2_CIPHERTEXT_2.value,
 				      m._m2_CIPHERTEXT_2.len);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
 			*ciphertext2_len = m._m2_CIPHERTEXT_2.len;
 			PRINT_ARRAY("msg2 CIPHERTEXT_2", ciphertext2,
 				    *ciphertext2_len);
-			return EdhocNoError;
+			return edhoc_no_error;
 		}
 	}
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 /**
  * @brief   Encodes message 1
@@ -193,8 +194,9 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
  * @param   msg1 pointer to a buffer for holding the encoded message
  * @param   msg1_len length of the encoded message
  */
-static inline EdhocError msg1_encode(const struct edhoc_initiator_context *c,
-				     uint8_t *msg1, uint32_t *msg1_len)
+static inline enum edhoc_error
+msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
+	    uint32_t *msg1_len)
 {
 	bool success;
 	struct message_1 m1;
@@ -215,8 +217,6 @@ static inline EdhocError msg1_encode(const struct edhoc_initiator_context *c,
 			m1._message_1_SUITES_I__selected_supported[i] =
 				c->suites_i.ptr[i];
 		}
-	} else {
-		return at_least_one_suite_needed;
 	}
 
 	/* G_X ephemeral public key */
@@ -251,23 +251,23 @@ static inline EdhocError msg1_encode(const struct edhoc_initiator_context *c,
 	*msg1_len = payload_len_out;
 
 	PRINT_ARRAY("message_1 (CBOR Sequence)", msg1, *msg1_len);
-	return EdhocNoError;
+	return edhoc_no_error;
 }
 
-EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
-			       struct other_party_cred *cred_r_array,
-			       uint16_t num_cred_r, uint8_t *err_msg,
-			       uint32_t *err_msg_len, uint8_t *ad_2,
-			       uint64_t *ad_2_len, uint8_t *prk_4x3m,
-			       uint8_t prk_4x3m_len, uint8_t *th4,
-			       uint8_t th4_len)
+enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
+				     struct other_party_cred *cred_r_array,
+				     uint16_t num_cred_r, uint8_t *err_msg,
+				     uint32_t *err_msg_len, uint8_t *ad_2,
+				     uint64_t *ad_2_len, uint8_t *prk_4x3m,
+				     uint8_t prk_4x3m_len, uint8_t *th4,
+				     uint8_t th4_len)
 {
-	EdhocError r;
+	enum edhoc_error r;
 
 	struct suite suite;
 	bool auth_method_static_dh_i = false, auth_method_static_dh_r = false;
 	r = get_suite((enum suite_label)c->suites_i.ptr[0], &suite);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -295,39 +295,39 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	/************************ encode and send message 1************************/
 
 	r = msg1_encode(c, (uint8_t *)&msg1, &msg1_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
 	r = tx(msg1, msg1_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
 	/**********************receive and process message 2***********************/
 
 	r = rx(msg2, &msg2_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, msg2_len);
 
 	/* If an error message is received msg2_parse will return 
-    ErrorMessageReceived. If this hapens edhoc_initiator_run will return. Then
+    error_message_received. If this hapens edhoc_initiator_run will return. Then
     the caller needs to examine SUITES_R in err_msg re-initialize the initiator 
     and call edhoc_initiator_run again*/
 	r = msg2_parse(c, msg2, msg2_len, c_i, &c_i_len, g_y, &g_y_len, c_r,
 		       &c_r_len, ciphertext2, &ciphertext2_len);
-	if (r == ErrorMessageReceived) {
-		/*provide the error message to the caller*/;
+	if (r == error_message_received) {
+		/*provide the error message to the caller*/
 		r = _memcpy_s(err_msg, *err_msg_len, msg2, msg2_len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		*err_msg_len = msg2_len;
-		return ErrorMessageReceived;
+		return error_message_received;
 	}
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -335,7 +335,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint8_t g_xy[ECDH_SECRET_DEFAULT_SIZE];
 	r = shared_secret_derive(suite.edhoc_ecdh_curve, c->x.ptr, c->x.len,
 				 g_y, g_y_len, g_xy);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("G_XY (ECDH shared secret) ", g_xy, sizeof(g_xy));
@@ -351,7 +351,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	/*calculate PRK_2e*/
 	uint8_t PRK_2e[PRK_DEFAULT_SIZE];
 	r = hkdf_extract(suite.edhoc_hash, NULL, 0, g_xy, sizeof(g_xy), PRK_2e);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("PRK_2e", PRK_2e, sizeof(PRK_2e));
@@ -362,7 +362,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "KEYSTREAM_2",
 		     (uint8_t *)&PRK_2e, sizeof(PRK_2e), (uint8_t *)&th2,
 		     sizeof(th2), KEYSTREAM_2, KEYSTREAM_2_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
@@ -380,7 +380,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	r = plaintext_split(P_2e, sizeof(P_2e), id_cred_r, &id_cred_r_len,
 			    sign_or_mac, &sign_or_mac_len, ad_2, ad_2_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("ID_CRED_R", id_cred_r, id_cred_r_len);
@@ -400,7 +400,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = retrieve_cred(auth_method_static_dh_r, cred_r_array, num_cred_r,
 			  id_cred_r, id_cred_r_len, cred_r, &cred_r_len, pk,
 			  &pk_len, g_r, &g_r_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -412,7 +412,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	/*derive prk_3e2m*/
 	r = prk_derive(auth_method_static_dh_r, suite, PRK_2e, sizeof(PRK_2e),
 		       g_r, g_r_len, c->x.ptr, c->x.len, PRK_3e2m);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("prk_3e2m", PRK_3e2m, sizeof(PRK_3e2m));
@@ -427,7 +427,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 					sizeof(th2), id_cred_r, id_cred_r_len,
 					cred_r, cred_r_len, ad_2, *ad_2_len,
 					m_2, &m_2_len, mac_2, &mac_2_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -438,10 +438,10 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
 				       diag_msg, strlen(diag_msg), NULL, 0);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
-			return ResponderAuthenticationFailed;
+			return responder_authentication_failed;
 		}
 	} else {
 		/*the responder authenticates with a signature*/
@@ -454,10 +454,10 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
 				       diag_msg, strlen(diag_msg), NULL, 0);
-			if (r != EdhocNoError) {
+			if (r != edhoc_no_error) {
 				return r;
 			}
-			return ResponderAuthenticationFailed;
+			return responder_authentication_failed;
 		}
 	}
 
@@ -476,7 +476,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = th3_calculate(suite.edhoc_hash, (uint8_t *)&th2, sizeof(th2),
 			  ciphertext2, ciphertext2_len, data_3, data_3_len,
 			  th3);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -484,7 +484,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = prk_derive(auth_method_static_dh_i, suite, (uint8_t *)&PRK_3e2m,
 		       sizeof(PRK_3e2m), g_y, sizeof(g_y), c->i.ptr, c->i.len,
 		       prk_4x3m);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
@@ -499,7 +499,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len, c->ad_3.ptr,
 		c->ad_3.len, m_3, &m_3_len, sign_or_mac_3,
 		(uint8_t *)&sign_or_mac_3_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -510,7 +510,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		r = sign(suite.edhoc_sign_curve, c->sk_i.ptr, c->sk_i.len,
 			 c->pk_i.ptr, c->pk_i.len, m_3, m_3_len, sign_or_mac_3,
 			 &sign_or_mac_3_len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		PRINT_ARRAY("Signature_or_MAC_3", sign_or_mac_3,
@@ -522,14 +522,14 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint16_t sign_or_mac_3_enc_len = sizeof(sign_or_mac_3_enc);
 	r = encode_byte_string(sign_or_mac_3, sign_or_mac_3_len,
 			       sign_or_mac_3_enc, &sign_or_mac_3_enc_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
 	uint8_t kid_buf[KID_DEFAULT_SIZE];
 	uint32_t kid_len = sizeof(kid_buf);
 	r = id_cred2kid(c->id_cred_i.ptr, c->id_cred_i.len, kid_buf, &kid_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("kid", kid_buf, kid_len);
@@ -539,25 +539,25 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	if (kid_len != 0) {
 		r = _memcpy_s(P_3ae, P_3ae_len, kid_buf, kid_len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		r = _memcpy_s(P_3ae + kid_len, P_3ae_len - kid_len,
 			      sign_or_mac_3_enc, sign_or_mac_3_enc_len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		P_3ae_len = sign_or_mac_3_enc_len + kid_len;
 	} else {
 		r = _memcpy_s(P_3ae, P_3ae_len, c->id_cred_i.ptr,
 			      c->id_cred_i.len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		r = _memcpy_s(P_3ae + c->id_cred_i.len,
 			      P_3ae_len - c->id_cred_i.len, sign_or_mac_3_enc,
 			      sign_or_mac_3_enc_len);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		P_3ae_len = c->id_cred_i.len + sign_or_mac_3_enc_len;
@@ -569,7 +569,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "K_3ae", PRK_3e2m,
 		     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), K_3ae,
 		     sizeof(K_3ae));
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("K_3ae", K_3ae, sizeof(K_3ae));
@@ -579,16 +579,16 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "IV_3ae", PRK_3e2m,
 		     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), IV_3ae,
 		     sizeof(IV_3ae));
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("IV_3ae", IV_3ae, sizeof(IV_3ae));
 
 	/*Associated data A_3ae*/
 	uint8_t A_3ae[A_3AE_DEFAULT_SIZE];
-	uint32_t A_3ae_len = sizeof(A_3ae);
+	uint16_t A_3ae_len = sizeof(A_3ae);
 	r = a_Xae_encode(th3, sizeof(th3), (uint8_t *)&A_3ae, &A_3ae_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("A_3ae", A_3ae, A_3ae_len);
@@ -605,7 +605,7 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = aead(ENCRYPT, P_3ae, P_3ae_len, K_3ae, sizeof(K_3ae), IV_3ae,
 		 sizeof(IV_3ae), A_3ae, A_3ae_len, ciphertext_3,
 		 ciphertext_3_len, tag, mac_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
@@ -616,17 +616,17 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint16_t ciphertext_3_enc_len = sizeof(ciphertext_3_enc);
 	r = encode_byte_string(ciphertext_3, sizeof(ciphertext_3),
 			       ciphertext_3_enc, &ciphertext_3_enc_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	//todo use here cbor encoding 
+	//todo use here cbor encoding
 	uint16_t msg3_len = ciphertext_3_enc_len + c_r_len;
 	uint8_t msg3[msg3_len];
 	if (c_r_len == 1) {
 		uint8_t c_r_bstr_ident;
 		r = c_x_bstr_identifier_encode(c_r[0], &c_r_bstr_ident);
-		if (r != EdhocNoError) {
+		if (r != edhoc_no_error) {
 			return r;
 		}
 		memcpy(msg3, &c_r_bstr_ident, 1);
@@ -640,16 +640,16 @@ EdhocError edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	PRINT_ARRAY("msg3", msg3, msg3_len);
 
 	r = tx(msg3, msg3_len);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
 	/*TH4*/
 	r = th4_calculate(suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
 			  sizeof(ciphertext_3), th4);
-	if (r != EdhocNoError) {
+	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	return EdhocNoError;
+	return edhoc_no_error;
 }

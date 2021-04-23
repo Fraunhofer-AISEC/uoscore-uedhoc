@@ -25,9 +25,9 @@
  * @param   okm_len length of output keying material
  * @param   out out-array
  * @param   out_len length of out
- * @return  EdhocError
+ * @return  edhoc_error
  */
-EdhocError create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
+enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
 			    uint8_t th_len, const char *label, uint64_t okm_len,
 			    uint8_t *out, uint8_t *out_len);
 

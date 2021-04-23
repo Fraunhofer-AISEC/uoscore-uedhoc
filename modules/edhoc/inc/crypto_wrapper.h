@@ -36,13 +36,15 @@ enum aes_operation {
  * @param   out_len the length of out
  * @param   tag the authentication tag
  * @param   tag_len the length of tag
- * @retval  an EdhocError code 
+ * @retval  edhoc_error code
  */
-EdhocError aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
-		const uint8_t *key, const uint16_t key_len, uint8_t *nonce,
-		const uint16_t nonce_len, const uint8_t *aad,
-		const uint16_t aad_len, uint8_t *out, const uint16_t out_len,
-		uint8_t *tag, const uint16_t tag_len);
+enum edhoc_error aead(enum aes_operation op, const uint8_t *in,
+		      const uint16_t in_len, const uint8_t *key,
+		      const uint16_t key_len, uint8_t *nonce,
+		      const uint16_t nonce_len, const uint8_t *aad,
+		      const uint16_t aad_len, uint8_t *out,
+		      const uint16_t out_len, uint8_t *tag,
+		      const uint16_t tag_len);
 
 /**
  * @brief   Derives ECDH shared secret
@@ -51,11 +53,12 @@ EdhocError aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
  * @param   pk public key
  * @param   pk_len length of pk
  * @param   shared_secret the result
- * @retval  an EdhocError code 
+ * @retval  an edhoc_error code
  */
-EdhocError shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
-				const uint32_t sk_len, const uint8_t *pk,
-				const uint32_t pk_len, uint8_t *shared_secret);
+enum edhoc_error shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
+				      const uint32_t sk_len, const uint8_t *pk,
+				      const uint32_t pk_len,
+				      uint8_t *shared_secret);
 
 /**
  * @brief   HKDF extract function, see rfc5869
@@ -65,11 +68,11 @@ EdhocError shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
  * @param   ikm input keying material
  * @param   ikm_len length of ikm
  * @param   out result
- * @retval  an EdhocError code
+ * @retval  an edhoc_error code
  */
-EdhocError hkdf_extract(enum hash_alg alg, const uint8_t *salt,
-			uint32_t salt_len, uint8_t *ikm, uint8_t ikm_len,
-			uint8_t *out);
+enum edhoc_error hkdf_extract(enum hash_alg alg, const uint8_t *salt,
+			      uint32_t salt_len, uint8_t *ikm, uint8_t ikm_len,
+			      uint8_t *out);
 
 /**
  * @brief   HKDF expand function, see rfc5869
@@ -80,11 +83,12 @@ EdhocError hkdf_extract(enum hash_alg alg, const uint8_t *salt,
  * @param   info_len length of info
  * @param   out the result
  * @param   out_len length of out
- * @retval  an EdhocError code
+ * @retval  an edhoc_error code
  */
-EdhocError hkdf_expand(enum hash_alg alg, const uint8_t *prk,
-		       const uint8_t prk_len, const uint8_t *info,
-		       const uint8_t info_len, uint8_t *out, uint64_t out_len);
+enum edhoc_error hkdf_expand(enum hash_alg alg, const uint8_t *prk,
+			     const uint8_t prk_len, const uint8_t *info,
+			     const uint8_t info_len, uint8_t *out,
+			     uint64_t out_len);
 
 /**
  * @brief   calculates a hash
@@ -92,10 +96,10 @@ EdhocError hkdf_expand(enum hash_alg alg, const uint8_t *prk,
  * @param   in input message
  * @param   in_len length of in
  * @param   out the hash 
- * @retval  an EdhocError code
+ * @retval  an edhoc_error code
  */
-EdhocError hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
-		uint8_t *out);
+enum edhoc_error hash(enum hash_alg alg, const uint8_t *in,
+		      const uint64_t in_len, uint8_t *out);
 
 /**
  * @brief   Verifies an asymmetric signature
@@ -108,12 +112,12 @@ EdhocError hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
  * @param   msg_len length of msg
  * @param   out signature
  * @param   out_len length of out
- * @retval  an EdhocError code
+ * @retval  an edhoc_error code
  */
-EdhocError sign(enum sign_alg_curve curve, const uint8_t *sk,
-		const uint8_t sk_len, const uint8_t *pk, const uint8_t pk_len,
-		const uint8_t *msg, const uint16_t msg_len, uint8_t *out,
-		uint32_t *out_len);
+enum edhoc_error sign(enum sign_alg_curve curve, const uint8_t *sk,
+		      const uint8_t sk_len, const uint8_t *pk,
+		      const uint8_t pk_len, const uint8_t *msg,
+		      const uint16_t msg_len, uint8_t *out, uint32_t *out_len);
 
 /**
  * @brief   Verifies an asymmetric signature
@@ -125,11 +129,11 @@ EdhocError sign(enum sign_alg_curve curve, const uint8_t *sk,
  * @param   sgn signature
  * @param   sgn_len length of sgn
  * @param   result true if the signature verification is successfully
- * @retval  an EdhocError code
+ * @retval  an edhoc_error code
  */
-EdhocError verify(enum sign_alg_curve curve, const uint8_t *pk,
-		  const uint8_t pk_len, const uint8_t *msg,
-		  const uint16_t msg_len, const uint8_t *sgn,
-		  const uint16_t sgn_len, bool *result);
+enum edhoc_error verify(enum sign_alg_curve curve, const uint8_t *pk,
+			const uint8_t pk_len, const uint8_t *msg,
+			const uint16_t msg_len, const uint8_t *sgn,
+			const uint16_t sgn_len, bool *result);
 
 #endif

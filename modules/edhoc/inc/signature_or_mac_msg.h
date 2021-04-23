@@ -22,7 +22,7 @@
  * @param   out_len length of out
  * @retval  edhoc error code
  */
-EdhocError encode_byte_string(const uint8_t *in, const uint8_t in_len,
+enum edhoc_error encode_byte_string(const uint8_t *in, const uint8_t in_len,
 			      uint8_t *out, uint16_t *out_len);
 
 /**
@@ -49,7 +49,7 @@ EdhocError encode_byte_string(const uint8_t *in, const uint8_t in_len,
  * @param   mac MAC_2/MAC_3 when the calling party uses static DH authentication
  * @param   m_len length of mac
  */
-EdhocError signature_or_mac_msg_create(
+enum edhoc_error signature_or_mac_msg_create(
 	bool static_dh_auth, struct suite suite, const char *label_k,
 	const char *label_iv, const uint8_t *prk, const uint8_t prk_len,
 	const uint8_t *th, const uint8_t th_len, const uint8_t *id_cred,

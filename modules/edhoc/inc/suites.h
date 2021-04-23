@@ -62,5 +62,5 @@ struct suite {
  * @param   label the suite label 
  * @param   suite the algorithms coresponding to label
  */
-EdhocError get_suite(enum suite_label label, struct suite *suite);
+enum edhoc_error get_suite(enum suite_label label, struct suite *suite);
 #endif
