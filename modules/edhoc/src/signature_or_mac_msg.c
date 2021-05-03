@@ -8,7 +8,7 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 */
-#include <cbor.h>
+
 #include <stdint.h>
 
 #include "../edhoc.h"
@@ -21,37 +21,21 @@
 #include "../inc/cose.h"
 #include "../cbor/encode_enc_structure.h"
 #include "../cbor/encode_sig_structure.h"
-//#include "../cbor/encode_byte_string.h"
+#include "../cbor/encode_bstr_type.h"
 
 enum edhoc_error encode_byte_string(const uint8_t *in, const uint8_t in_len,
 				    uint8_t *out, uint16_t *out_len)
 {
-	// cbor_state_t state = {
-	//	.payload = out,
-	//	.payload_end = out + *out_len,
-	//	.elem_count = 1,
-	// };
-	// bool success;
-	// success = bstrx_encode(&state, in);
-	// *out_len = state.payload - out;
-
-	// bool success;
-	// size_t payload_len_out;
-	// success = cbor_encode_b_str(out, *out_len, in, &payload_len_out);
-	// if (!success) {
-	// 	return cbor_encoding_error;
-	// }
-	// *out_len = payload_len_out;
-
-	// todo fix this when bug in cddl-gen is fixed
-
-	int r;
-	CborEncoder enc;
-	cbor_encoder_init(&enc, out, *out_len, 0);
-	r = cbor_encode_byte_string(&enc, in, in_len);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
-	*out_len = cbor_encoder_get_buffer_size(&enc, out);
+	bool ok;
+	size_t payload_len_out;
+	cbor_string_type_t tmp;
+	tmp.value = in;
+	tmp.len = in_len;
+	ok = cbor_encode_b_str(out, *out_len, &tmp, &payload_len_out);
+	if (!ok) {
+		return cbor_encoding_error;
+	}
+	*out_len = payload_len_out;
 
 	return edhoc_no_error;
 }
@@ -68,7 +52,7 @@ m_encode(enum cose_context cose_context, const uint8_t *id_cred,
 {
 	enum edhoc_error r;
 
-	uint8_t th_enc[th_len + 2];
+	uint8_t th_enc[th_len + 10];
 	uint16_t th_enc_len = sizeof(th_enc);
 	r = encode_byte_string(th2, th_len, th_enc, &th_enc_len);
 	if (r != edhoc_no_error) {

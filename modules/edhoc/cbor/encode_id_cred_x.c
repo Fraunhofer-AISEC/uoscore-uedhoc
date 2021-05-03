@@ -1,6 +1,6 @@
 /*
  * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated with a default_max_qty of 3
  */
 
 #include <stdint.h>
@@ -10,8 +10,8 @@
 #include "cbor_encode.h"
 #include "encode_id_cred_x.h"
 
-#if DEFAULT_MAXQ != 3
-#error "The type file was generated with a different default_maxq than this file"
+#if DEFAULT_MAX_QTY != 3
+#error "The type file was generated with a different default_max_qty than this file"
 #endif
 
 
@@ -19,9 +19,8 @@ static bool encode_repeated_id_cred_x_map_kid(
 		cbor_state_t *state, const struct id_cred_x_map_kid *input)
 {
 	cbor_print("%s\n", __func__);
-	uint32_t tmp_value;
 
-	bool tmp_result = ((((uintx32_encode(state, ((tmp_value = 4, &tmp_value)))))
+	bool tmp_result = ((((uintx32_put(state, (4))))
 	&& (bstrx_encode(state, (&(*input)._id_cred_x_map_kid)))));
 
 	if (!tmp_result)
@@ -34,9 +33,8 @@ static bool encode_repeated_id_cred_x_map_x5chain(
 		cbor_state_t *state, const struct id_cred_x_map_x5chain *input)
 {
 	cbor_print("%s\n", __func__);
-	uint32_t tmp_value;
 
-	bool tmp_result = ((((uintx32_encode(state, ((tmp_value = 33, &tmp_value)))))
+	bool tmp_result = ((((uintx32_put(state, (33))))
 	&& (bstrx_encode(state, (&(*input)._id_cred_x_map_x5chain)))));
 
 	if (!tmp_result)
@@ -49,10 +47,9 @@ static bool encode_repeated_id_cred_x_map_x5t(
 		cbor_state_t *state, const struct id_cred_x_map_x5t_ *input)
 {
 	cbor_print("%s\n", __func__);
-	uint32_t tmp_value;
 	bool int_res;
 
-	bool tmp_result = ((((uintx32_encode(state, ((tmp_value = 34, &tmp_value)))))
+	bool tmp_result = ((((uintx32_put(state, (34))))
 	&& (list_start_encode(state, 2) && (int_res = (((intx32_encode(state, (&(*input)._id_cred_x_map_x5t_int))))
 	&& ((bstrx_encode(state, (&(*input)._id_cred_x_map_x5t_bstr))))), ((list_end_encode(state, 2)) && int_res)))));
 

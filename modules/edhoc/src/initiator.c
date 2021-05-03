@@ -9,11 +9,8 @@
    except according to those terms.
 */
 
-#include <cbor.h>
-
 #include "../edhoc.h"
 #include "../inc/a_Xae_encode.h"
-#include "../inc/cbor_decoder.h"
 #include "../inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
 #include "../inc/error.h"
@@ -31,25 +28,8 @@
 #include "../inc/txrx_wrapper.h"
 #include "../cbor/encode_message_1.h"
 #include "../cbor/decode_message_2.h"
+#include "../cbor/encode_message_3.h"
 #include "../cbor/decode_message_2_c_i.h"
-
-/**
- * @brief   Encodes a connection identifier C_x of length one byte to 
- *          bstr_identifier
- * @param   c_x connection identifier
- * @param   pointer to the output buffer
- */
-static inline enum edhoc_error c_x_bstr_identifier_encode(uint8_t c_x,
-							  uint8_t *out)
-{
-	CborEncoder enc;
-	cbor_encoder_init(&enc, out, 1, 0);
-	int64_t t = c_x - 24;
-	CborError r = cbor_encode_int(&enc, t);
-	if (r == CborErrorOutOfMemory)
-		return CborEncodingBufferToSmall;
-	return edhoc_no_error;
-}
 
 /**
  * @brief   Parses message 2
@@ -65,7 +45,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	   uint64_t *g_y_len, uint8_t *c_r, uint64_t *c_r_len,
 	   uint8_t *ciphertext2, uint64_t *ciphertext2_len)
 {
-	bool success;
+	bool ok;
 	size_t decode_len = 0;
 	enum edhoc_error r;
 
@@ -73,8 +53,8 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	if (!(c->corr == 1 || c->corr == 3)) {
 		struct m2ci m;
 
-		success = cbor_decode_m2ci(msg2, msg2_len, &m, &decode_len);
-		if (!success) {
+		ok = cbor_decode_m2ci(msg2, msg2_len, &m, &decode_len);
+		if (!ok) {
 			return cbor_decoding_error;
 		}
 
@@ -136,8 +116,8 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	} else {
 		struct m2 m;
 
-		success = cbor_decode_m2(msg2, msg2_len, &m, &decode_len);
-		if (!success) {
+		ok = cbor_decode_m2(msg2, msg2_len, &m, &decode_len);
+		if (!ok) {
 			return cbor_decoding_error;
 		}
 		/*No C_I*/
@@ -198,7 +178,7 @@ static inline enum edhoc_error
 msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	    uint32_t *msg1_len)
 {
-	bool success;
+	bool ok;
 	struct message_1 m1;
 
 	/*METHOD_CORR*/
@@ -243,9 +223,9 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	}
 
 	size_t payload_len_out;
-	success = cbor_encode_message_1(msg1, *msg1_len, &m1, &payload_len_out);
+	ok = cbor_encode_message_1(msg1, *msg1_len, &m1, &payload_len_out);
 
-	if (!success) {
+	if (!ok) {
 		return cbor_encoding_error;
 	}
 	*msg1_len = payload_len_out;
@@ -434,7 +414,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint8_t diag_msg[] = { "Responder authentication FIALED!\n" };
 	if (auth_method_static_dh_r) {
 		if (!memcmp(mac_2, sign_or_mac, mac_2_len)) {
-			PRINT_MSG("Responder authentication successful!\n");
+			PRINT_MSG("Responder authentication okful!\n");
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
 				       diag_msg, strlen(diag_msg), NULL, 0);
@@ -450,7 +430,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			   m_2_len, (uint8_t *)&sign_or_mac, sign_or_mac_len,
 			   &verified);
 		if (verified) {
-			PRINT_MSG("Responder authentication successful!\n");
+			PRINT_MSG("Responder authentication okful!\n");
 		} else {
 			r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
 				       diag_msg, strlen(diag_msg), NULL, 0);
@@ -461,7 +441,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		}
 	}
 
-	/********msg3 create and send**********************************************/
+	/********msg3 create and send******************************************/
 
 	uint8_t *data_3;
 	uint8_t data_3_len;
@@ -614,28 +594,16 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	/*massage 3 create and send*/
 	uint8_t ciphertext_3_enc[sizeof(ciphertext_3) + 2];
 	uint16_t ciphertext_3_enc_len = sizeof(ciphertext_3_enc);
+
 	r = encode_byte_string(ciphertext_3, sizeof(ciphertext_3),
 			       ciphertext_3_enc, &ciphertext_3_enc_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
-
-	//todo use here cbor encoding
 	uint16_t msg3_len = ciphertext_3_enc_len + c_r_len;
 	uint8_t msg3[msg3_len];
-	if (c_r_len == 1) {
-		uint8_t c_r_bstr_ident;
-		r = c_x_bstr_identifier_encode(c_r[0], &c_r_bstr_ident);
-		if (r != edhoc_no_error) {
-			return r;
-		}
-		memcpy(msg3, &c_r_bstr_ident, 1);
-		memcpy(msg3 + 1, ciphertext_3_enc, ciphertext_3_enc_len);
-		msg3_len = ciphertext_3_enc_len + 1;
-	} else {
-		memcpy(msg3, c_r, c_r_len);
-		memcpy(msg3 + c_r_len, ciphertext_3_enc, ciphertext_3_enc_len);
-	}
+	memcpy(msg3, data_3, data_3_len);
+	memcpy(msg3 + data_3_len, ciphertext_3_enc, ciphertext_3_enc_len);
 
 	PRINT_ARRAY("msg3", msg3, msg3_len);
 

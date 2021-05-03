@@ -13,7 +13,6 @@
 #include <string.h>
 
 #include "../edhoc.h"
-#include "../inc/cbor_decoder.h"
 #include "../inc/crypto_wrapper.h"
 #include "../inc/error.h"
 #include "../inc/print_util.h"

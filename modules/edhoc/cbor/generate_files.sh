@@ -31,12 +31,11 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -
 
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_2.cddl code -d -t m2ci --oc decode_message_2_c_i.c --oh decode_message_2_c_i.h
 
+#encode message 3
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_3.cddl code -e -t m3 --oc encode_message_3.c --oh encode_message_3.h
 
-
-
-# python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_3.cddl code -e -t message_3 --oc message_3.c --oh message_3.h
-
-# python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_4.cddl code -e -t message_4 --oc message_4.c --oh message_4.h
+#decode message 3
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_3.cddl code -d -t m3 --oc decode_message_3.c --oh decode_message_3.h
 
 # encode error message
 python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c message_error.cddl code -e -t message_error --oc encode_message_error.c --oh encode_message_error.h
@@ -79,7 +78,7 @@ python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c th.cddl code -e -t th
 
 ### primitive types ###
 #encode byte_string
-#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c cose.cddl code -e -t byte_string --oc encode_byte_string.c --oh encode_byte_string.h
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c primitive_types.cddl code -e -t bstr_type --oc encode_bstr_type.c --oh encode_bstr_type.h
 
-#encode byte_string
-#python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c primitive_types.cddl code -e -t int_type --oc encode_int_type.c --oh encode_int_type.h
+#encode int
+python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c primitive_types.cddl code -e -t int_type --oc encode_int_type.c --oh encode_int_type.h

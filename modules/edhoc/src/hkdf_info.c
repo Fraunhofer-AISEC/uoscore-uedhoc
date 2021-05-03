@@ -22,7 +22,7 @@ enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
 				  uint64_t okm_len, uint8_t *out,
 				  uint8_t *out_len)
 {
-	bool success;
+	bool ok;
 	struct info info;
 
 	info._info_edhoc_aead_id_choice = _info_edhoc_aead_id_int;
@@ -37,9 +37,9 @@ enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
 	info._info_length = okm_len;
 
 	size_t payload_len_out;
-	success = cbor_encode_info(out, *out_len, &info, &payload_len_out);
+	ok = cbor_encode_info(out, *out_len, &info, &payload_len_out);
 
-	if (!success) {
+	if (!ok) {
 		return cbor_encoding_error;
 	}
 	*out_len = payload_len_out;
