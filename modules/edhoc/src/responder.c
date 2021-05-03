@@ -292,7 +292,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 				     uint16_t th4_len)
 {
 	enum edhoc_error r;
-	/******************** receive and process message 1 ***********************/
+	/**************** receive and process message 1 ***********************/
 	uint8_t msg1[MSG_1_DEFAULT_SIZE];
 	uint32_t msg1_len = sizeof(msg1);
 
@@ -340,7 +340,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	bool static_dh_i, static_dh_r;
 	authentication_type_get(method, &static_dh_i, &static_dh_r);
 
-	/*********************** create and send message 2*************************/
+	/******************* create and send message 2*************************/
 
 	uint8_t th2[SHA_DEFAULT_SIZE];
 	uint64_t tmp_c_i_len;

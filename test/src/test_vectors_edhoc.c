@@ -24,15 +24,15 @@
  line 0 - 290
 produces the result
 PRK_4x3m(size 32)
-        02 56 2f 1f 01 78 5c 0a a5 f5 94 64 0c 49 cb f6
-		9f 72 2e 9e 6c 57 83 7d 8e 15 79 ec 45 fe 64 7a 
+	02 56 2f 1f 01 78 5c 0a a5 f5 94 64 0c 49 cb f6
+	9f 72 2e 9e 6c 57 83 7d 8e 15 79 ec 45 fe 64 7a 
 TH4 (size 32):
-		3B 69 A6 7F EC 7E 73 6C C1 A9 52 6C DA 00 02 D4 
-		09 F5 B9 EA 0A 2B E9 60 51 A6 E3 0D 93 05 FD 51 
+	3B 69 A6 7F EC 7E 73 6C C1 A9 52 6C DA 00 02 D4 
+	09 F5 B9 EA 0A 2B E9 60 51 A6 E3 0D 93 05 FD 51 
 OSCORE Master Secret(size 16)
-        96 aa 88 ce 86 5e ba 1f fa f3 89 64 13 2c c4 42
+	96 aa 88 ce 86 5e ba 1f fa f3 89 64 13 2c c4 42
 OSCORE Master Salt(size 8)
-        5e c3 ee 41 7c fb ba e9 
+	5e c3 ee 41 7c fb ba e9 
 
  */
 

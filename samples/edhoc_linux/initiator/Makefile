@@ -108,6 +108,8 @@ endif
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" 
 
+# required for gddl-gen library
+CFLAGS += -DCDDL_CBOR_CANONICAL 
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
