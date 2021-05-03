@@ -11,7 +11,7 @@
 #ifndef PLAINTEXT_H
 #define PLAINTEXT_H
 
-#include <cbor.h>
+
 #include <stdint.h>
 
 #include "error.h"

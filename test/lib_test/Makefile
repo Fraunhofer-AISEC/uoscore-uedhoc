@@ -24,14 +24,6 @@ DIR = $(PREFIX)
 ################################################################################
 # Source files
 DO_NOT_COMPILE_SOURCES = \
-../../externals/tinycbor/src/open_memstream.c \
-../../externals/tinycbor/src/cbortojson.c \
-../../externals/tinycbor/src/cborpretty.c \
-../../externals/tinycbor/src/cborencoder_close_container_checked.c \
-../../externals/tinycbor/src/cborvalidation.c \
-../../externals/tinycbor/src/cborparser_dup_string.c \
-../../externals/tinycbor/src/cborpretty_stdio.c \
-../../externals/tinycbor/src/cborerrorstrings.c \
 ../../externals/tinycrypt/lib/source/ctr_prng.c \
 ../../externals/tinycrypt/lib/source/ecc_dh.c \
 ../../externals/tinycrypt/lib/source/cbc_mode.c \
@@ -49,7 +41,6 @@ ifeq	($(LIB_NAME), libuedhoc.a)
 	C_SOURCES += $(wildcard ../../modules/edhoc/cbor/*.c)
 	C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
 	C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
-	C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycbor/src/*.c))
 endif 
 
 ifeq	($(LIB_NAME), libuoscore.a) 

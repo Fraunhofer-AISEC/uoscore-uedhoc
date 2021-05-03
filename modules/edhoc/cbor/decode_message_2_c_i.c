@@ -1,6 +1,6 @@
 /*
  * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated with a default_max_qty of 3
  */
 
 #include <stdint.h>
@@ -10,8 +10,8 @@
 #include "cbor_decode.h"
 #include "decode_message_2_c_i.h"
 
-#if DEFAULT_MAXQ != 3
-#error "The type file was generated with a different default_maxq than this file"
+#if DEFAULT_MAX_QTY != 3
+#error "The type file was generated with a different default_max_qty than this file"
 #endif
 
 
@@ -22,11 +22,11 @@ static bool decode_m2ci(
 	bool int_res;
 
 	bool tmp_result = (((((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._m2ci_C_I_int)))) && (((*result)._m2ci_C_I_choice = _m2ci_C_I_int) || 1))
-	|| (union_elem_code(state) && (((bstrx_decode(state, (&(*result)._m2ci_C_I_bstr)))) && (((*result)._m2ci_C_I_choice = _m2ci_C_I_bstr) || 1)))), union_end_code(state), int_res)))
+	|| (((bstrx_decode(state, (&(*result)._m2ci_C_I_bstr)))) && (((*result)._m2ci_C_I_choice = _m2ci_C_I_bstr) || 1))), union_end_code(state), int_res)))
 	&& ((union_start_code(state) && (int_res = ((((tstrx_decode(state, (&(*result)._m2ci_G_Y_tstr)))) && (((*result)._m2ci_G_Y_choice = _m2ci_G_Y_tstr) || 1))
-	|| (union_elem_code(state) && (((bstrx_decode(state, (&(*result)._m2ci_G_Y_bstr)))) && (((*result)._m2ci_G_Y_choice = _m2ci_G_Y_bstr) || 1)))), union_end_code(state), int_res)))
+	|| (((bstrx_decode(state, (&(*result)._m2ci_G_Y_bstr)))) && (((*result)._m2ci_G_Y_choice = _m2ci_G_Y_bstr) || 1))), union_end_code(state), int_res)))
 	&& ((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._m2ci_C_R_int)))) && (((*result)._m2ci_C_R_choice = _m2ci_C_R_int) || 1))
-	|| (union_elem_code(state) && (((bstrx_decode(state, (&(*result)._m2ci_C_R_bstr)))) && (((*result)._m2ci_C_R_choice = _m2ci_C_R_bstr) || 1)))), union_end_code(state), int_res)))
+	|| (((bstrx_decode(state, (&(*result)._m2ci_C_R_bstr)))) && (((*result)._m2ci_C_R_choice = _m2ci_C_R_bstr) || 1))), union_end_code(state), int_res)))
 	&& ((bstrx_decode(state, (&(*result)._m2ci_CIPHERTEXT_2)))))));
 
 	if (!tmp_result)

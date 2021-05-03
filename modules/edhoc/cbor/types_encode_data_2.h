@@ -1,6 +1,6 @@
 /*
  * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated with a default_max_qty of 3
  */
 
 #ifndef TYPES_ENCODE_DATA_2_H__
@@ -12,7 +12,7 @@
 #include <string.h>
 #include "cbor_encode.h"
 
-#define DEFAULT_MAXQ 3
+#define DEFAULT_MAX_QTY 3
 
 struct data_2_C_I_ {
  	union {

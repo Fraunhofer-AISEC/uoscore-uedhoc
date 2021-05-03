@@ -1,6 +1,6 @@
 /*
  * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated with a default_max_qty of 3
  */
 
 #include <stdint.h>
@@ -10,8 +10,8 @@
 #include "cbor_decode.h"
 #include "decode_plaintext.h"
 
-#if DEFAULT_MAXQ != 3
-#error "The type file was generated with a different default_maxq than this file"
+#if DEFAULT_MAX_QTY != 3
+#error "The type file was generated with a different default_max_qty than this file"
 #endif
 
 
@@ -83,7 +83,7 @@ static bool decode_plaintext(
 
 	bool tmp_result = (((((union_start_code(state) && (int_res = ((((decode_map(state, (&(*result)._plaintext_ID_CRED_x__map)))) && (((*result)._plaintext_ID_CRED_x_choice = _plaintext_ID_CRED_x__map) || 1))
 	|| (union_elem_code(state) && (((bstrx_decode(state, (&(*result)._plaintext_ID_CRED_x_bstr)))) && (((*result)._plaintext_ID_CRED_x_choice = _plaintext_ID_CRED_x_bstr) || 1)))
-	|| (union_elem_code(state) && (((intx32_decode(state, (&(*result)._plaintext_ID_CRED_x_int)))) && (((*result)._plaintext_ID_CRED_x_choice = _plaintext_ID_CRED_x_int) || 1)))), union_end_code(state), int_res)))
+	|| (((intx32_decode(state, (&(*result)._plaintext_ID_CRED_x_int)))) && (((*result)._plaintext_ID_CRED_x_choice = _plaintext_ID_CRED_x_int) || 1))), union_end_code(state), int_res)))
 	&& ((bstrx_decode(state, (&(*result)._plaintext_SGN_or_MAC_x))))
 	&& present_decode(&((*result)._plaintext_AD_x_present), (void *)bstrx_decode, state, (&(*result)._plaintext_AD_x)))));
 

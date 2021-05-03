@@ -9,11 +9,9 @@
    except according to those terms.
 */
 
-#include <cbor.h>
 
 #include "../edhoc.h"
 #include "../inc/a_Xae_encode.h"
-#include "../inc/cbor_decoder.h"
 #include "../inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
 #include "../inc/error.h"
@@ -32,6 +30,7 @@
 #include "../cbor/decode_message_1.h"
 #include "../cbor/encode_message_2_c_i.h"
 #include "../cbor/encode_message_2.h"
+#include "../cbor/decode_message_3.h"
 /**
  * @brief   Parses message 1
  * @param   msg1 buffer containing message 1
@@ -54,12 +53,12 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
 	   uint64_t *ad1_len)
 {
 	uint32_t i;
-	bool success;
+	bool ok;
 	struct message_1 m;
 	size_t decode_len = 0;
 
-	success = cbor_decode_message_1(msg1, msg1_len, &m, &decode_len);
-	if (!success) {
+	ok = cbor_decode_message_1(msg1, msg1_len, &m, &decode_len);
+	if (!ok) {
 		return cbor_decoding_error;
 	}
 
@@ -147,42 +146,42 @@ static inline enum edhoc_error
 msg3_parse(uint8_t corr, uint8_t *msg3, uint16_t msg3_len, uint8_t *c_r,
 	   uint64_t *c_r_len, uint8_t *ciphertext_3, uint64_t *ciphertext_3_len)
 {
-	uint8_t *temp_ptr = msg3;
-	uint8_t *next_temp_ptr;
-	uint32_t temp_len = msg3_len;
-	CborType cbor_type;
 	enum edhoc_error r;
+	bool ok;
+	struct m3 m;
+	size_t decode_len = 0;
+
+	ok = cbor_decode_m3(msg3, msg3_len, &m, &decode_len);
+	if (!ok) {
+		return cbor_decoding_error;
+	}
 
 	if (corr != 2 && corr != 3) {
 		/*C_R is present*/
 		if (*c_r_len == 1) {
 			/*C_R is encoded as int*/
-			int buf;
-			r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-					 &buf, c_r_len, &cbor_type);
-			c_r[0] = (uint8_t)buf;
+			c_r[0] = m._m3_C_R._m3_C_R_int;
 		} else {
-			r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len,
-					 c_r, c_r_len, &cbor_type);
+			r = _memcpy_s(c_r, *c_r_len,
+				      m._m3_C_R._m3_C_R_bstr.value,
+				      m._m3_C_R._m3_C_R_bstr.len);
+			if (r != edhoc_no_error) {
+				return r;
+			}
+
+			*c_r_len = m._m3_C_R._m3_C_R_bstr.len;
 		}
-		if (r != edhoc_no_error)
-			return r;
-		temp_len -= (next_temp_ptr - temp_ptr);
-		temp_ptr = next_temp_ptr;
 		PRINT_ARRAY("msg3 C_R", c_r, *c_r_len);
 	}
 
-	/*get cyphertext_2 or DIAG_MSG*/
-	r = cbor_decoder(&next_temp_ptr, temp_ptr, temp_len, ciphertext_3,
-			 ciphertext_3_len, &cbor_type);
-	if (r != edhoc_no_error)
+	r = _memcpy_s(ciphertext_3, *ciphertext_3_len, m._m3_CIPHERTEXT_3.value,
+		      m._m3_CIPHERTEXT_3.len);
+	if (r != edhoc_no_error) {
 		return r;
-	if (cbor_type == CborTextStringType) {
-		/*the error message and message 3 differ in the type of the second 
-        element. In the error message the second element is DIAG_MSG : tstr and 
-        in message 2 it is cyphertext_2 : bstr*/
-		return error_message_received;
 	}
+
+	*ciphertext_3_len = m._m3_CIPHERTEXT_3.len;
+
 	PRINT_ARRAY("msg3 CIPHERTEXT_3", ciphertext_3, *ciphertext_3_len);
 	return edhoc_no_error;
 };
@@ -612,7 +611,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 			}
 			return responder_authentication_failed;
 		} else {
-			PRINT_MSG("Initiator authentication successful!\n");
+			PRINT_MSG("Initiator authentication okful!\n");
 		}
 	} else {
 		/*the initiator authenticates with a signature*/
@@ -621,7 +620,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 			   m_3_len, (uint8_t *)&sign_or_mac, sign_or_mac_len,
 			   &verified);
 		if (verified) {
-			PRINT_MSG("Initiator authentication successful!\n");
+			PRINT_MSG("Initiator authentication okful!\n");
 		} else {
 			PRINT_MSG("Initiator authentication failed!\n");
 			r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,

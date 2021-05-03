@@ -12,7 +12,6 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../inc/cbor_decoder.h"
 #include "../inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"

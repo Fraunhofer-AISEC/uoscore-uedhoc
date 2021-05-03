@@ -1,6 +1,6 @@
 /*
  * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated with a default_max_qty of 3
  */
 
 #include <stdint.h>
@@ -10,8 +10,8 @@
 #include "cbor_decode.h"
 #include "decode_message_1.h"
 
-#if DEFAULT_MAXQ != 3
-#error "The type file was generated with a different default_maxq than this file"
+#if DEFAULT_MAX_QTY != 3
+#error "The type file was generated with a different default_max_qty than this file"
 #endif
 
 
@@ -27,7 +27,7 @@ static bool decode_message_1(
 	|| (union_elem_code(state) && (((intx32_decode(state, (&(*result)._message_1_SUITES_I_int)))) && (((*result)._message_1_SUITES_I_choice = _message_1_SUITES_I_int) || 1)))), union_end_code(state), int_res)))
 	&& ((bstrx_decode(state, (&(*result)._message_1_G_X))))
 	&& ((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._message_1_C_I_int)))) && (((*result)._message_1_C_I_choice = _message_1_C_I_int) || 1))
-	|| (union_elem_code(state) && (((bstrx_decode(state, (&(*result)._message_1_C_I_bstr)))) && (((*result)._message_1_C_I_choice = _message_1_C_I_bstr) || 1)))), union_end_code(state), int_res)))
+	|| (((bstrx_decode(state, (&(*result)._message_1_C_I_bstr)))) && (((*result)._message_1_C_I_choice = _message_1_C_I_bstr) || 1))), union_end_code(state), int_res)))
 	&& present_decode(&((*result)._message_1_AD_1_present), (void *)bstrx_decode, state, (&(*result)._message_1_AD_1)))));
 
 	if (!tmp_result)
