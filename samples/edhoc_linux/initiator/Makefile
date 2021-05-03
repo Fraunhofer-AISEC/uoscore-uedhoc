@@ -44,14 +44,6 @@ src/main.cpp \
 
 # C sources
 DO_NOT_COMPILE_SOURCES = \
-../../../externals/tinycbor/src/open_memstream.c \
-../../../externals/tinycbor/src/cbortojson.c \
-../../../externals/tinycbor/src/cborpretty.c \
-../../../externals/tinycbor/src/cborencoder_close_container_checked.c \
-../../../externals/tinycbor/src/cborvalidation.c \
-../../../externals/tinycbor/src/cborparser_dup_string.c \
-../../../externals/tinycbor/src/cborpretty_stdio.c \
-../../../externals/tinycbor/src/cborerrorstrings.c \
 ../../../externals/tinycrypt/lib/source/ctr_prng.c \
 ../../../externals/tinycrypt/lib/source/ecc_dh.c \
 ../../../externals/tinycrypt/lib/source/cbc_mode.c \
@@ -70,7 +62,6 @@ C_SOURCES += ../../../modules/edhoc/crypto_wrapper.c
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
 C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycbor/src/*.c))
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycrypt/lib/source/*.c))
 
 #$(info    C_SOURCES is $(C_SOURCES))

@@ -43,10 +43,6 @@ enum edhoc_error {
 	cbor_decoding_error = 16,
 	suites_i_list_to_long = 17,
 
-	//todo to be removed after migration to cddl-gen
-	CborEncodingBufferToSmall = 18,
-	CborByteStringBufferToSmall = 19,
-	ErrorDuringCborDecoding = 20,
 };
 
 #endif
