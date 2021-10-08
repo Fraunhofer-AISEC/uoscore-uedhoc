@@ -11,7 +11,7 @@
 
 message_1 = (
 	METHOD_CORR: int,
-	SUITES_I: [ selected: int, supported: 2**10 int ] / int,
+	SUITES_I: [ suite: 2**10 int ] / int,
 	G_X: bstr,
 	C_I: int / bstr,
 	? AD_1: bstr,

@@ -39,7 +39,6 @@ OSCORE Master Salt(size 8)
 
 */
 
-
 #ifdef RESPONDER_TEST_1
 uint8_t SUITES_R[] = { 0 };
 uint32_t SUITES_R_LEN = sizeof(SUITES_R);
@@ -950,4 +949,82 @@ uint8_t MSG_3[] = {
 uint32_t MSG_3_LEN = sizeof(MSG_3);
 #endif
 
+#endif
+
+/*
+
+
+Test 5
+
+reference interop4 Marco-Christian (Test 10)
+Ciphersuite: 2
+Correlation Method: 1
+Authentication Method: 0
+Identity Credential Type: kid
+
+
+The result which we achieve:
+
+
+*/
+
+#ifdef RESPONDER_TEST_5
+
+uint8_t SUITES_R[] = { 2 };
+uint32_t SUITES_R_LEN = sizeof(SUITES_R);
+
+uint8_t G_Y[] = { 0x81, 0xdf, 0x54, 0xb3, 0x75, 0x6a, 0xcf, 0xc8,
+		  0xa1, 0xe9, 0xb0, 0x8b, 0xa1, 0x0d, 0xe4, 0xe7,
+		  0xe7, 0xdd, 0x93, 0x45, 0x87, 0xa1, 0xec, 0xdb,
+		  0x21, 0xb9, 0x2f, 0x8f, 0x22, 0xc3, 0xa3, 0x8d };
+uint32_t G_Y_LEN = sizeof(G_Y);
+
+uint8_t Y[] = { 0x73, 0x97, 0xba, 0x34, 0xa7, 0xb6, 0x0a, 0x4d,
+		0x98, 0xef, 0x5e, 0x91, 0x56, 0x3f, 0xc8, 0x54,
+		0x9f, 0x35, 0x54, 0x49, 0x4f, 0x1f, 0xeb, 0xd4,
+		0x65, 0x36, 0x0c, 0x4b, 0x90, 0xe7, 0x41, 0x71 };
+uint32_t Y_LEN = sizeof(Y);
+
+uint8_t C_R[] = { 0x2c };
+uint32_t C_R_LEN = sizeof(C_R);
+
+uint8_t ID_CRED_R[] = {};
+uint32_t ID_CRED_R_LEN = sizeof(ID_CRED_R);
+
+uint8_t CRED_R[] = {};
+uint32_t CRED_R_LEN = sizeof(CRED_R);
+
+uint8_t *AD_2;
+uint32_t AD_2_LEN = 0;
+
+uint8_t SK_R[] = {};
+uint8_t SK_R_LEN = sizeof(SK_R);
+
+uint8_t PK_R[32] = {};
+uint8_t PK_R_LEN = sizeof(PK_R);
+
+uint8_t R[] = {};
+uint8_t R_LEN = sizeof(R);
+
+uint8_t G_R[] = {};
+uint8_t G_R_LEN = sizeof(G_R);
+
+/*other party credentials*/
+uint8_t ID_CRED_I[] = {};
+uint32_t ID_CRED_I_LEN = sizeof(ID_CRED_I);
+
+uint8_t CRED_I[] = {};
+uint32_t CRED_I_LEN = sizeof(CRED_I);
+
+uint8_t PK_I[] = {};
+uint8_t PK_I_LEN = sizeof(PK_I);
+
+uint8_t *G_I = NULL;
+uint32_t G_I_LEN = 0;
+
+uint8_t CA[] = {};
+uint8_t CA_LEN = sizeof(CA);
+
+uint8_t CA_PK[] = {};
+uint8_t CA_PK_LEN = sizeof(CA_PK);
 #endif

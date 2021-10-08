@@ -140,10 +140,10 @@ enum edhoc_error signature_or_mac_msg_create(
 	 * 8 -> out[8]
 	 */
 	uint8_t in, out[8];
-	if (suite.edhoc_aead == AES_CCM_16_64_128) {
-		*mac_len = 8; /*8 byte tag (64bit)*/
-	} else {
-		return unsupported_aead_algorithm;
+
+	*mac_len = 8;
+	if (suite.edhoc_aead == AES_CCM_16_128_128) {
+		*mac_len = 16;
 	}
 	r = aead(ENCRYPT, &in, 0, K_m, sizeof(K_m), IV_m, sizeof(IV_m), A_m,
 		 A_m_len, (uint8_t *)&out, 0, mac, *mac_len);

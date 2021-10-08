@@ -45,14 +45,11 @@ src/main.cpp \
 # C sources
 DO_NOT_COMPILE_SOURCES = \
 ../../../externals/tinycrypt/lib/source/ctr_prng.c \
-../../../externals/tinycrypt/lib/source/ecc_dh.c \
 ../../../externals/tinycrypt/lib/source/cbc_mode.c \
 ../../../externals/tinycrypt/lib/source/hmac_prng.c \
 ../../../externals/tinycrypt/lib/source/ctr_mode.c \
-../../../externals/tinycrypt/lib/source/ecc_platform_specific.c \
-../../../externals/tinycrypt/lib/source/cmac_mode.c \
-../../../externals/tinycrypt/lib/source/ecc.c \
-../../../externals/tinycrypt/lib/source/ecc_dsa.c 
+../../../externals/tinycrypt/lib/source/cmac_mode.c 
+
 
 C_SOURCES = $(wildcard src/*.c)
 C_SOURCES += $(wildcard ../../common/*.c) 

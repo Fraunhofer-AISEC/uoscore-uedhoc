@@ -22,8 +22,7 @@ static bool encode_message_1(
 	bool int_res;
 
 	bool tmp_result = (((((intx32_encode(state, (&(*input)._message_1_METHOD_CORR))))
-	&& ((((*input)._message_1_SUITES_I_choice == _message_1_SUITES_I__selected) ? ((list_start_encode(state, 11) && (int_res = (((intx32_encode(state, (&(*input)._message_1_SUITES_I__selected_selected))))
-	&& multi_encode(2, 10, &(*input)._message_1_SUITES_I__selected_supported_count, (void *)intx32_encode, state, (&(*input)._message_1_SUITES_I__selected_supported), sizeof(int32_t))), ((list_end_encode(state, 11)) && int_res))))
+	&& ((((*input)._message_1_SUITES_I_choice == _message_1_SUITES_I__suite) ? ((list_start_encode(state, 10) && (int_res = (multi_encode(2, 10, &(*input)._message_1_SUITES_I__suite_suite_count, (void *)intx32_encode, state, (&(*input)._message_1_SUITES_I__suite_suite), sizeof(int32_t))), ((list_end_encode(state, 10)) && int_res))))
 	: (((*input)._message_1_SUITES_I_choice == _message_1_SUITES_I_int) ? ((intx32_encode(state, (&(*input)._message_1_SUITES_I_int))))
 	: false)))
 	&& ((bstrx_encode(state, (&(*input)._message_1_G_X))))

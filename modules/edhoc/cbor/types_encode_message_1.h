@@ -18,14 +18,13 @@ struct message_1 {
  	int32_t _message_1_METHOD_CORR;
 	union {
 		struct {
-			int32_t _message_1_SUITES_I__selected_selected;
-			int32_t _message_1_SUITES_I__selected_supported[10];
-			size_t _message_1_SUITES_I__selected_supported_count;
+			int32_t _message_1_SUITES_I__suite_suite[10];
+			size_t _message_1_SUITES_I__suite_suite_count;
 		};
 		int32_t _message_1_SUITES_I_int;
 	};
 	enum {
-		_message_1_SUITES_I__selected,
+		_message_1_SUITES_I__suite,
 		_message_1_SUITES_I_int,
 	} _message_1_SUITES_I_choice;
 	cbor_string_type_t _message_1_G_X;

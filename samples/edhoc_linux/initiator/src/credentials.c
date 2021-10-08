@@ -1048,3 +1048,91 @@ uint32_t MSG_3_LEN = sizeof(MSG_3);
 #endif
 
 #endif
+
+/*
+
+
+Test 5
+
+reference interop4 Marco-Christian (Test 10)
+Ciphersuite: 2
+Correlation Method: 1
+Authentication Method: 0
+Identity Credential Type: kid
+
+
+The result which we achieve:
+
+
+*/
+
+#ifdef INITIATOR_TEST_5
+
+enum method_type METHOD_TYPE = INITIATOR_SDHK_RESPONDER_SDHK;
+uint8_t CORR = 1;
+
+uint8_t SUITES_I[] = { 2 };
+uint32_t SUITES_I_LEN = sizeof(SUITES_I);
+
+uint8_t G_X[] = { 0x47, 0x57, 0x76, 0xf8, 0x44, 0x97, 0x9a, 0xd0,
+		  0xb4, 0x63, 0xc5, 0xa6, 0xa4, 0x34, 0x3a, 0x66,
+		  0x3d, 0x17, 0xa3, 0xa8, 0x0e, 0x38, 0xa8, 0x1d,
+		  0x3e, 0x34, 0x96, 0xf6, 0x06, 0x1f, 0xd7, 0x16 };
+uint32_t G_X_LEN = sizeof(G_X);
+
+uint8_t X[] = { 0x0a, 0xe7, 0x99, 0x77, 0x5c, 0xb1, 0x51, 0xbf,
+		0xc2, 0x54, 0x87, 0x35, 0xf4, 0x4a, 0xcf, 0x1d,
+		0x94, 0x29, 0xcf, 0x9a, 0x95, 0xdd, 0xcd, 0x2a,
+		0x13, 0x9e, 0x3a, 0x28, 0xd8, 0x63, 0xa0, 0x81 };
+uint32_t X_LEN = sizeof(X);
+
+uint8_t C_I[] = { 0x16 };
+uint32_t C_I_LEN = sizeof(C_I);
+
+uint8_t *AD_1 = NULL;
+uint32_t AD_1_LEN = 0;
+
+uint8_t *AD_3 = NULL;
+uint32_t AD_3_LEN = 0;
+
+uint8_t ID_CRED_I[] = {
+
+};
+
+uint32_t ID_CRED_I_LEN = sizeof(ID_CRED_I);
+
+uint8_t CRED_I[] = {};
+
+uint32_t CRED_I_LEN = sizeof(CRED_I);
+
+uint8_t I[] = {};
+uint32_t I_LEN = sizeof(I);
+
+uint8_t G_I[] = {};
+uint32_t G_I_LEN = sizeof(G_I);
+
+uint8_t SK_I[] = {};
+uint32_t SK_I_LEN = sizeof(SK_I);
+
+uint8_t PK_I[] = {};
+uint32_t PK_I_LEN = sizeof(PK_I);
+
+/*other party credentials*/
+uint8_t *ID_CRED_R = NULL;
+uint32_t ID_CRED_R_LEN = 0;
+
+uint8_t *CRED_R = NULL;
+uint32_t CRED_R_LEN = 0;
+
+uint8_t *PK_R = NULL;
+uint8_t PK_R_LEN = 0;
+
+uint8_t G_R[] = {};
+uint8_t G_R_LEN = sizeof(G_R);
+
+uint8_t CA[] = {};
+uint8_t CA_LEN = sizeof(CA);
+
+uint8_t CA_PK[] = {};
+uint8_t CA_PK_LEN = sizeof(CA_PK);
+#endif

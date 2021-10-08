@@ -192,8 +192,7 @@ enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
 	uint16_t th2_input_len = sizeof(th2_input);
 	enum edhoc_error r;
 
-	PRINT_ARRAY("msg1", msg1, msg1_len);
-	PRINT_ARRAY("c_r", c_r, c_r_len);
+	PRINT_ARRAY("C_R", c_r, c_r_len);
 
 	r = th2_input_encode(msg1, msg1_len, c_i, c_i_len, g_y, g_y_len, c_r,
 			     c_r_len, th2_input, &th2_input_len);

@@ -25,23 +25,26 @@ enum edhoc_error {
 
 	hkdf_fialed = 3,
 	aead_failed = 4,
-	unsupported_cipher_suite = 5,
-	unsupported_ecdh_curve = 6,
-	unsupported_aead_algorithm = 7,
+	sign_failed = 5,
+	sha_failed = 6,
+	dh_failed = 7,
+	unsupported_cipher_suite = 8,
+	unsupported_ecdh_curve = 9,
+	unsupported_aead_algorithm = 10,
 
-	responder_authentication_failed = 8,
-	aead_authentication_failed = 9,
-	certificate_authentication_failed = 10,
+	responder_authentication_failed = 11,
+	aead_authentication_failed = 12,
+	certificate_authentication_failed = 13,
 
-	credential_not_found = 11,
-	no_such_ca = 12,
+	credential_not_found = 14,
+	no_such_ca = 15,
 
-	message_buff_to_small = 13,
-	dest_buffer_to_small = 14,
+	message_buff_to_small = 16,
+	dest_buffer_to_small = 17,
 
-	cbor_encoding_error = 15,
-	cbor_decoding_error = 16,
-	suites_i_list_to_long = 17,
+	cbor_encoding_error = 18,
+	cbor_decoding_error = 19,
+	suites_i_list_to_long = 20,
 
 };
 

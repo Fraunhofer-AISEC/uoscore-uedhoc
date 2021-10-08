@@ -16,3 +16,4 @@
 [submodule "externals/cddl-gen"]
 	path = externals/cddl-gen
 	url = https://github.com/NordicSemiconductor/cddl-gen.git
+

@@ -191,10 +191,10 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 		m1._message_1_SUITES_I_int = c->suites_i.ptr[0];
 	} else if (c->suites_i.len > 1) {
 		/* more than one suites, encode into array */
-		m1._message_1_SUITES_I_choice = _message_1_SUITES_I__selected;
-		m1._message_1_SUITES_I__selected_selected = c->suites_i.ptr[0];
+		m1._message_1_SUITES_I_choice = _message_1_SUITES_I__suite;
+		m1._message_1_SUITES_I__suite_suite_count = c->suites_i.len;
 		for (uint32_t i = 0; i < c->suites_i.len; i++) {
-			m1._message_1_SUITES_I__selected_supported[i] =
+			m1._message_1_SUITES_I__suite_suite[i] =
 				c->suites_i.ptr[i];
 		}
 	}

@@ -9,7 +9,6 @@
    except according to those terms.
 */
 
-
 #include "../edhoc.h"
 #include "../inc/a_Xae_encode.h"
 #include "../inc/crypto_wrapper.h"
@@ -73,18 +72,14 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
 		*suites_i_len = 1;
 	} else {
 		/*the initiator supports more than one suite*/
-		if (m._message_1_SUITES_I__selected_supported_count >
-		    *suites_i_len) {
+		if (m._message_1_SUITES_I__suite_suite_count > *suites_i_len) {
 			return suites_i_list_to_long;
 		}
-		suites_i[0] = m._message_1_SUITES_I__selected_selected;
 
-		for (i = 1; i < m._message_1_SUITES_I__selected_supported_count;
-		     i++) {
-			suites_i[i] =
-				m._message_1_SUITES_I__selected_supported[i - 1];
+		for (i = 0; i < m._message_1_SUITES_I__suite_suite_count; i++) {
+			suites_i[i] = m._message_1_SUITES_I__suite_suite[i];
 		}
-		*suites_i_len = 1 + i; /*the selected + all other suites*/
+		*suites_i_len = m._message_1_SUITES_I__suite_suite_count;
 	}
 	PRINT_ARRAY("msg1 SUITES_I", suites_i, *suites_i_len);
 
@@ -523,10 +518,8 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	}
 
 	uint8_t tag[16];
-	uint8_t mac_len;
-	if (suite.edhoc_aead == AES_CCM_16_64_128) {
-		mac_len = 8;
-	} else {
+	uint8_t mac_len = 8;
+	if (suite.edhoc_aead == AES_CCM_16_128_128) {
 		mac_len = 16;
 	}
 	uint8_t P_3ae[ciphertext_3_len - mac_len];
