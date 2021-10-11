@@ -29,6 +29,14 @@ extern struct byte_array EMPTY_ARRAY;
 extern struct byte_array NULL_ARRAY;
 
 /**
+ * 
+ * 
+ * 
+ */
+void byte_array_init(uint8_t *buf, uint32_t buf_len,
+		     struct byte_array *byte_array);
+
+/**
  * @brief   Compares if the given two arrays have an equal content.
  *
  *          Handles null-arrays correctly

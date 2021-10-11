@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -46,23 +47,21 @@ static bool decode_m3(
 
 
 
-__attribute__((unused)) static bool type_test_decode_m3(
-		struct m3 *result)
-{
-	/* This function should not be called, it is present only to test that
-	 * the types of the function and struct match, since this information
-	 * is lost with the casts in the entry function.
-	 */
-	return decode_m3(NULL, result);
-}
-
-
 bool cbor_decode_m3(
-		const uint8_t *payload, size_t payload_len,
+		const uint8_t *payload, uint32_t payload_len,
 		struct m3 *result,
-		size_t *payload_len_out)
+		uint32_t *payload_len_out)
 {
-	return entry_function(payload, payload_len, (const void *)result,
-		payload_len_out, (void *)decode_m3,
-		2, 1);
+	cbor_state_t states[3];
+
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 2);
+
+	bool ret = decode_m3(states, result);
+
+	if (ret && (payload_len_out != NULL)) {
+		*payload_len_out = MIN(payload_len,
+				(size_t)states[0].payload - (size_t)payload);
+	}
+
+	return ret;
 }

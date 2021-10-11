@@ -20,15 +20,14 @@
  * @param   alg hash algorithm to be used
  * @param   msg1 pointer to a message 1
  * @param   msg1_len length of message 1
- * @param   c_i Pointer to the conception identifier of the initiator
  * @param   g_y Pointer to the public DH parameter
  * @param   c_r Pointer to the conception identifier of the responder
  * @param   th2 ouput buffer
  */
 enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
-			       uint32_t msg1_len, uint8_t *c_i,
-			       uint32_t c_i_len, uint8_t *g_y, uint32_t g_y_len,
-			       uint8_t *c_r, uint32_t c_r_len, uint8_t *th2);
+			       uint32_t msg1_len, uint8_t *g_y,
+			       uint32_t g_y_len, uint8_t *c_r, uint32_t c_r_len,
+			       uint8_t *th2);
 
 /**
  * @brief   calculates transcript hash th3

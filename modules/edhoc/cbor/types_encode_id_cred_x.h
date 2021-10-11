@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -29,11 +30,11 @@ struct id_cred_x_map_x5t_ {
 
 struct id_cred_x_map {
  	struct id_cred_x_map_kid _id_cred_x_map_kid;
-	size_t _id_cred_x_map_kid_present;
+	uint32_t _id_cred_x_map_kid_present;
 	struct id_cred_x_map_x5chain _id_cred_x_map_x5chain;
-	size_t _id_cred_x_map_x5chain_present;
+	uint32_t _id_cred_x_map_x5chain_present;
 	struct id_cred_x_map_x5t_ _id_cred_x_map_x5t;
-	size_t _id_cred_x_map_x5t_present;
+	uint32_t _id_cred_x_map_x5t_present;
 };
 
 

@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -26,10 +27,10 @@ struct th3_data_3_ {
 };
 
 struct th3 {
- 	cbor_string_type_t _th3_th2;
+ 	cbor_string_type_t _th3_th_2;
 	cbor_string_type_t _th3_CIPHERTEXT_2;
 	struct th3_data_3_ _th3_data_3;
-	size_t _th3_data_3_present;
+	uint32_t _th3_data_3_present;
 };
 
 

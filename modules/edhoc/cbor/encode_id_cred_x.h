@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -19,9 +20,9 @@
 
 
 bool cbor_encode_id_cred_x_map(
-		uint8_t *payload, size_t payload_len,
+		uint8_t *payload, uint32_t payload_len,
 		const struct id_cred_x_map *input,
-		size_t *payload_len_out);
+		uint32_t *payload_len_out);
 
 
 #endif /* ENCODE_ID_CRED_X_H__ */

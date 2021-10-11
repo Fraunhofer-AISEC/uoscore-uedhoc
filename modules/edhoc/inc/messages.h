@@ -19,7 +19,7 @@ struct msg_1 {
 	struct byte_array suites_i;
 	struct byte_array g_x;
 	struct byte_array c_i;
-	struct byte_array ad_1;
+	struct byte_array ead_1;
 };
 
 struct msg_2 {

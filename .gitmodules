@@ -17,3 +17,6 @@
 	path = externals/cddl-gen
 	url = https://github.com/NordicSemiconductor/cddl-gen.git
 
+[submodule "externals/jsmn"]
+	path = externals/jsmn
+	url = git@github.com:zserge/jsmn.git

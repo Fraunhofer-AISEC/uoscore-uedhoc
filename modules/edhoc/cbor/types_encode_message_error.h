@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -28,23 +29,23 @@ struct message_error_C_x_ {
 struct message_error_SUITES_R_ {
  	union {
 		struct {
-			int32_t _message_error_SUITES_R__supported_supported[10];
-			size_t _message_error_SUITES_R__supported_supported_count;
+			int32_t _SUITES_R__supported_supported[10];
+			uint32_t _SUITES_R__supported_supported_count;
 		};
 		int32_t _message_error_SUITES_R_int;
 	};
 	enum {
-		_message_error_SUITES_R__supported,
+		_SUITES_R__supported,
 		_message_error_SUITES_R_int,
 	} _message_error_SUITES_R_choice;
 };
 
 struct message_error {
  	struct message_error_C_x_ _message_error_C_x;
-	size_t _message_error_C_x_present;
+	uint32_t _message_error_C_x_present;
 	cbor_string_type_t _message_error_DIAG_MSG;
 	struct message_error_SUITES_R_ _message_error_SUITES_R;
-	size_t _message_error_SUITES_R_present;
+	uint32_t _message_error_SUITES_R_present;
 };
 
 

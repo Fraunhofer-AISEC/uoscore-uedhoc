@@ -34,7 +34,7 @@
  * @brief   Parses message 1
  * @param   msg1 buffer containing message 1
  * @param   msg1_len length of msg1
- * @param   method_corr 4*method+corr
+ * @param   method method
  * @param   suites_i
  * @param   suites_i_len length of suites_i
  * @param   g_x Public ephemeral key of the initiator
@@ -46,7 +46,7 @@
  * @retval an edhoc_error code
  */
 static inline enum edhoc_error
-msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
+msg1_parse(uint8_t *msg1, uint32_t msg1_len, enum method_type *method,
 	   uint8_t *suites_i, uint64_t *suites_i_len, uint8_t *g_x,
 	   uint64_t *g_x_len, uint8_t *c_i, uint64_t *c_i_len, uint8_t *ad1,
 	   uint64_t *ad1_len)
@@ -61,9 +61,9 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
 		return cbor_decoding_error;
 	}
 
-	/*METHOD_CORR*/
-	*method_corr = m._message_1_METHOD_CORR;
-	PRINT_ARRAY("msg1 METHOD_CORR", method_corr, 1);
+	/*METHOD*/
+	*method = m._message_1_METHOD;
+	PRINTF("msg1 METHOD: %d", (int)*method);
 
 	/*SUITES_I*/
 	if (m._message_1_SUITES_I_choice == _message_1_SUITES_I_int) {
@@ -72,14 +72,14 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
 		*suites_i_len = 1;
 	} else {
 		/*the initiator supports more than one suite*/
-		if (m._message_1_SUITES_I__suite_suite_count > *suites_i_len) {
+		if (m._SUITES_I__suite_suite_count > *suites_i_len) {
 			return suites_i_list_to_long;
 		}
 
-		for (i = 0; i < m._message_1_SUITES_I__suite_suite_count; i++) {
-			suites_i[i] = m._message_1_SUITES_I__suite_suite[i];
+		for (i = 0; i < m._SUITES_I__suite_suite_count; i++) {
+			suites_i[i] = m._SUITES_I__suite_suite[i];
 		}
-		*suites_i_len = m._message_1_SUITES_I__suite_suite_count;
+		*suites_i_len = m._SUITES_I__suite_suite_count;
 	}
 	PRINT_ARRAY("msg1 SUITES_I", suites_i, *suites_i_len);
 
@@ -90,7 +90,7 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
 
 	/*C_I*/
 	if (m._message_1_C_I_choice == _message_1_C_I_int) {
-		*c_i = m._message_1_C_I_int + 24;
+		*c_i = m._message_1_C_I_int;
 		*c_i_len = 1;
 	} else {
 		_memcpy_s(c_i, *c_i_len, m._message_1_C_I_bstr.value,
@@ -99,12 +99,12 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, uint8_t *method_corr,
 	}
 	PRINT_ARRAY("msg1 C_I", c_i, *c_i_len);
 
-	/*AD_1*/
-	if (m._message_1_AD_1_present) {
-		_memcpy_s(ad1, *ad1_len, m._message_1_AD_1.value,
-			  m._message_1_AD_1.len);
-		*ad1_len = m._message_1_AD_1.len;
-		PRINT_ARRAY("msg1 AD_1", ad1, *ad1_len);
+	/*ead_1*/
+	if (m._message_1_ead_1_present) {
+		_memcpy_s(ad1, *ad1_len, m._message_1_ead_1.value,
+			  m._message_1_ead_1.len);
+		*ad1_len = m._message_1_ead_1.len;
+		PRINT_ARRAY("msg1 ead_1", ad1, *ad1_len);
 	}
 	return edhoc_no_error;
 }
@@ -280,9 +280,9 @@ msg2_encode(uint8_t corr, const uint8_t *c_i, uint8_t c_i_len,
 enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 				     struct other_party_cred *cred_i_array,
 				     uint16_t num_cred_i, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ad_1,
-				     uint64_t *ad_1_len, uint8_t *ad_3,
-				     uint64_t *ad_3_len, uint8_t *prk_4x3m,
+				     uint32_t *err_msg_len, uint8_t *ead_1,
+				     uint64_t *ead_1_len, uint8_t *ead_3,
+				     uint64_t *ead_3_len, uint8_t *prk_4x3m,
 				     uint16_t prk_4x3m_len, uint8_t *th4,
 				     uint16_t th4_len)
 {
@@ -297,7 +297,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	}
 	PRINT_ARRAY("message_1 (CBOR Sequence)", msg1, msg1_len);
 
-	uint8_t method_corr;
+	enum method_type method;
 	uint8_t suites_i[5];
 	uint64_t suites_i_len = sizeof(suites_i);
 	uint8_t g_x[G_X_DEFAULT_SIZE];
@@ -305,14 +305,14 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	uint8_t c_i[C_I_DEFAULT_SIZE];
 	uint64_t c_i_len = sizeof(c_i);
 
-	r = msg1_parse(msg1, msg1_len, &method_corr, suites_i, &suites_i_len,
-		       g_x, &g_x_len, c_i, &c_i_len, ad_1, ad_1_len);
+	r = msg1_parse(msg1, msg1_len, &method, suites_i, &suites_i_len, g_x,
+		       &g_x_len, c_i, &c_i_len, ead_1, ead_1_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
 	if (!(selected_suite_is_supported(suites_i[0], &c->suites_r))) {
-		r = tx_err_msg(RESPONDER, method_corr, c_i, c_i_len, NULL, 0,
+		r = tx_err_msg(RESPONDER, method, c_i, c_i_len, NULL, 0,
 			       c->suites_r.ptr, c->suites_r.len);
 		if (r != edhoc_no_error) {
 			return r;
@@ -322,9 +322,9 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	}
 
 	/*get the method*/
-	enum method_type method = method_corr >> 2;
+	//enum method_type method = method_corr >> 2;
 	/*get corr*/
-	uint8_t corr = method_corr - 4 * method;
+	//uint8_t corr = method_corr - 4 * method;
 	/*get cipher suite*/
 	struct suite suite;
 	r = get_suite((enum suite_label)suites_i[0], &suite);
@@ -338,15 +338,15 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	/******************* create and send message 2*************************/
 
 	uint8_t th2[SHA_DEFAULT_SIZE];
-	uint64_t tmp_c_i_len;
-	if ((corr == 1) || (corr = 3)) {
-		tmp_c_i_len = 0;
-	} else {
-		tmp_c_i_len = c_i_len;
-	}
+	//uint64_t tmp_c_i_len;
+	// if ((corr == 1) || (corr = 3)) {
+	// 	tmp_c_i_len = 0;
+	// } else {
+	// 	tmp_c_i_len = c_i_len;
+	// }
 
-	r = th2_calculate(suite.edhoc_hash, msg1, msg1_len, c_i, tmp_c_i_len,
-			  c->g_y.ptr, c->g_y.len, c->c_r.ptr, c->c_r.len, th2);
+	r = th2_calculate(suite.edhoc_hash, msg1, msg1_len, c->g_y.ptr,
+			  c->g_y.len, c->c_r.ptr, c->c_r.len, th2);
 	if (r != edhoc_no_error) {
 		return r;
 	}
@@ -390,242 +390,244 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		static_dh_r, suite, "K_2m", "IV_2m", (uint8_t *)&PRK_3e2m,
 		sizeof(PRK_3e2m), (uint8_t *)&th2, sizeof(th2),
 		c->id_cred_r.ptr, c->id_cred_r.len, c->cred_r.ptr,
-		c->cred_r.len, c->ad_2.ptr, c->ad_2.len, m_2, &m_2_len,
+		c->cred_r.len, c->ead_2.ptr, c->ead_2.len, m_2, &m_2_len,
 		sign_or_mac_2, (uint8_t *)&sign_or_mac_2_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	/*Signature_or_mac_2*/
-	if (!static_dh_r) {
-		/*Calculate a signature*/
-		sign_or_mac_2_len = 64;
-		r = sign(suite.edhoc_sign_curve, c->sk_r.ptr, c->sk_r.len,
-			 c->pk_r.ptr, c->pk_r.len, m_2, m_2_len, sign_or_mac_2,
-			 &sign_or_mac_2_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
-		PRINT_ARRAY("Signature_or_MAC_2", sign_or_mac_2,
-			    sign_or_mac_2_len);
-	}
+	// /*Signature_or_mac_2*/
+	// if (!static_dh_r) {
+	// 	/*Calculate a signature*/
+	// 	sign_or_mac_2_len = 64;
+	// 	r = sign(suite.edhoc_sign_curve, c->sk_r.ptr, c->sk_r.len,
+	// 		 c->pk_r.ptr, c->pk_r.len, m_2, m_2_len, sign_or_mac_2,
+	// 		 &sign_or_mac_2_len);
+	// 	if (r != edhoc_no_error) {
+	// 		return r;
+	// 	}
+	// 	PRINT_ARRAY("Signature_or_MAC_2", sign_or_mac_2,
+	// 		    sign_or_mac_2_len);
+	// }
 
-	/*Calculate P_2e*/
-	uint16_t P_2e_len =
-		c->id_cred_r.len + sign_or_mac_2_len + 2 + c->ad_2.len;
-	uint8_t P_2e[P_2e_len];
+	// /*Calculate P_2e*/
+	// uint16_t P_2e_len =
+	// 	c->id_cred_r.len + sign_or_mac_2_len + 2 + c->ead_2.len;
+	// uint8_t P_2e[P_2e_len];
 
-	r = plaintext_encode(c->id_cred_r.ptr, c->id_cred_r.len, sign_or_mac_2,
-			     sign_or_mac_2_len, c->ad_2.ptr, c->ad_2.len, P_2e,
-			     &P_2e_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("P_2e", P_2e, P_2e_len);
+	// r = plaintext_encode(c->id_cred_r.ptr, c->id_cred_r.len, sign_or_mac_2,
+	// 		     sign_or_mac_2_len, c->ead_2.ptr, c->ead_2.len,
+	// 		     P_2e, &P_2e_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("P_2e", P_2e, P_2e_len);
 
-	/*Calculate KEYSTREAM_2*/
-	uint8_t KEYSTREAM_2[P_2e_len];
-	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "KEYSTREAM_2",
-		     (uint8_t *)&PRK_2e, sizeof(PRK_2e), (uint8_t *)&th2,
-		     sizeof(th2), KEYSTREAM_2, sizeof(KEYSTREAM_2));
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
+	// /*Calculate KEYSTREAM_2*/
+	// uint8_t KEYSTREAM_2[P_2e_len];
+	// r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "KEYSTREAM_2",
+	// 	     (uint8_t *)&PRK_2e, sizeof(PRK_2e), (uint8_t *)&th2,
+	// 	     sizeof(th2), KEYSTREAM_2, sizeof(KEYSTREAM_2));
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
 
-	/*Ciphertext 2 calculate*/
-	ciphertext_2_len = P_2e_len;
-	for (uint16_t i = 0; i < P_2e_len; i++) {
-		ciphertext_2[i] = P_2e[i] ^ KEYSTREAM_2[i];
-	}
-	PRINT_ARRAY("ciphertext_2", ciphertext_2, ciphertext_2_len);
+	// /*Ciphertext 2 calculate*/
+	// ciphertext_2_len = P_2e_len;
+	// for (uint16_t i = 0; i < P_2e_len; i++) {
+	// 	ciphertext_2[i] = P_2e[i] ^ KEYSTREAM_2[i];
+	// }
+	// PRINT_ARRAY("ciphertext_2", ciphertext_2, ciphertext_2_len);
 
-	/*message 2 create and send*/
-	uint8_t msg2[MSG_2_DEFAULT_SIZE];
-	uint32_t msg2_len = sizeof(msg2);
-	r = msg2_encode(corr, c_i, c_i_len, c->g_y.ptr, c->g_y.len, c->c_r.ptr,
-			c->c_r.len, ciphertext_2, ciphertext_2_len, msg2,
-			&msg2_len);
-	if (r != edhoc_no_error)
-		return r;
-	r = tx(msg2, msg2_len);
-	if (r != edhoc_no_error)
-		return r;
+	// /*message 2 create and send*/
+	// uint8_t msg2[MSG_2_DEFAULT_SIZE];
+	// uint32_t msg2_len = sizeof(msg2);
+	// r = msg2_encode(corr, c_i, c_i_len, c->g_y.ptr, c->g_y.len, c->c_r.ptr,
+	// 		c->c_r.len, ciphertext_2, ciphertext_2_len, msg2,
+	// 		&msg2_len);
+	// if (r != edhoc_no_error)
+	// 	return r;
+	// r = tx(msg2, msg2_len);
+	// if (r != edhoc_no_error)
+	// 	return r;
 
-	/********message 3 receive and process*********************************/
-	uint8_t msg3[MSG_3_DEFAULT_SIZE];
-	uint32_t msg3_len = sizeof(msg3);
-	r = rx(msg3, &msg3_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// /********message 3 receive and process*********************************/
+	// uint8_t msg3[MSG_3_DEFAULT_SIZE];
+	// uint32_t msg3_len = sizeof(msg3);
+	// r = rx(msg3, &msg3_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	uint8_t c_r[c->c_r.len];
-	uint64_t c_r_len = sizeof(c_r);
-	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
-	uint64_t ciphertext_3_len = sizeof(ciphertext_3);
+	// uint8_t c_r[c->c_r.len];
+	// uint64_t c_r_len = sizeof(c_r);
+	// uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
+	// uint64_t ciphertext_3_len = sizeof(ciphertext_3);
 
-	r = msg3_parse(corr, msg3, msg3_len, c_r, &c_r_len, ciphertext_3,
-		       &ciphertext_3_len);
-	if (r == error_message_received) {
-		/*provide the error message to the caller*/
-		r = _memcpy_s(err_msg, *err_msg_len, msg3, msg3_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
-		*err_msg_len = msg3_len;
-		return error_message_received;
-	}
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// r = msg3_parse(corr, msg3, msg3_len, c_r, &c_r_len, ciphertext_3,
+	// 	       &ciphertext_3_len);
+	// if (r == error_message_received) {
+	// 	/*provide the error message to the caller*/
+	// 	r = _memcpy_s(err_msg, *err_msg_len, msg3, msg3_len);
+	// 	if (r != edhoc_no_error) {
+	// 		return r;
+	// 	}
+	// 	*err_msg_len = msg3_len;
+	// 	return error_message_received;
+	// }
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	uint8_t th3[32];
-	r = th3_calculate(suite.edhoc_hash, (uint8_t *)&th2, sizeof(th2),
-			  ciphertext_2, ciphertext_2_len, c->c_r.ptr,
-			  c->c_r.len, th3);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// uint8_t th3[32];
+	// r = th3_calculate(suite.edhoc_hash, (uint8_t *)&th2, sizeof(th2),
+	// 		  ciphertext_2, ciphertext_2_len, c->c_r.ptr,
+	// 		  c->c_r.len, th3);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	uint8_t K_3ae[AEAD_KEY_DEFAULT_SIZE];
-	uint8_t IV_3ae[AEAD_IV_DEFAULT_SIZE];
+	// uint8_t K_3ae[AEAD_KEY_DEFAULT_SIZE];
+	// uint8_t IV_3ae[AEAD_IV_DEFAULT_SIZE];
 
-	/*Calculate K_3ae*/
-	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "K_3ae", PRK_3e2m,
-		     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), K_3ae,
-		     sizeof(K_3ae));
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("K_3ae", K_3ae, sizeof(K_3ae));
+	// /*Calculate K_3ae*/
+	// r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "K_3ae", PRK_3e2m,
+	// 	     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), K_3ae,
+	// 	     sizeof(K_3ae));
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("K_3ae", K_3ae, sizeof(K_3ae));
 
-	/*Calculate IV_3ae*/
-	r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "IV_3ae", PRK_3e2m,
-		     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), IV_3ae,
-		     sizeof(IV_3ae));
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("IV_3ae", IV_3ae, sizeof(IV_3ae));
+	// /*Calculate IV_3ae*/
+	// r = okm_calc(suite.edhoc_aead, suite.edhoc_hash, "IV_3ae", PRK_3e2m,
+	// 	     sizeof(PRK_3e2m), (uint8_t *)&th3, sizeof(th3), IV_3ae,
+	// 	     sizeof(IV_3ae));
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("IV_3ae", IV_3ae, sizeof(IV_3ae));
 
-	/*Associated data A_3ae*/
-	uint8_t A_3ae[A_3AE_DEFAULT_SIZE];
-	uint16_t A_3ae_len = sizeof(A_3ae);
-	r = a_Xae_encode(th3, sizeof(th3), (uint8_t *)&A_3ae, &A_3ae_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// /*Associated data A_3ae*/
+	// uint8_t A_3ae[A_3AE_DEFAULT_SIZE];
+	// uint16_t A_3ae_len = sizeof(A_3ae);
+	// r = a_Xae_encode(th3, sizeof(th3), (uint8_t *)&A_3ae, &A_3ae_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	uint8_t tag[16];
-	uint8_t mac_len = 8;
-	if (suite.edhoc_aead == AES_CCM_16_128_128) {
-		mac_len = 16;
-	}
-	uint8_t P_3ae[ciphertext_3_len - mac_len];
-	//memcpy(tag, &ciphertext_3[ciphertext_3_len - mac_len], mac_len);
-	r = _memcpy_s(tag, sizeof(tag),
-		      &ciphertext_3[ciphertext_3_len - mac_len], mac_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	r = aead(DECRYPT, ciphertext_3, ciphertext_3_len, K_3ae, sizeof(K_3ae),
-		 IV_3ae, sizeof(IV_3ae), A_3ae, A_3ae_len, P_3ae, sizeof(P_3ae),
-		 tag, mac_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("P_3ae", P_3ae, sizeof(P_3ae));
+	// uint8_t tag[16];
+	// uint8_t mac_len = 8;
+	// if (suite.edhoc_aead == AES_CCM_16_128_128) {
+	// 	mac_len = 16;
+	// }
+	// uint8_t P_3ae[ciphertext_3_len - mac_len];
+	// //memcpy(tag, &ciphertext_3[ciphertext_3_len - mac_len], mac_len);
+	// r = _memcpy_s(tag, sizeof(tag),
+	// 	      &ciphertext_3[ciphertext_3_len - mac_len], mac_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// r = aead(DECRYPT, ciphertext_3, ciphertext_3_len, K_3ae, sizeof(K_3ae),
+	// 	 IV_3ae, sizeof(IV_3ae), A_3ae, A_3ae_len, P_3ae, sizeof(P_3ae),
+	// 	 tag, mac_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("P_3ae", P_3ae, sizeof(P_3ae));
 
-	uint8_t id_cred_i[ID_CRED_DEFAULT_SIZE];
-	uint64_t id_cred_i_len = sizeof(id_cred_i);
-	uint8_t sign_or_mac[SGN_OR_MAC_DEFAULT_SIZE];
-	uint64_t sign_or_mac_len = sizeof(sign_or_mac);
-	r = plaintext_split(P_3ae, sizeof(P_3ae), id_cred_i, &id_cred_i_len,
-			    sign_or_mac, &sign_or_mac_len, ad_3, ad_3_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// uint8_t id_cred_i[ID_CRED_DEFAULT_SIZE];
+	// uint64_t id_cred_i_len = sizeof(id_cred_i);
+	// uint8_t sign_or_mac[SGN_OR_MAC_DEFAULT_SIZE];
+	// uint64_t sign_or_mac_len = sizeof(sign_or_mac);
+	// r = plaintext_split(P_3ae, sizeof(P_3ae), id_cred_i, &id_cred_i_len,
+	// 		    sign_or_mac, &sign_or_mac_len, ead_3, ead_3_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	PRINT_ARRAY("ID_CRED_I", id_cred_i, id_cred_i_len);
-	PRINT_ARRAY("sign_or_mac", sign_or_mac, sign_or_mac_len);
-	if (*ad_3_len) {
-		PRINT_ARRAY("AD_3", ad_3, *ad_3_len);
-	}
+	// PRINT_ARRAY("ID_CRED_I", id_cred_i, id_cred_i_len);
+	// PRINT_ARRAY("sign_or_mac", sign_or_mac, sign_or_mac_len);
+	// if (*ead_3_len) {
+	// 	PRINT_ARRAY("ead_3", ead_3, *ead_3_len);
+	// }
 
-	/*check the authenticity of the responder*/
-	uint8_t cred_i[CRED_DEFAULT_SIZE];
-	uint16_t cred_i_len = sizeof(cred_i);
-	uint8_t pk[PK_DEFAULT_SIZE];
-	uint16_t pk_len = sizeof(pk);
-	uint8_t g_i[G_I_DEFAULT_SIZE];
-	uint16_t g_i_len = sizeof(g_i);
+	// /*check the authenticity of the responder*/
+	// uint8_t cred_i[CRED_DEFAULT_SIZE];
+	// uint16_t cred_i_len = sizeof(cred_i);
+	// uint8_t pk[PK_DEFAULT_SIZE];
+	// uint16_t pk_len = sizeof(pk);
+	// uint8_t g_i[G_I_DEFAULT_SIZE];
+	// uint16_t g_i_len = sizeof(g_i);
 
-	r = retrieve_cred(static_dh_i, cred_i_array, num_cred_i, id_cred_i,
-			  id_cred_i_len, cred_i, &cred_i_len, pk, &pk_len, g_i,
-			  &g_i_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("CRED_I", cred_i, cred_i_len);
-	PRINT_ARRAY("pk", pk, pk_len);
-	PRINT_ARRAY("g_i", g_i, g_i_len);
+	// r = retrieve_cred(static_dh_i, cred_i_array, num_cred_i, id_cred_i,
+	// 		  id_cred_i_len, cred_i, &cred_i_len, pk, &pk_len, g_i,
+	// 		  &g_i_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("CRED_I", cred_i, cred_i_len);
+	// PRINT_ARRAY("pk", pk, pk_len);
+	// PRINT_ARRAY("g_i", g_i, g_i_len);
 
-	/*derive prk_4x3m*/
-	r = prk_derive(static_dh_i, suite, (uint8_t *)&PRK_3e2m,
-		       sizeof(PRK_3e2m), g_i, g_i_len, c->y.ptr, c->y.len,
-		       prk_4x3m);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
+	// /*derive prk_4x3m*/
+	// r = prk_derive(static_dh_i, suite, (uint8_t *)&PRK_3e2m,
+	// 	       sizeof(PRK_3e2m), g_i, g_i_len, c->y.ptr, c->y.len,
+	// 	       prk_4x3m);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
-	uint8_t m_3[A_2M_DEFAULT_SIZE];
-	uint16_t m_3_len = sizeof(m_3);
-	uint8_t mac_3[16];
-	uint8_t mac_3_len = sizeof(mac_3);
-	r = signature_or_mac_msg_create(static_dh_i, suite, "K_3m", "IV_3m",
-					prk_4x3m, prk_4x3m_len, (uint8_t *)&th3,
-					sizeof(th3), id_cred_i, id_cred_i_len,
-					cred_i, cred_i_len, ad_3, *ad_3_len,
-					m_3, &m_3_len, mac_3, &mac_3_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// uint8_t m_3[A_2M_DEFAULT_SIZE];
+	// uint16_t m_3_len = sizeof(m_3);
+	// uint8_t mac_3[16];
+	// uint8_t mac_3_len = sizeof(mac_3);
+	// r = signature_or_mac_msg_create(static_dh_i, suite, "K_3m", "IV_3m",
+	// 				prk_4x3m, prk_4x3m_len, (uint8_t *)&th3,
+	// 				sizeof(th3), id_cred_i, id_cred_i_len,
+	// 				cred_i, cred_i_len, ead_3, *ead_3_len,
+	// 				m_3, &m_3_len, mac_3, &mac_3_len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	if (static_dh_i) {
-		/*check inner mac MAC_3*/
-		if (0 != memcmp(mac_3, sign_or_mac, mac_3_len)) {
-			PRINT_MSG("Initiator authentication failed!");
-			r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,
-				       NULL, 0);
-			if (r != edhoc_no_error) {
-				return r;
-			}
-			return responder_authentication_failed;
-		} else {
-			PRINT_MSG("Initiator authentication okful!\n");
-		}
-	} else {
-		/*the initiator authenticates with a signature*/
-		bool verified = false;
-		r = verify(suite.edhoc_sign_curve, pk, pk_len, (uint8_t *)&m_3,
-			   m_3_len, (uint8_t *)&sign_or_mac, sign_or_mac_len,
-			   &verified);
-		if (verified) {
-			PRINT_MSG("Initiator authentication okful!\n");
-		} else {
-			PRINT_MSG("Initiator authentication failed!\n");
-			r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,
-				       NULL, 0);
-			if (r != edhoc_no_error) {
-				return r;
-			}
-			return responder_authentication_failed;
-		}
-	}
+	// if (static_dh_i) {
+	// 	/*check inner mac MAC_3*/
+	// 	if (0 != memcmp(mac_3, sign_or_mac, mac_3_len)) {
+	// 		PRINT_MSG("Initiator authentication failed!");
+	// 		r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,
+	// 			       NULL, 0);
+	// 		if (r != edhoc_no_error) {
+	// 			return r;
+	// 		}
+	// 		return responder_authentication_failed;
+	// 	} else {
+	// 		PRINT_MSG("Initiator authentication okful!\n");
+	// 	}
+	// } else {
+	// 	/*the initiator authenticates with a signature*/
+	// 	bool verified = false;
+	// 	r = verify(suite.edhoc_sign_curve, pk, pk_len, (uint8_t *)&m_3,
+	// 		   m_3_len, (uint8_t *)&sign_or_mac, sign_or_mac_len,
+	// 		   &verified);
+	// 	if (verified) {
+	// 		PRINT_MSG("Initiator authentication okful!\n");
+	// 	} else {
+	// 		PRINT_MSG("Initiator authentication failed!\n");
+	// 		r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,
+	// 			       NULL, 0);
+	// 		if (r != edhoc_no_error) {
+	// 			return r;
+	// 		}
+	// 		return responder_authentication_failed;
+	// 	}
+	// }
 
-	/*TH4*/
-	return th4_calculate(suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
-			     ciphertext_3_len, th4);
+	// /*TH4*/
+	// return th4_calculate(suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
+	// 		     ciphertext_3_len, th4);
+
+	return edhoc_no_error;
 }

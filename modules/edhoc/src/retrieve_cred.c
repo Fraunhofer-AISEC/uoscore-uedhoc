@@ -44,7 +44,7 @@ static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
 		return cbor_decoding_error;
 	}
 	PRINT_MSG("CBOR certificate parsed.\n");
-	PRINTF("Certificate type: %d\n", c._cert_cert_type);
+	PRINTF("Certificate type: %d\n", c._cert_type);
 	PRINT_ARRAY("Serial number", c._cert_serial_number.value,
 		    c._cert_serial_number.len);
 	PRINT_ARRAY("issuer", c._cert_issuer.value, c._cert_issuer.len);

@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -20,7 +21,7 @@ static bool decode_cert(
 {
 	cbor_print("%s\n", __func__);
 
-	bool tmp_result = (((((intx32_decode(state, (&(*result)._cert_cert_type))))
+	bool tmp_result = (((((intx32_decode(state, (&(*result)._cert_type))))
 	&& ((bstrx_decode(state, (&(*result)._cert_serial_number))))
 	&& ((tstrx_decode(state, (&(*result)._cert_issuer))))
 	&& ((intx32_decode(state, (&(*result)._cert_validity_not_before))))
@@ -38,23 +39,21 @@ static bool decode_cert(
 
 
 
-__attribute__((unused)) static bool type_test_decode_cert(
-		struct cert *result)
-{
-	/* This function should not be called, it is present only to test that
-	 * the types of the function and struct match, since this information
-	 * is lost with the casts in the entry function.
-	 */
-	return decode_cert(NULL, result);
-}
-
-
 bool cbor_decode_cert(
-		const uint8_t *payload, size_t payload_len,
+		const uint8_t *payload, uint32_t payload_len,
 		struct cert *result,
-		size_t *payload_len_out)
+		uint32_t *payload_len_out)
 {
-	return entry_function(payload, payload_len, (const void *)result,
-		payload_len_out, (void *)decode_cert,
-		9, 0);
+	cbor_state_t states[2];
+
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 9);
+
+	bool ret = decode_cert(states, result);
+
+	if (ret && (payload_len_out != NULL)) {
+		*payload_len_out = MIN(payload_len,
+				(size_t)states[0].payload - (size_t)payload);
+	}
+
+	return ret;
 }

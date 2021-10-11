@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -15,16 +16,16 @@
 #define DEFAULT_MAX_QTY 3
 
 struct message_1 {
- 	int32_t _message_1_METHOD_CORR;
+ 	int32_t _message_1_METHOD;
 	union {
 		struct {
-			int32_t _message_1_SUITES_I__suite_suite[10];
-			size_t _message_1_SUITES_I__suite_suite_count;
+			int32_t _SUITES_I__suite_suite[10];
+			uint32_t _SUITES_I__suite_suite_count;
 		};
 		int32_t _message_1_SUITES_I_int;
 	};
 	enum {
-		_message_1_SUITES_I__suite,
+		_SUITES_I__suite,
 		_message_1_SUITES_I_int,
 	} _message_1_SUITES_I_choice;
 	cbor_string_type_t _message_1_G_X;
@@ -36,8 +37,8 @@ struct message_1 {
 		_message_1_C_I_int,
 		_message_1_C_I_bstr,
 	} _message_1_C_I_choice;
-	cbor_string_type_t _message_1_AD_1;
-	size_t _message_1_AD_1_present;
+	cbor_string_type_t _message_1_ead_1;
+	uint32_t _message_1_ead_1_present;
 };
 
 

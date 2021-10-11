@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -31,23 +32,21 @@ static bool encode_th4(
 
 
 
-__attribute__((unused)) static bool type_test_encode_th4(
-		const struct th4 *input)
-{
-	/* This function should not be called, it is present only to test that
-	 * the types of the function and struct match, since this information
-	 * is lost with the casts in the entry function.
-	 */
-	return encode_th4(NULL, input);
-}
-
-
 bool cbor_encode_th4(
-		uint8_t *payload, size_t payload_len,
+		uint8_t *payload, uint32_t payload_len,
 		const struct th4 *input,
-		size_t *payload_len_out)
+		uint32_t *payload_len_out)
 {
-	return entry_function(payload, payload_len, (const void *)input,
-		payload_len_out, (void *)encode_th4,
-		2, 0);
+	cbor_state_t states[2];
+
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 2);
+
+	bool ret = encode_th4(states, input);
+
+	if (ret && (payload_len_out != NULL)) {
+		*payload_len_out = MIN(payload_len,
+				(size_t)states[0].payload - (size_t)payload);
+	}
+
+	return ret;
 }

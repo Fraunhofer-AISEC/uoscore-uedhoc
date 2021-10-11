@@ -26,6 +26,9 @@ enum edhoc_error prk_derive(bool static_dh_auth, struct suite suite,
 
 	if (static_dh_auth) {
 		uint8_t dh_secret[ECDH_SECRET_DEFAULT_SIZE];
+
+		PRINT_ARRAY("Static secret key R", stat_sk, stat_sk_len);
+		PRINT_ARRAY("Ephemeral public key G_X", stat_pk, stat_pk_len);
 		r = shared_secret_derive(suite.edhoc_ecdh_curve, stat_sk,
 					 stat_sk_len, stat_pk, stat_pk_len,
 					 dh_secret);

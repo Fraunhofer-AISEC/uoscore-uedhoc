@@ -31,7 +31,7 @@ enum edhoc_error encode_byte_string(const uint8_t *in, const uint8_t in_len,
 	cbor_string_type_t tmp;
 	tmp.value = in;
 	tmp.len = in_len;
-	ok = cbor_encode_b_str(out, *out_len, &tmp, &payload_len_out);
+	ok = cbor_encode_bstr_type_b_str(out, *out_len, &tmp, &payload_len_out);
 	if (!ok) {
 		return cbor_encoding_error;
 	}

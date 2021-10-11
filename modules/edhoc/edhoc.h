@@ -96,7 +96,7 @@ struct edhoc_responder_context {
 	struct byte_array c_r;
 	struct byte_array g_r; /* static DH pk -> use only with method 1 or 3*/
 	struct byte_array r; /* static DH sk -> use only with method 1 or 3*/
-	struct byte_array ad_2;
+	struct byte_array ead_2;
 	struct byte_array id_cred_r;
 	struct byte_array cred_r;
 	struct byte_array sk_r; /*sign key -use with method 0 and 2*/
@@ -109,8 +109,8 @@ struct edhoc_initiator_context {
 	uint8_t corr;
 	struct byte_array suites_i;
 	struct byte_array c_i;
-	struct byte_array ad_1;
-	struct byte_array ad_3;
+	struct byte_array ead_1;
+	struct byte_array ead_3;
 	struct byte_array id_cred_i;
 	struct byte_array cred_i;
 	struct byte_array g_x; /*ephemeral dh public key*/
@@ -144,9 +144,9 @@ ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
  * @param   num_cred_r number of the elements in cred_r_array
  * @param   err_msg in case that an error message is received its contend is 
  *          provided to the caller though the err_msg
- * @param   ad_2 the received in msg2 additional data is provided to the 
- *          caller through ad_2
- * @param   ad_2_len length of ad_2
+ * @param   ead_2 the received in msg2 additional data is provided to the 
+ *          caller through ead_2
+ * @param   ead_2_len length of ead_2
  * @param   prk_4x3m used in the exporter interface
  * @param   prk_4x3m_len length of prk_4x3m
  * @param   th4 transcript hash4 used in the exporter interface
@@ -155,8 +155,8 @@ ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
 enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 				     struct other_party_cred *cred_r_array,
 				     uint16_t num_cred_r, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ad_2,
-				     uint64_t *ad_2_len, uint8_t *prk_4x3m,
+				     uint32_t *err_msg_len, uint8_t *ead_2,
+				     uint64_t *ead_2_len, uint8_t *prk_4x3m,
 				     uint8_t prk_4x3m_len, uint8_t *th4,
 				     uint8_t th4_len);
 
@@ -169,12 +169,12 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
  * @param   num_cred_i number of the elements in cred_i_array
  * @param   err_msg in case that an error message is received its contend is 
  *          provided to the caller though the err_msg
- * @param   ad_1 the received in msg1 additional data is provided to the caller 
- *          through ad_1
- * @param   ad_1_len length of ad_1
- * @param   ad_3 the received in msg3 additional data is provided to the caller 
- *          through ad_3
- * @param   ad_3_len length of ad_3
+ * @param   ead_1 the received in msg1 additional data is provided to the caller 
+ *          through ead_1
+ * @param   ead_1_len length of ead_1
+ * @param   ead_3 the received in msg3 additional data is provided to the caller 
+ *          through ead_3
+ * @param   ead_3_len length of ead_3
  * @param   prk_4x3m used in the exporter interface
  * @param   prk_4x3m_len length of prk_4x3m
  * @param   th4 transcript hash4 used in the exporter interface
@@ -183,9 +183,9 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 				     struct other_party_cred *cred_i_array,
 				     uint16_t num_cred_i, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ad_1,
-				     uint64_t *ad_1_len, uint8_t *ad_3,
-				     uint64_t *ad_3_len, uint8_t *prk_4x3m,
+				     uint32_t *err_msg_len, uint8_t *ead_1,
+				     uint64_t *ead_1_len, uint8_t *ead_3,
+				     uint64_t *ead_3_len, uint8_t *prk_4x3m,
 				     uint16_t prk_4x3m_len, uint8_t *th4,
 				     uint16_t th4_len);
 

@@ -78,7 +78,8 @@ C_INCLUDES =  \
 -I../../../externals/compact25519/src/c25519/ \
 -I../../../externals/compact25519/src/\
 -I../../../externals/tinycrypt/lib/include \
--I../../../externals/cddl-gen/include
+-I../../../externals/cddl-gen/include \
+-I../../../externals/jsmn
 
 
 #########################################

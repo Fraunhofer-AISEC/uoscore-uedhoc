@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -19,9 +20,9 @@
 
 
 bool cbor_decode_m3(
-		const uint8_t *payload, size_t payload_len,
+		const uint8_t *payload, uint32_t payload_len,
 		struct m3 *result,
-		size_t *payload_len_out);
+		uint32_t *payload_len_out);
 
 
 #endif /* DECODE_MESSAGE_3_H__ */

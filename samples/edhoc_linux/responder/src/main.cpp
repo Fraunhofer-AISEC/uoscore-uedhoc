@@ -22,6 +22,7 @@
 extern "C" {
 #include "../../../../modules/edhoc/edhoc.h"
 #include "../../../common/sock.h"
+#include "../../../common/test_vec_parser.h"
 }
 #include "../../../../externals/cantcoap/cantcoap.h"
 #include "credentials.h"
@@ -178,7 +179,46 @@ int main()
 	uint64_t ad_1_len = sizeof(ad_1);
 	uint8_t ad_3[AD_DEFAULT_SIZE];
 	uint64_t ad_3_len = sizeof(ad_1);
+
+	/* test vector inputs */
+	const uint8_t TEST_VEC_NUM = 5;
+	uint16_t cred_num = 1;
+	struct other_party_cred cred_i;
+	struct edhoc_responder_context c_r;
+	struct other_party_cred_bufs other_party_bufs;
+	struct edhoc_responder_context_bufs responder_context_bufs;
+	char filename[] = { "../../common/edhoc-vectors-json_v11.txt" };
+	char test_vec_buf[1024 * 120];
+	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
+
+	/*errors*/
 	enum edhoc_error r;
+	int err;
+
+	err = read_test_vectors(filename, test_vec_buf, &test_vec_buf_len);
+	if (err != 0) {
+		printf("cannot read test_vectors!\n");
+		return -1;
+	}
+
+	err = get_OTHER_PARTY_CRED_from_test_vec(INITIATOR, &other_party_bufs,
+						 &cred_i, TEST_VEC_NUM,
+						 test_vec_buf,
+						 test_vec_buf_len);
+	if (err != 0) {
+		printf("cannot get OTHER_PARTY_CRED\n");
+		return -1;
+	}
+
+	err = get_EDHOC_RESPONDER_CONTEXT_from_test_vec(&responder_context_bufs,
+							&c_r, TEST_VEC_NUM,
+							test_vec_buf,
+							test_vec_buf_len);
+
+	if (err != 0) {
+		printf("cannot get RESPONDER_CONTEXT\n");
+		return -1;
+	}
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
 	uint32_t seed;
@@ -201,30 +241,30 @@ int main()
 	PRINT_ARRAY("public ephemeral DH key", G_Y_random, sizeof(G_Y_random));
 #endif
 
-	struct other_party_cred cred_i = { { ID_CRED_I_LEN, ID_CRED_I },
-					   { CRED_I_LEN, CRED_I },
-					   { PK_I_LEN, PK_I },
-					   { G_I_LEN, G_I },
-					   { CA_LEN, CA },
-					   { CA_PK_LEN, CA_PK } };
-	uint16_t cred_num = 1;
-	struct edhoc_responder_context c_r = { { SUITES_R_LEN, SUITES_R },
-#ifdef USE_RANDOM_EPHEMERAL_DH_KEY
-					       { sizeof(G_Y_random),
-						 G_Y_random },
-					       { sizeof(Y_random), Y_random },
-#else
-					       { G_Y_LEN, G_Y },
-					       { Y_LEN, Y },
-#endif
-					       { C_R_LEN, C_R },
-					       { G_R_LEN, G_R },
-					       { R_LEN, R },
-					       { AD_2_LEN, AD_2 },
-					       { ID_CRED_R_LEN, ID_CRED_R },
-					       { CRED_R_LEN, CRED_R },
-					       { SK_R_LEN, SK_R },
-					       { PK_R_LEN, PK_R } };
+	// 	struct other_party_cred cred_i = { { ID_CRED_I_LEN, ID_CRED_I },
+	// 					   { CRED_I_LEN, CRED_I },
+	// 					   { PK_I_LEN, PK_I },
+	// 					   { G_I_LEN, G_I },
+	// 					   { CA_LEN, CA },
+	// 					   { CA_PK_LEN, CA_PK } };
+	// 	uint16_t cred_num = 1;
+	// 	struct edhoc_responder_context c_r = { { SUITES_R_LEN, SUITES_R },
+	// #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
+	// 					       { sizeof(G_Y_random),
+	// 						 G_Y_random },
+	// 					       { sizeof(Y_random), Y_random },
+	// #else
+	// 					       { G_Y_LEN, G_Y },
+	// 					       { Y_LEN, Y },
+	// #endif
+	// 					       { C_R_LEN, C_R },
+	// 					       { G_R_LEN, G_R },
+	// 					       { R_LEN, R },
+	// 					       { AD_2_LEN, AD_2 },
+	// 					       { ID_CRED_R_LEN, ID_CRED_R },
+	// 					       { CRED_R_LEN, CRED_R },
+	// 					       { SK_R_LEN, SK_R },
+	// 					       { PK_R_LEN, PK_R } };
 
 	start_coap_server();
 

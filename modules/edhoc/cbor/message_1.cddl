@@ -10,9 +10,9 @@
 ; This file should be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
 message_1 = (
-	METHOD_CORR: int,
+	METHOD: int,
 	SUITES_I: [ suite: 2**10 int ] / int,
 	G_X: bstr,
 	C_I: int / bstr,
-	? AD_1: bstr,
+	? ead_1: bstr,
 )

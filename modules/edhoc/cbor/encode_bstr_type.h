@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -18,10 +19,10 @@
 #endif
 
 
-bool cbor_encode_b_str(
-		uint8_t *payload, size_t payload_len,
+bool cbor_encode_bstr_type_b_str(
+		uint8_t *payload, uint32_t payload_len,
 		const cbor_string_type_t *input,
-		size_t *payload_len_out);
+		uint32_t *payload_len_out);
 
 
 #endif /* ENCODE_BSTR_TYPE_H__ */

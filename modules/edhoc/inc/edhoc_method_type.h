@@ -42,7 +42,7 @@ enum method_type {
  * @param   static_dh_r true if the responder authenticates with static DH key
  */
 enum edhoc_error authentication_type_get(enum method_type m,
-				   volatile bool *static_dh_i,
-				   volatile bool *static_dh_r);
+					 volatile bool *static_dh_i,
+					 volatile bool *static_dh_r);
 
 #endif

@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -29,11 +30,11 @@ struct map_x5t_ {
 
 struct map {
  	struct map_kid _map_kid;
-	size_t _map_kid_present;
+	uint32_t _map_kid_present;
 	struct map_x5chain _map_x5chain;
-	size_t _map_x5chain_present;
+	uint32_t _map_x5chain_present;
 	struct map_x5t_ _map_x5t;
-	size_t _map_x5t_present;
+	uint32_t _map_x5t_present;
 };
 
 struct plaintext {
@@ -49,7 +50,7 @@ struct plaintext {
 	} _plaintext_ID_CRED_x_choice;
 	cbor_string_type_t _plaintext_SGN_or_MAC_x;
 	cbor_string_type_t _plaintext_AD_x;
-	size_t _plaintext_AD_x_present;
+	uint32_t _plaintext_AD_x_present;
 };
 
 

@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -15,7 +16,7 @@
 #define DEFAULT_MAX_QTY 3
 
 struct cert {
- 	int32_t _cert_cert_type;
+ 	int32_t _cert_type;
 	cbor_string_type_t _cert_serial_number;
 	cbor_string_type_t _cert_issuer;
 	int32_t _cert_validity_not_before;

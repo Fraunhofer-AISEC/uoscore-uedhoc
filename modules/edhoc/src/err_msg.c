@@ -26,67 +26,66 @@
 static inline enum edhoc_error err_msg_crate(struct error_msg *msg_struct,
 					     struct byte_array *msg)
 {
-	bool success;
-	struct message_error mr;
+	// 	bool success;
+	// 	struct message_error mr;
 
-	/*Encode C_x if present*/
-	if (msg_struct->c_x.len) {
-		mr._message_error_C_x_present = true;
-		if (msg_struct->c_x.len == 1) {
-			mr._message_error_C_x._message_error_C_x_choice =
-				_message_error_C_x_int;
-			mr._message_error_C_x._message_error_C_x_int =
-				*(msg_struct->c_x.ptr) - 24;
-		} else {
-			mr._message_error_C_x._message_error_C_x_choice =
-				_message_error_C_x_bstr;
-			mr._message_error_C_x._message_error_C_x_bstr.value =
-				msg_struct->c_x.ptr;
-			mr._message_error_C_x._message_error_C_x_bstr.len =
-				msg_struct->c_x.len;
-		}
-	}
+	// 	/*Encode C_x if present*/
+	// 	if (msg_struct->c_x.len) {
+	// 		mr._message_error_C_x_present = true;
+	// 		if (msg_struct->c_x.len == 1) {
+	// 			mr._message_error_C_x._message_error_C_x_choice =
+	// 				_message_error_C_x_int;
+	// 			mr._message_error_C_x._message_error_C_x_int =
+	// 				*(msg_struct->c_x.ptr) - 24;
+	// 		} else {
+	// 			mr._message_error_C_x._message_error_C_x_choice =
+	// 				_message_error_C_x_bstr;
+	// 			mr._message_error_C_x._message_error_C_x_bstr.value =
+	// 				msg_struct->c_x.ptr;
+	// 			mr._message_error_C_x._message_error_C_x_bstr.len =
+	// 				msg_struct->c_x.len;
+	// 		}
+	// 	}
 
-	/*Encode DIAG_MSG*/
-	mr._message_error_DIAG_MSG.value = msg_struct->diag_msg.ptr;
-	mr._message_error_DIAG_MSG.len = msg_struct->diag_msg.len;
+	// 	/*Encode DIAG_MSG*/
+	// 	mr._message_error_DIAG_MSG.value = msg_struct->diag_msg.ptr;
+	// 	mr._message_error_DIAG_MSG.len = msg_struct->diag_msg.len;
 
-	/*Encode SUITES_R if present*/
-	if (msg_struct->suites_r.len) {
-		mr._message_error_SUITES_R_present = true;
-		if (msg_struct->suites_r.len == 1) {
-			mr._message_error_SUITES_R
-				._message_error_SUITES_R_choice =
-				_message_error_SUITES_R_int;
-			mr._message_error_SUITES_R._message_error_SUITES_R_int =
-				msg_struct->suites_r.ptr[0];
-		} else {
-			mr._message_error_SUITES_R
-				._message_error_SUITES_R_choice =
-				_message_error_SUITES_R__supported;
-			uint32_t i;
-			for (i = 0; i < msg_struct->suites_r.len; i++) {
-				mr._message_error_SUITES_R
-					._message_error_SUITES_R__supported_supported
-						[i] =
-					msg_struct->suites_r.ptr[i];
-			}
-			mr._message_error_SUITES_R
-				._message_error_SUITES_R__supported_supported_count =
-				i - 1;
-		}
-	}
+	// 	/*Encode SUITES_R if present*/
+	// 	if (msg_struct->suites_r.len) {
+	// 		//todo fix that
+	// 		// mr._message_error_SUITES_R_present = true;
+	// 		// if (msg_struct->suites_r.len == 1) {
+	// 		// 	mr._message_error_SUITES_R
+	// 		// 		._message_error_SUITES_R_choice =
+	// 		// 		_message_error_SUITES_R_int;
+	// 		// 	mr._message_error_SUITES_R._message_error_SUITES_R_int =
+	// 		// 		msg_struct->suites_r.ptr[0];
+	// 		// } else {
+	// 		// 	mr._message_error_SUITES_R
+	// 		// 		._message_error_SUITES_R_choice =
+	// 		// 		_message_error_SUITES_R_int;
+	// 		// 	uint32_t i;
+	// 		// 	for (i = 0; i < msg_struct->suites_r.len; i++) {
+	// 		// 		mr._message_error_SUITES_R
+	// 		// 			._message_error_SUITES_R_int[i] =
+	// 		// 			msg_struct->suites_r.ptr[i];
+	// 		// 	}
+	// 		// 	mr._message_error_SUITES_R
+	// 		// 		._message_error_SUITES_R_int_supported_count =
+	// 		// 		i - 1;
+	// 	}
+	// }
 
-	size_t payload_len_out;
-	success = cbor_encode_message_error(msg->ptr, msg->len, &mr,
-					    &payload_len_out);
+	// size_t payload_len_out;
+	// success = cbor_encode_message_error(msg->ptr, msg->len, &mr, &payload_len_out);
 
-	if (!success) {
-		return cbor_encoding_error;
-	}
-	msg->len = payload_len_out;
+	// if (!success) {
+	// 	return cbor_encoding_error;
+	// }
+	// msg->len = payload_len_out;
 
-	PRINT_ARRAY("Error message (CBOR Sequence)", msg->ptr, msg->len);
+	// PRINT_ARRAY("Error message (CBOR Sequence)", msg->ptr, msg->len);
 	return edhoc_no_error;
 }
 

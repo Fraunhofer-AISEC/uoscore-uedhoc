@@ -21,6 +21,13 @@ struct byte_array NULL_ARRAY = {
 	.ptr = NULL,
 };
 
+void byte_array_init(uint8_t *buf, uint32_t buf_len,
+		     struct byte_array *byte_array)
+{
+	byte_array->len = buf_len;
+	byte_array->ptr = buf;
+}
+
 bool array_equals(const struct byte_array *left, const struct byte_array *right)
 {
 	if (left->len != right->len) {

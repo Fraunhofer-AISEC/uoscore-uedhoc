@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -35,7 +36,7 @@ static bool encode_th3(
 {
 	cbor_print("%s\n", __func__);
 
-	bool tmp_result = (((((bstrx_encode(state, (&(*input)._th3_th2))))
+	bool tmp_result = (((((bstrx_encode(state, (&(*input)._th3_th_2))))
 	&& ((bstrx_encode(state, (&(*input)._th3_CIPHERTEXT_2))))
 	&& present_encode(&((*input)._th3_data_3_present), (void *)encode_repeated_th3_data_3, state, (&(*input)._th3_data_3)))));
 
@@ -47,23 +48,21 @@ static bool encode_th3(
 
 
 
-__attribute__((unused)) static bool type_test_encode_th3(
-		const struct th3 *input)
-{
-	/* This function should not be called, it is present only to test that
-	 * the types of the function and struct match, since this information
-	 * is lost with the casts in the entry function.
-	 */
-	return encode_th3(NULL, input);
-}
-
-
 bool cbor_encode_th3(
-		uint8_t *payload, size_t payload_len,
+		uint8_t *payload, uint32_t payload_len,
 		const struct th3 *input,
-		size_t *payload_len_out)
+		uint32_t *payload_len_out)
 {
-	return entry_function(payload, payload_len, (const void *)input,
-		payload_len_out, (void *)encode_th3,
-		3, 1);
+	cbor_state_t states[3];
+
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 3);
+
+	bool ret = encode_th3(states, input);
+
+	if (ret && (payload_len_out != NULL)) {
+		*payload_len_out = MIN(payload_len,
+				(size_t)states[0].payload - (size_t)payload);
+	}
+
+	return ret;
 }

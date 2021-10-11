@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -95,23 +96,21 @@ static bool decode_plaintext(
 
 
 
-__attribute__((unused)) static bool type_test_decode_plaintext(
-		struct plaintext *result)
-{
-	/* This function should not be called, it is present only to test that
-	 * the types of the function and struct match, since this information
-	 * is lost with the casts in the entry function.
-	 */
-	return decode_plaintext(NULL, result);
-}
-
-
 bool cbor_decode_plaintext(
-		const uint8_t *payload, size_t payload_len,
+		const uint8_t *payload, uint32_t payload_len,
 		struct plaintext *result,
-		size_t *payload_len_out)
+		uint32_t *payload_len_out)
 {
-	return entry_function(payload, payload_len, (const void *)result,
-		payload_len_out, (void *)decode_plaintext,
-		3, 3);
+	cbor_state_t states[5];
+
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 3);
+
+	bool ret = decode_plaintext(states, result);
+
+	if (ret && (payload_len_out != NULL)) {
+		*payload_len_out = MIN(payload_len,
+				(size_t)states[0].payload - (size_t)payload);
+	}
+
+	return ret;
 }

@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -27,7 +28,7 @@ struct data_2_C_I_ {
 
 struct data_2 {
  	struct data_2_C_I_ _data_2_C_I;
-	size_t _data_2_C_I_present;
+	uint32_t _data_2_C_I_present;
 	cbor_string_type_t _data_2_G_Y;
 	union {
 		int32_t _data_2_C_R_int;

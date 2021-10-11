@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -36,7 +37,7 @@ static bool encode_repeated_message_error_SUITES_R(
 	cbor_print("%s\n", __func__);
 	bool int_res;
 
-	bool tmp_result = (((((*input)._message_error_SUITES_R_choice == _message_error_SUITES_R__supported) ? ((list_start_encode(state, 10) && (int_res = (multi_encode(2, 10, &(*input)._message_error_SUITES_R__supported_supported_count, (void *)intx32_encode, state, (&(*input)._message_error_SUITES_R__supported_supported), sizeof(int32_t))), ((list_end_encode(state, 10)) && int_res))))
+	bool tmp_result = (((((*input)._message_error_SUITES_R_choice == _SUITES_R__supported) ? ((list_start_encode(state, 10) && (int_res = (multi_encode(2, 10, &(*input)._SUITES_R__supported_supported_count, (void *)intx32_encode, state, (&(*input)._SUITES_R__supported_supported), sizeof(int32_t))), ((list_end_encode(state, 10)) && int_res))))
 	: (((*input)._message_error_SUITES_R_choice == _message_error_SUITES_R_int) ? ((intx32_encode(state, (&(*input)._message_error_SUITES_R_int))))
 	: false))));
 
@@ -63,23 +64,21 @@ static bool encode_message_error(
 
 
 
-__attribute__((unused)) static bool type_test_encode_message_error(
-		const struct message_error *input)
-{
-	/* This function should not be called, it is present only to test that
-	 * the types of the function and struct match, since this information
-	 * is lost with the casts in the entry function.
-	 */
-	return encode_message_error(NULL, input);
-}
-
-
 bool cbor_encode_message_error(
-		uint8_t *payload, size_t payload_len,
+		uint8_t *payload, uint32_t payload_len,
 		const struct message_error *input,
-		size_t *payload_len_out)
+		uint32_t *payload_len_out)
 {
-	return entry_function(payload, payload_len, (const void *)input,
-		payload_len_out, (void *)encode_message_error,
-		3, 2);
+	cbor_state_t states[4];
+
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 3);
+
+	bool ret = encode_message_error(states, input);
+
+	if (ret && (payload_len_out != NULL)) {
+		*payload_len_out = MIN(payload_len,
+				(size_t)states[0].payload - (size_t)payload);
+	}
+
+	return ret;
 }

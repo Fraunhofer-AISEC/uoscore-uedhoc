@@ -39,8 +39,8 @@ enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 			int32_t i = *map._id_cred_x_map_kid._id_cred_x_map_kid
 					     .value -
 				    24;
-			ok = cbor_encode_i(_kid, *kid_len, &i,
-					   &payload_len_out);
+			ok = cbor_encode_int_type_i(_kid, *kid_len, &i,
+						    &payload_len_out);
 			if (!ok) {
 				return cbor_encoding_error;
 			}

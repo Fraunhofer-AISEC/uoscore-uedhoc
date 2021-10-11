@@ -1,5 +1,6 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
  * Generated with a default_max_qty of 3
  */
 
@@ -27,7 +28,7 @@ struct m3_C_R_ {
 
 struct m3 {
  	struct m3_C_R_ _m3_C_R;
-	size_t _m3_C_R_present;
+	uint32_t _m3_C_R_present;
 	cbor_string_type_t _m3_CIPHERTEXT_3;
 };
 

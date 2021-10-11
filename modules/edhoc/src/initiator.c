@@ -182,7 +182,7 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	struct message_1 m1;
 
 	/*METHOD_CORR*/
-	m1._message_1_METHOD_CORR = (4 * c->method_type + c->corr);
+	m1._message_1_METHOD = c->method_type;
 
 	/*SUITES_I*/
 	if (c->suites_i.len == 1) {
@@ -191,11 +191,10 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 		m1._message_1_SUITES_I_int = c->suites_i.ptr[0];
 	} else if (c->suites_i.len > 1) {
 		/* more than one suites, encode into array */
-		m1._message_1_SUITES_I_choice = _message_1_SUITES_I__suite;
-		m1._message_1_SUITES_I__suite_suite_count = c->suites_i.len;
+		m1._message_1_SUITES_I_choice = _SUITES_I__suite;
+		m1._SUITES_I__suite_suite_count = c->suites_i.len;
 		for (uint32_t i = 0; i < c->suites_i.len; i++) {
-			m1._message_1_SUITES_I__suite_suite[i] =
-				c->suites_i.ptr[i];
+			m1._SUITES_I__suite_suite[i] = c->suites_i.ptr[i];
 		}
 	}
 
@@ -206,20 +205,20 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	/* C_I connection id, encoded as  bstr_identifier */
 	if (c->c_i.len == 1) {
 		m1._message_1_C_I_choice = _message_1_C_I_int;
-		m1._message_1_C_I_int = (*c->c_i.ptr - 24);
+		m1._message_1_C_I_int = *c->c_i.ptr;
 	} else {
 		m1._message_1_C_I_choice = _message_1_C_I_bstr;
 		m1._message_1_C_I_bstr.value = c->c_i.ptr;
 		m1._message_1_C_I_bstr.len = c->c_i.len;
 	}
 
-	if (c->ad_1.len != 0) {
-		/* AD_1 unprotected opaque auxiliary data */
-		m1._message_1_AD_1.value = c->ad_1.ptr;
-		m1._message_1_AD_1.len = c->ad_1.len;
-		m1._message_1_AD_1_present = c->ad_1.len;
+	if (c->ead_1.len != 0) {
+		/* ead_1 unprotected opaque auxiliary data */
+		m1._message_1_ead_1.value = c->ead_1.ptr;
+		m1._message_1_ead_1.len = c->ead_1.len;
+		m1._message_1_ead_1_present = c->ead_1.len;
 	} else {
-		m1._message_1_AD_1_present = 0;
+		m1._message_1_ead_1_present = 0;
 	}
 
 	size_t payload_len_out;
@@ -237,8 +236,8 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 				     struct other_party_cred *cred_r_array,
 				     uint16_t num_cred_r, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ad_2,
-				     uint64_t *ad_2_len, uint8_t *prk_4x3m,
+				     uint32_t *err_msg_len, uint8_t *ead_2,
+				     uint64_t *ead_2_len, uint8_t *prk_4x3m,
 				     uint8_t prk_4x3m_len, uint8_t *th4,
 				     uint8_t th4_len)
 {
@@ -322,8 +321,8 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*calculate th2*/
 	uint8_t th2[SHA_DEFAULT_SIZE];
-	r = th2_calculate(suite.edhoc_hash, msg1, msg1_len, c_i, c_i_len, g_y,
-			  sizeof(g_y), c_r, c_r_len, th2);
+	r = th2_calculate(suite.edhoc_hash, msg1, msg1_len, g_y, sizeof(g_y),
+			  c_r, c_r_len, th2);
 	if (r != 0) {
 		return r;
 	}
@@ -359,14 +358,14 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint64_t id_cred_r_len = sizeof(id_cred_r);
 
 	r = plaintext_split(P_2e, sizeof(P_2e), id_cred_r, &id_cred_r_len,
-			    sign_or_mac, &sign_or_mac_len, ad_2, ad_2_len);
+			    sign_or_mac, &sign_or_mac_len, ead_2, ead_2_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 	PRINT_ARRAY("ID_CRED_R", id_cred_r, id_cred_r_len);
 	PRINT_ARRAY("sign_or_mac", sign_or_mac, sign_or_mac_len);
-	if (*ad_2_len) {
-		PRINT_ARRAY("AD_2", ad_2, *ad_2_len);
+	if (*ead_2_len) {
+		PRINT_ARRAY("ead_2", ead_2, *ead_2_len);
 	}
 
 	/*check the authenticity of the responder*/
@@ -405,7 +404,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 					"IV_2m", (uint8_t *)&PRK_3e2m,
 					sizeof(PRK_3e2m), (uint8_t *)&th2,
 					sizeof(th2), id_cred_r, id_cred_r_len,
-					cred_r, cred_r_len, ad_2, *ad_2_len,
+					cred_r, cred_r_len, ead_2, *ead_2_len,
 					m_2, &m_2_len, mac_2, &mac_2_len);
 	if (r != edhoc_no_error) {
 		return r;
@@ -478,8 +477,8 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = signature_or_mac_msg_create(
 		auth_method_static_dh_i, suite, "K_3m", "IV_3m", prk_4x3m,
 		prk_4x3m_len, (uint8_t *)&th3, sizeof(th3), c->id_cred_i.ptr,
-		c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len, c->ad_3.ptr,
-		c->ad_3.len, m_3, &m_3_len, sign_or_mac_3,
+		c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len, c->ead_3.ptr,
+		c->ead_3.len, m_3, &m_3_len, sign_or_mac_3,
 		(uint8_t *)&sign_or_mac_3_len);
 	if (r != edhoc_no_error) {
 		return r;
