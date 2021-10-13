@@ -22,7 +22,7 @@ static bool encode_repeated_id_cred_x_map_kid(
 	cbor_print("%s\n", __func__);
 
 	bool tmp_result = ((((uintx32_put(state, (4))))
-	&& (bstrx_encode(state, (&(*input)._id_cred_x_map_kid)))));
+	&& (intx32_encode(state, (&(*input)._id_cred_x_map_kid)))));
 
 	if (!tmp_result)
 		cbor_trace();

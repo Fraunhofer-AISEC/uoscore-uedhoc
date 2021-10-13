@@ -16,16 +16,9 @@
 #define DEFAULT_MAX_QTY 3
 
 struct info {
- 	union {
-		int32_t _info_edhoc_aead_id_int;
-		cbor_string_type_t _info_edhoc_aead_id_tstr;
-	};
-	enum {
-		_info_edhoc_aead_id_int,
-		_info_edhoc_aead_id_tstr,
-	} _info_edhoc_aead_id_choice;
-	cbor_string_type_t _info_transcript_hash;
+ 	cbor_string_type_t _info_transcript_hash;
 	cbor_string_type_t _info_label;
+	cbor_string_type_t _info_context;
 	uint32_t _info_length;
 };
 

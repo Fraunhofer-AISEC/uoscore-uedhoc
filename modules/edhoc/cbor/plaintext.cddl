@@ -14,7 +14,7 @@ plaintext = (
 
 ;currently x5bag and x5u are not supported
 map = {
-	? kid: 4 =>  bstr, 
+	? kid: 4 =>  int, 
 ;	? x5bag: 32 => bstr,
 	? x5chain: 33 => bstr, 
 	? x5t: 34 => [int, bstr], 
@@ -24,7 +24,7 @@ map = {
 ;map and id_cred_x_map are identical. 
 ;We just need different names to resolve inclusion conflicts
 id_cred_x_map = {
-	? kid: 4 =>  bstr, 
+	? kid: 4 =>  int, 
 ;	? x5bag: 32 => bstr,
 	? x5chain: 33 => bstr, 
 	? x5t: 34 => [int, bstr], 

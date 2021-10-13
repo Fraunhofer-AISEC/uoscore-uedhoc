@@ -9,9 +9,5 @@
 
 ; This file should be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
-info = (
-	transcript_hash: bstr,
-	label: tstr,
-	context: bstr,
-	length: uint
-)
+cx = ( C_X: bstr / int)
+

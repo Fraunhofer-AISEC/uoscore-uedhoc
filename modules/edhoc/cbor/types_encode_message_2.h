@@ -16,14 +16,7 @@
 #define DEFAULT_MAX_QTY 3
 
 struct m2 {
- 	union {
-		cbor_string_type_t _m2_G_Y_tstr;
-		cbor_string_type_t _m2_G_Y_bstr;
-	};
-	enum {
-		_m2_G_Y_tstr,
-		_m2_G_Y_bstr,
-	} _m2_G_Y_choice;
+ 	cbor_string_type_t _m2_G_Y_CIPHERTEXT_2;
 	union {
 		int32_t _m2_C_R_int;
 		cbor_string_type_t _m2_C_R_bstr;
@@ -32,7 +25,6 @@ struct m2 {
 		_m2_C_R_int,
 		_m2_C_R_bstr,
 	} _m2_C_R_choice;
-	cbor_string_type_t _m2_CIPHERTEXT_2;
 };
 
 

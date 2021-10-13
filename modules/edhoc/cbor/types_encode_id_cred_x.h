@@ -16,7 +16,7 @@
 #define DEFAULT_MAX_QTY 3
 
 struct id_cred_x_map_kid {
- 	cbor_string_type_t _id_cred_x_map_kid;
+ 	int32_t _id_cred_x_map_kid;
 };
 
 struct id_cred_x_map_x5chain {

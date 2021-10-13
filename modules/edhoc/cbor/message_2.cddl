@@ -11,14 +11,14 @@
 
 
 
-m2ci = (
-	C_I: int / bstr,
-	G_Y: tstr / bstr,
-	C_R: int / bstr,
-	CIPHERTEXT_2: bstr,
-)
+; m2ci = (
+; 	C_I: int / bstr,
+; 	G_Y: tstr / bstr,
+; 	C_R: int / bstr,
+; 	CIPHERTEXT_2: bstr,
+; )
 
-m2 = ( G_Y: tstr / bstr, C_R: int / bstr, CIPHERTEXT_2: bstr, )
+m2 = ( G_Y_CIPHERTEXT_2: bstr, C_R: int / bstr )
 
 
 

@@ -9,22 +9,21 @@
 #include <stddef.h>
 #include <string.h>
 #include "cbor_decode.h"
-#include "decode_message_2.h"
+#include "decode_c_x.h"
 
 #if DEFAULT_MAX_QTY != 3
 #error "The type file was generated with a different default_max_qty than this file"
 #endif
 
 
-static bool decode_m2(
-		cbor_state_t *state, struct m2 *result)
+static bool decode_cx_C_X(
+		cbor_state_t *state, struct cx_C_X_ *result)
 {
 	cbor_print("%s\n", __func__);
 	bool int_res;
 
-	bool tmp_result = (((((bstrx_decode(state, (&(*result)._m2_G_Y_CIPHERTEXT_2))))
-	&& ((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._m2_C_R_int)))) && (((*result)._m2_C_R_choice = _m2_C_R_int) || 1))
-	|| (((bstrx_decode(state, (&(*result)._m2_C_R_bstr)))) && (((*result)._m2_C_R_choice = _m2_C_R_bstr) || 1))), union_end_code(state), int_res))))));
+	bool tmp_result = (((union_start_code(state) && (int_res = ((((bstrx_decode(state, (&(*result)._cx_C_X_bstr)))) && (((*result)._cx_C_X_choice = _cx_C_X_bstr) || 1))
+	|| (((intx32_decode(state, (&(*result)._cx_C_X_int)))) && (((*result)._cx_C_X_choice = _cx_C_X_int) || 1))), union_end_code(state), int_res))));
 
 	if (!tmp_result)
 		cbor_trace();
@@ -34,16 +33,16 @@ static bool decode_m2(
 
 
 
-bool cbor_decode_m2(
+bool cbor_decode_cx_C_X(
 		const uint8_t *payload, uint32_t payload_len,
-		struct m2 *result,
+		struct cx_C_X_ *result,
 		uint32_t *payload_len_out)
 {
 	cbor_state_t states[3];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 2);
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 1);
 
-	bool ret = decode_m2(states, result);
+	bool ret = decode_cx_C_X(states, result);
 
 	if (ret && (payload_len_out != NULL)) {
 		*payload_len_out = MIN(payload_len,

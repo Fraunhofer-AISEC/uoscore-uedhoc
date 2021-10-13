@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <edhoc.h>
+#include "../../modules/edhoc/edhoc.h"
 #include "test_vec_parser.h"
-//#include "print_util.h"
-//#include "byte_array.h"
+#include "cbor/decode_c_x.h"
+#include "../../modules/edhoc/inc/memcpy_s.h"
 
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s)
 {
@@ -118,6 +118,52 @@ int get_element(char *test_vec_buf, jsmntok_t *t, uint32_t element_total_count,
 	return 0;
 }
 
+int get_C_X_decode(enum C_X_TYPE C_X, uint8_t vec_num, char *test_vec_buf,
+		   int r, jsmntok_t *t, uint8_t *cx_buf, uint32_t cx_buf_len,
+		   struct c_x *c_x_out)
+{
+	/* get c_i or c_x and decode it to int/bstr */
+	uint8_t c_x_tmp_buf[32];
+	struct byte_array c_x_tmp;
+	byte_array_init(c_x_tmp_buf, sizeof(c_x_tmp_buf), &c_x_tmp);
+	if (C_X == C_I) {
+		get_element(test_vec_buf, t, r, "c_i", vec_num, &c_x_tmp);
+	} else {
+		get_element(test_vec_buf, t, r, "c_r", vec_num, &c_x_tmp);
+	}
+
+	bool ok;
+	size_t decode_len = 0;
+	enum edhoc_error err;
+	struct cx_C_X_ cx;
+
+	ok = cbor_decode_cx_C_X(c_x_tmp.ptr, c_x_tmp.len, &cx, &decode_len);
+	if (!ok) {
+		printf("Cannot decode C_I: %d\n", r);
+		return -1;
+	}
+
+	if (cx._cx_C_X_choice == _cx_C_X_int) {
+		c_x_out->type = INT;
+		c_x_out->mem.c_x_int = cx._cx_C_X_int;
+		PRINTF("C_I_raw (int): %d\n", c_x_out->mem.c_x_int);
+	} else {
+		c_x_init(c_x_out, cx_buf, cx_buf_len);
+		c_x_out->type = BSTR;
+		err = _memcpy_s(c_x_out->mem.c_x_bstr.ptr,
+				c_x_out->mem.c_x_bstr.len,
+				cx._cx_C_X_bstr.value, cx._cx_C_X_bstr.len);
+		c_x_out->mem.c_x_bstr.len = cx._cx_C_X_bstr.len;
+		if (err != edhoc_no_error) {
+			printf("the buffer for C_X is to small");
+			return -1;
+		}
+		PRINT_ARRAY("C_I_raw (bstr):", c_x_out->mem.c_x_bstr.ptr,
+			    c_x_out->mem.c_x_bstr.len);
+	}
+	return 0;
+}
+
 int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 				       struct other_party_cred_bufs *bufs,
 				       struct other_party_cred *c,
@@ -175,7 +221,6 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 
 	byte_array_init(method_buf, sizeof(method_buf), &method);
 	byte_array_init(bufs->suites_i, sizeof(bufs->suites_i), &c->suites_i);
-	byte_array_init(bufs->c_i, sizeof(bufs->c_i), &c->c_i);
 	byte_array_init(bufs->ead_1, sizeof(bufs->ead_1), &c->ead_1);
 	byte_array_init(bufs->ead_3, sizeof(bufs->ead_3), &c->ead_3);
 	byte_array_init(bufs->id_cred_i, sizeof(bufs->id_cred_i),
@@ -187,9 +232,8 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	byte_array_init(bufs->i, sizeof(bufs->i), &c->i);
 
 	get_element(test_vec_buf, t, r, "method", vec_num, &method);
-	c->method_type = method_buf[0];
+	c->method = method_buf[0];
 	get_element(test_vec_buf, t, r, "suites_i", vec_num, &c->suites_i);
-	get_element(test_vec_buf, t, r, "c_i", vec_num, &c->c_i);
 	get_element(test_vec_buf, t, r, "ead_1", vec_num, &c->ead_1);
 	get_element(test_vec_buf, t, r, "ead_3", vec_num, &c->ead_3);
 	get_element(test_vec_buf, t, r, "id_cred_i", vec_num, &c->id_cred_i);
@@ -198,11 +242,9 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	get_element(test_vec_buf, t, r, "x_raw", vec_num, &c->x);
 	get_element(test_vec_buf, t, r, "g_i_raw", vec_num, &c->g_i);
 	get_element(test_vec_buf, t, r, "i_raw", vec_num, &c->i);
-	//get_element(test_vec_buf, t, r, "sk_i", vec_num, &c->sk_i);
 
-	// PRINT_ARRAY("id_cred", c->id_cred.ptr, c->id_cred.len);
-	// PRINT_ARRAY("cred", c->cred.ptr, c->cred.len);
-	return 0;
+	return get_C_X_decode(C_I, vec_num, test_vec_buf, r, t, bufs->c_i,
+			      sizeof(bufs->c_i), &c->c_i);
 }
 
 int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
@@ -225,7 +267,7 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	byte_array_init(bufs->suites_r, sizeof(bufs->suites_r), &c->suites_r);
 	byte_array_init(bufs->g_y, sizeof(bufs->g_y), &c->g_y);
 	byte_array_init(bufs->y, sizeof(bufs->y), &c->y);
-	byte_array_init(bufs->c_r, sizeof(bufs->c_r), &c->c_r);
+	//byte_array_init(bufs->c_r, sizeof(bufs->c_r), &c->c_r);
 	byte_array_init(bufs->g_r, sizeof(bufs->g_r), &c->g_r);
 	byte_array_init(bufs->r, sizeof(bufs->r), &c->r);
 	byte_array_init(bufs->ead_2, sizeof(bufs->ead_2), &c->ead_2);
@@ -234,7 +276,8 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	byte_array_init(bufs->cred_r, sizeof(bufs->cred_r), &c->cred_r);
 
 	get_element(test_vec_buf, t, r, "suites_r", vec_num, &c->suites_r);
-	get_element(test_vec_buf, t, r, "c_r", vec_num, &c->c_r);
+	//get_element(test_vec_buf, t, r, "c_r_raw", vec_num, &c->c_r);
+	//get_element(test_vec_buf, t, r, "c_r", vec_num, &c->c_r);
 	get_element(test_vec_buf, t, r, "ead_1", vec_num, &c->ead_2);
 	get_element(test_vec_buf, t, r, "id_cred_r", vec_num, &c->id_cred_r);
 	get_element(test_vec_buf, t, r, "cred_r", vec_num, &c->cred_r);
@@ -244,7 +287,6 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	get_element(test_vec_buf, t, r, "r_raw", vec_num, &c->r);
 	//get_element(test_vec_buf, t, r, "sk_i", vec_num, &c->sk_i);
 
-	// PRINT_ARRAY("id_cred", c->id_cred.ptr, c->id_cred.len);
-	// PRINT_ARRAY("cred", c->cred.ptr, c->cred.len);
-	return 0;
+	return get_C_X_decode(C_R, vec_num, test_vec_buf, r, t, bufs->c_r,
+			      sizeof(bufs->c_r), &c->c_r);
 }

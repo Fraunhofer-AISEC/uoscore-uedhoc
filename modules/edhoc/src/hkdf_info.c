@@ -17,22 +17,22 @@
 #include "../inc/suites.h"
 #include "../cbor/encode_info.h"
 
-enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
-				  uint8_t th_len, const char *label,
-				  uint64_t okm_len, uint8_t *out,
-				  uint8_t *out_len)
+enum edhoc_error create_hkdf_info(const uint8_t *th, uint8_t th_len,
+				  const char *label, uint8_t *context,
+				  uint32_t context_len, uint64_t okm_len,
+				  uint8_t *out, uint8_t *out_len)
 {
 	bool ok;
 	struct info info;
-
-	info._info_edhoc_aead_id_choice = _info_edhoc_aead_id_int;
-	info._info_edhoc_aead_id_int = aead_alg;
 
 	info._info_transcript_hash.value = th;
 	info._info_transcript_hash.len = th_len;
 
 	info._info_label.value = (uint8_t *)label;
 	info._info_label.len = strlen(label);
+
+	info._info_context.value = context;
+	info._info_context.len = context_len;
 
 	info._info_length = okm_len;
 

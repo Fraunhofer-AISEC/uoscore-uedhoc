@@ -4,8 +4,8 @@
  * Generated with a default_max_qty of 3
  */
 
-#ifndef TYPES_DECODE_MESSAGE_2_H__
-#define TYPES_DECODE_MESSAGE_2_H__
+#ifndef TYPES_DECODE_C_X_H__
+#define TYPES_DECODE_C_X_H__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -15,17 +15,16 @@
 
 #define DEFAULT_MAX_QTY 3
 
-struct m2 {
- 	cbor_string_type_t _m2_G_Y_CIPHERTEXT_2;
-	union {
-		int32_t _m2_C_R_int;
-		cbor_string_type_t _m2_C_R_bstr;
+struct cx_C_X_ {
+ 	union {
+		cbor_string_type_t _cx_C_X_bstr;
+		int32_t _cx_C_X_int;
 	};
 	enum {
-		_m2_C_R_int,
-		_m2_C_R_bstr,
-	} _m2_C_R_choice;
+		_cx_C_X_bstr,
+		_cx_C_X_int,
+	} _cx_C_X_choice;
 };
 
 
-#endif /* TYPES_DECODE_MESSAGE_2_H__ */
+#endif /* TYPES_DECODE_C_X_H__ */

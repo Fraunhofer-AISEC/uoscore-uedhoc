@@ -14,6 +14,7 @@
 #include "byte_array.h"
 #include "error.h"
 #include "suites.h"
+#include "c_x.h"
 
 /**
  * @brief   calculates transcript hash th2 
@@ -26,8 +27,7 @@
  */
 enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
 			       uint32_t msg1_len, uint8_t *g_y,
-			       uint32_t g_y_len, uint8_t *c_r, uint32_t c_r_len,
-			       uint8_t *th2);
+			       uint32_t g_y_len, struct c_x *c_r, uint8_t *th2);
 
 /**
  * @brief   calculates transcript hash th3

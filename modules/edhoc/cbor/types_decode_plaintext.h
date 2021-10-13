@@ -16,7 +16,7 @@
 #define DEFAULT_MAX_QTY 3
 
 struct map_kid {
- 	cbor_string_type_t _map_kid;
+ 	int32_t _map_kid;
 };
 
 struct map_x5chain {

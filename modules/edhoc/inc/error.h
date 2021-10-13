@@ -31,20 +31,21 @@ enum edhoc_error {
 	unsupported_cipher_suite = 8,
 	unsupported_ecdh_curve = 9,
 	unsupported_aead_algorithm = 10,
+	unsupported_hash_algorithm = 11,
 
-	responder_authentication_failed = 11,
-	aead_authentication_failed = 12,
-	certificate_authentication_failed = 13,
+	responder_authentication_failed = 12,
+	aead_authentication_failed = 13,
+	certificate_authentication_failed = 14,
 
-	credential_not_found = 14,
-	no_such_ca = 15,
+	credential_not_found = 15,
+	no_such_ca = 16,
 
-	message_buff_to_small = 16,
-	dest_buffer_to_small = 17,
+	message_buff_to_small = 17,
+	dest_buffer_to_small = 18,
 
-	cbor_encoding_error = 18,
-	cbor_decoding_error = 19,
-	suites_i_list_to_long = 20,
+	cbor_encoding_error = 19,
+	cbor_decoding_error = 20,
+	suites_i_list_to_long = 21,
 
 };
 

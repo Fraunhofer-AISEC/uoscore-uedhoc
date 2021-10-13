@@ -53,6 +53,7 @@ DO_NOT_COMPILE_SOURCES = \
 
 C_SOURCES = $(wildcard src/*.c)
 C_SOURCES += $(wildcard ../../common/*.c) 
+C_SOURCES += $(wildcard ../../common/cbor/*.c) 
 C_SOURCES += $(wildcard ../../../modules/edhoc/src/*.c)
 C_SOURCES += $(wildcard ../../../modules/edhoc/cbor/*.c)
 C_SOURCES += ../../../modules/edhoc/crypto_wrapper.c

@@ -6,6 +6,7 @@
 #include "edhoc.h"
 
 enum role { INITIATOR, RESPONDER };
+enum C_X_TYPE { C_I, C_R };
 
 struct other_party_cred_bufs {
 	uint8_t id_cred[ID_CRED_DEFAULT_SIZE];
@@ -17,8 +18,9 @@ struct other_party_cred_bufs {
 };
 
 struct edhoc_initiator_context_bufs {
-	uint8_t suites_i[5];
 	uint8_t c_i[C_I_DEFAULT_SIZE];
+	int c_r_int;
+	uint8_t suites_i[5];
 	uint8_t ead_1[AD_DEFAULT_SIZE];
 	uint8_t ead_3[AD_DEFAULT_SIZE];
 	uint8_t id_cred_i[ID_CRED_DEFAULT_SIZE];
@@ -32,10 +34,11 @@ struct edhoc_initiator_context_bufs {
 };
 
 struct edhoc_responder_context_bufs {
+	uint8_t c_r[C_I_DEFAULT_SIZE];
+	int c_r_int;
 	uint8_t suites_r[5];
 	uint8_t g_y[G_X_DEFAULT_SIZE];
 	uint8_t y[G_X_DEFAULT_SIZE];
-	uint8_t c_r[C_I_DEFAULT_SIZE];
 	uint8_t g_r[G_I_DEFAULT_SIZE];
 	uint8_t r[G_I_DEFAULT_SIZE];
 	uint8_t ead_2[AD_DEFAULT_SIZE];

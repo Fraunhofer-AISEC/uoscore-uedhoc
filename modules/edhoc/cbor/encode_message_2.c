@@ -21,13 +21,10 @@ static bool encode_m2(
 {
 	cbor_print("%s\n", __func__);
 
-	bool tmp_result = (((((((*input)._m2_G_Y_choice == _m2_G_Y_tstr) ? ((tstrx_encode(state, (&(*input)._m2_G_Y_tstr))))
-	: (((*input)._m2_G_Y_choice == _m2_G_Y_bstr) ? ((bstrx_encode(state, (&(*input)._m2_G_Y_bstr))))
-	: false)))
+	bool tmp_result = (((((bstrx_encode(state, (&(*input)._m2_G_Y_CIPHERTEXT_2))))
 	&& ((((*input)._m2_C_R_choice == _m2_C_R_int) ? ((intx32_encode(state, (&(*input)._m2_C_R_int))))
 	: (((*input)._m2_C_R_choice == _m2_C_R_bstr) ? ((bstrx_encode(state, (&(*input)._m2_C_R_bstr))))
-	: false)))
-	&& ((bstrx_encode(state, (&(*input)._m2_CIPHERTEXT_2)))))));
+	: false))))));
 
 	if (!tmp_result)
 		cbor_trace();
@@ -44,7 +41,7 @@ bool cbor_encode_m2(
 {
 	cbor_state_t states[3];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 3);
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 2);
 
 	bool ret = encode_m2(states, input);
 

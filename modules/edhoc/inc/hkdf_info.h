@@ -27,8 +27,9 @@
  * @param   out_len length of out
  * @return  edhoc_error
  */
-enum edhoc_error create_hkdf_info(enum aead_alg aead_alg, const uint8_t *th,
-			    uint8_t th_len, const char *label, uint64_t okm_len,
-			    uint8_t *out, uint8_t *out_len);
+enum edhoc_error create_hkdf_info(const uint8_t *th, uint8_t th_len,
+				  const char *label, uint8_t *context,
+				  uint32_t context_len, uint64_t okm_len,
+				  uint8_t *out, uint8_t *out_len);
 
 #endif

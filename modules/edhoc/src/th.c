@@ -15,6 +15,7 @@
 #include "../inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
+#include "../inc/c_x.h"
 #include "../cbor/encode_data_2.h"
 #include "../cbor/encode_th2.h"
 #include "../cbor/encode_th3.h"
@@ -33,8 +34,8 @@
  */
 static inline enum edhoc_error
 th2_input_encode(uint8_t *hash_msg1, uint32_t hash_msg1_len, uint8_t *g_y,
-		 uint32_t g_y_len, uint8_t *c_r, uint32_t c_r_len,
-		 uint8_t *th2_input, uint16_t *th2_input_len)
+		 uint32_t g_y_len, struct c_x *c_r, uint8_t *th2_input,
+		 uint16_t *th2_input_len)
 {
 	//enum edhoc_error r;
 	bool success;
@@ -49,14 +50,14 @@ th2_input_encode(uint8_t *hash_msg1, uint32_t hash_msg1_len, uint8_t *g_y,
 	th2._th2_G_Y.value = g_y;
 	th2._th2_G_Y.len = g_y_len;
 
-	/*Encode C_R as bstr_identifier*/
-	if (c_r_len == 1) {
+	/*Encode C_R as int or byte*/
+	if (c_r->type == INT) {
 		th2._th2_C_R_choice = _th2_C_R_int;
-		th2._th2_C_R_int = *c_r;
+		th2._th2_C_R_int = c_r->mem.c_x_int;
 	} else {
 		th2._th2_C_R_choice = _th2_C_R_bstr;
-		th2._th2_C_R_bstr.value = c_r;
-		th2._th2_C_R_bstr.len = c_r_len;
+		th2._th2_C_R_bstr.value = c_r->mem.c_x_bstr.ptr;
+		th2._th2_C_R_bstr.len = c_r->mem.c_x_bstr.len;
 	}
 	success = cbor_encode_th2(th2_input, *th2_input_len, &th2,
 				  &payload_len_out);
@@ -169,8 +170,7 @@ static inline enum edhoc_error th4_input_encode(uint8_t *th3, uint8_t th3_len,
 
 enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
 			       uint32_t msg1_len, uint8_t *g_y,
-			       uint32_t g_y_len, uint8_t *c_r, uint32_t c_r_len,
-			       uint8_t *th2)
+			       uint32_t g_y_len, struct c_x *c_r, uint8_t *th2)
 {
 	uint8_t th2_input[TH_INPUT_DEFAULT_SIZE];
 	uint16_t th2_input_len = sizeof(th2_input);
@@ -184,7 +184,7 @@ enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
 	PRINT_ARRAY("hash_msg1_raw", hash_msg1, SHA_DEFAULT_SIZE);
 
 	r = th2_input_encode(hash_msg1, sizeof(hash_msg1), g_y, g_y_len, c_r,
-			     c_r_len, th2_input, &th2_input_len);
+			     th2_input, &th2_input_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}

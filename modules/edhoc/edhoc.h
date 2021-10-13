@@ -20,6 +20,7 @@
 #include "inc/messages.h"
 #include "inc/print_util.h"
 #include "inc/suites.h"
+#include "inc/c_x.h"
 
 /*define EDHOC_BUF_SIZES_RPK in order to use smaller buffers and save some RAM if need when RPKs are used*/
 #ifndef EDHOC_BUF_SIZES_RPK
@@ -71,7 +72,7 @@
 #define DERIVED_SECRET_DEFAULT_SIZE 32
 #define AD_DEFAULT_SIZE 32
 #define PRK_DEFAULT_SIZE 32
-#define INFO_DEFAULT_SIZE 64
+#define INFO_DEFAULT_SIZE 250
 #define A_3AE_DEFAULT_SIZE 64
 #define A_2AE_DEFAULT_SIZE 64
 #define KID_DEFAULT_SIZE 8
@@ -90,10 +91,11 @@ struct other_party_cred {
 };
 
 struct edhoc_responder_context {
+	struct c_x c_r; /*connection identifier of the responder*/
 	struct byte_array suites_r;
 	struct byte_array g_y; /*ephemeral dh public key*/
 	struct byte_array y; /*ephemeral dh secret key*/
-	struct byte_array c_r;
+
 	struct byte_array g_r; /* static DH pk -> use only with method 1 or 3*/
 	struct byte_array r; /* static DH sk -> use only with method 1 or 3*/
 	struct byte_array ead_2;
@@ -105,10 +107,10 @@ struct edhoc_responder_context {
 };
 
 struct edhoc_initiator_context {
-	enum method_type method_type;
-	uint8_t corr;
+	struct c_x c_i; /*connection identifier of the initiator*/
+	enum method_type method;
+	//uint8_t corr;
 	struct byte_array suites_i;
-	struct byte_array c_i;
 	struct byte_array ead_1;
 	struct byte_array ead_3;
 	struct byte_array id_cred_i;

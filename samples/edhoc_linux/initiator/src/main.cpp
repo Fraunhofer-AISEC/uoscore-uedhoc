@@ -25,8 +25,6 @@ extern "C" {
 #include "../../../common/test_vec_parser.h"
 }
 #include "../../../../externals/cantcoap/cantcoap.h"
-#include "credentials.h"
-#include "credentials_select.h"
 
 #define USE_IPV4
 
@@ -125,8 +123,8 @@ void recv_coap(uint8_t **msg, uint32_t *msg_len)
 
 int main()
 {
-	uint8_t oscore_master_secret[16];
-	uint8_t oscore_master_salt[8];
+	//uint8_t oscore_master_secret[16];
+	//uint8_t oscore_master_salt[8];
 
 	/* edhoc declarations */
 	uint8_t PRK_4x3m[PRK_DEFAULT_SIZE];
@@ -137,7 +135,7 @@ int main()
 	uint64_t ad_2_len = sizeof(ad_2);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 5;
+	const uint8_t TEST_VEC_NUM = 1;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_r;
 	struct edhoc_initiator_context c_i;
@@ -240,15 +238,15 @@ int main()
 	PRINT_ARRAY("PRK_4x3m", PRK_4x3m, sizeof(PRK_4x3m));
 	PRINT_ARRAY("th4", th4, sizeof(th4));
 
-	edhoc_exporter(SHA_256, AES_CCM_16_64_128, PRK_4x3m, sizeof(PRK_4x3m),
-		       th4, sizeof(th4), "OSCORE Master Secret",
-		       oscore_master_secret, 16);
-	PRINT_ARRAY("OSCORE Master Secret", oscore_master_secret, 16);
+	// edhoc_exporter(SHA_256, AES_CCM_16_64_128, PRK_4x3m, sizeof(PRK_4x3m),
+	// 	       th4, sizeof(th4), "OSCORE Master Secret",
+	// 	       oscore_master_secret, 16);
+	// PRINT_ARRAY("OSCORE Master Secret", oscore_master_secret, 16);
 
-	edhoc_exporter(SHA_256, AES_CCM_16_64_128, PRK_4x3m, sizeof(PRK_4x3m),
-		       th4, sizeof(th4), "OSCORE Master Salt",
-		       oscore_master_salt, 8);
-	PRINT_ARRAY("OSCORE Master Salt", oscore_master_salt, 8);
+	// edhoc_exporter(SHA_256, AES_CCM_16_64_128, PRK_4x3m, sizeof(PRK_4x3m),
+	// 	       th4, sizeof(th4), "OSCORE Master Salt",
+	// 	       oscore_master_salt, 8);
+	// PRINT_ARRAY("OSCORE Master Salt", oscore_master_salt, 8);
 
 	close(sockfd);
 	return 0;

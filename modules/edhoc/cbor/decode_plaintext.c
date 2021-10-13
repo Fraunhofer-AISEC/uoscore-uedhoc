@@ -22,7 +22,7 @@ static bool decode_repeated_map_kid(
 	cbor_print("%s\n", __func__);
 
 	bool tmp_result = ((((uintx32_expect(state, (4))))
-	&& (bstrx_decode(state, (&(*result)._map_kid)))));
+	&& (intx32_decode(state, (&(*result)._map_kid)))));
 
 	if (!tmp_result)
 		cbor_trace();

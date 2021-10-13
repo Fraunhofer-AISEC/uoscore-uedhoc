@@ -20,14 +20,11 @@ static bool encode_info(
 		cbor_state_t *state, const struct info *input)
 {
 	cbor_print("%s\n", __func__);
-	bool int_res;
 
-	bool tmp_result = (((list_start_encode(state, 4) && (int_res = (((((*input)._info_edhoc_aead_id_choice == _info_edhoc_aead_id_int) ? ((intx32_encode(state, (&(*input)._info_edhoc_aead_id_int))))
-	: (((*input)._info_edhoc_aead_id_choice == _info_edhoc_aead_id_tstr) ? ((tstrx_encode(state, (&(*input)._info_edhoc_aead_id_tstr))))
-	: false)))
-	&& ((bstrx_encode(state, (&(*input)._info_transcript_hash))))
+	bool tmp_result = (((((bstrx_encode(state, (&(*input)._info_transcript_hash))))
 	&& ((tstrx_encode(state, (&(*input)._info_label))))
-	&& ((uintx32_encode(state, (&(*input)._info_length))))), ((list_end_encode(state, 4)) && int_res)))));
+	&& ((bstrx_encode(state, (&(*input)._info_context))))
+	&& ((uintx32_encode(state, (&(*input)._info_length)))))));
 
 	if (!tmp_result)
 		cbor_trace();
@@ -42,9 +39,9 @@ bool cbor_encode_info(
 		const struct info *input,
 		uint32_t *payload_len_out)
 {
-	cbor_state_t states[4];
+	cbor_state_t states[2];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 1);
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 4);
 
 	bool ret = encode_info(states, input);
 
