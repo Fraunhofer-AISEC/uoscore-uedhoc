@@ -36,13 +36,10 @@ enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
  * @param   th2_len length of th2
  * @param   ciphertext_2 
  * @param   ciphertext_2_len  length of ciphertext_2_len
- * @param   data_3 
- * @param   data_3_len  length of data_3_len
  * @param   th3 ouput buffer
  */
 enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 			       uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
-			       uint8_t *data_3, uint8_t data_3_len,
 			       uint8_t *th3);
 
 /**

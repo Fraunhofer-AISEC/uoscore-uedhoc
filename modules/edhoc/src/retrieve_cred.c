@@ -93,6 +93,8 @@ enum edhoc_error retrieve_cred(bool static_dh_auth,
 	size_t decode_len = 0;
 	struct id_cred_x_map map;
 
+	//TODO implement here retrieving of the public of the other party from CRED_x of the other party!!!
+
 	/*check first if the credential is preestablished (RPK)*/
 	for (uint16_t i = 0; i < cred_num; i++) {
 		if (cred_array[i].id_cred.len == id_cred_len) {

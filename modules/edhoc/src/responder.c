@@ -147,43 +147,43 @@ static inline enum edhoc_error
 msg3_parse(uint8_t corr, uint8_t *msg3, uint16_t msg3_len, uint8_t *c_r,
 	   uint64_t *c_r_len, uint8_t *ciphertext_3, uint64_t *ciphertext_3_len)
 {
-	enum edhoc_error r;
-	bool ok;
-	struct m3 m;
-	size_t decode_len = 0;
+	// enum edhoc_error r;
+	// bool ok;
+	// struct m3 m;
+	// size_t decode_len = 0;
 
-	ok = cbor_decode_m3(msg3, msg3_len, &m, &decode_len);
-	if (!ok) {
-		return cbor_decoding_error;
-	}
+	// ok = cbor_decode_m3(msg3, msg3_len, &m, &decode_len);
+	// if (!ok) {
+	// 	return cbor_decoding_error;
+	// }
 
-	if (corr != 2 && corr != 3) {
-		/*C_R is present*/
-		if (*c_r_len == 1) {
-			/*C_R is encoded as int*/
-			c_r[0] = m._m3_C_R._m3_C_R_int;
-		} else {
-			r = _memcpy_s(c_r, *c_r_len,
-				      m._m3_C_R._m3_C_R_bstr.value,
-				      m._m3_C_R._m3_C_R_bstr.len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
+	// if (corr != 2 && corr != 3) {
+	// 	/*C_R is present*/
+	// 	if (*c_r_len == 1) {
+	// 		/*C_R is encoded as int*/
+	// 		c_r[0] = m._m3_C_R._m3_C_R_int;
+	// 	} else {
+	// 		r = _memcpy_s(c_r, *c_r_len,
+	// 			      m._m3_C_R._m3_C_R_bstr.value,
+	// 			      m._m3_C_R._m3_C_R_bstr.len);
+	// 		if (r != edhoc_no_error) {
+	// 			return r;
+	// 		}
 
-			*c_r_len = m._m3_C_R._m3_C_R_bstr.len;
-		}
-		PRINT_ARRAY("msg3 C_R", c_r, *c_r_len);
-	}
+	// 		*c_r_len = m._m3_C_R._m3_C_R_bstr.len;
+	// 	}
+	// 	PRINT_ARRAY("msg3 C_R", c_r, *c_r_len);
+	// }
 
-	r = _memcpy_s(ciphertext_3, *ciphertext_3_len, m._m3_CIPHERTEXT_3.value,
-		      m._m3_CIPHERTEXT_3.len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	// r = _memcpy_s(ciphertext_3, *ciphertext_3_len, m._m3_CIPHERTEXT_3.value,
+	// 	      m._m3_CIPHERTEXT_3.len);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
 
-	*ciphertext_3_len = m._m3_CIPHERTEXT_3.len;
+	// *ciphertext_3_len = m._m3_CIPHERTEXT_3.len;
 
-	PRINT_ARRAY("msg3 CIPHERTEXT_3", ciphertext_3, *ciphertext_3_len);
+	// PRINT_ARRAY("msg3 CIPHERTEXT_3", ciphertext_3, *ciphertext_3_len);
 	return edhoc_no_error;
 };
 
@@ -238,57 +238,6 @@ static inline enum edhoc_error msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
 	*msg2_len = payload_len_out;
 
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, *msg2_len);
-	return edhoc_no_error;
-}
-
-enum edhoc_error mac2_calc(struct edhoc_responder_context *c, bool static_dh_r,
-			   struct suite *suite, const uint8_t *prk,
-			   uint8_t prk_len, const uint8_t *th, uint8_t th_len,
-			   uint8_t *mac_2, uint32_t *mac_2_len)
-{
-	enum edhoc_error r;
-	uint32_t context_mac2_len =
-		c->id_cred_r.len + c->cred_r.len + c->ead_2.len;
-	uint8_t context_mac2[context_mac2_len];
-	r = _memcpy_s(context_mac2, sizeof(context_mac2), c->id_cred_r.ptr,
-		      c->id_cred_r.len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	r = _memcpy_s(context_mac2 + c->id_cred_r.len,
-		      sizeof(context_mac2) - c->id_cred_r.len, c->cred_r.ptr,
-		      c->cred_r.len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	r = _memcpy_s(context_mac2 + c->id_cred_r.len + c->cred_r.len,
-		      sizeof(context_mac2) - c->id_cred_r.len - c->cred_r.len,
-		      c->ead_2.ptr, c->ead_2.len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-
-	PRINT_ARRAY("context mac 2", context_mac2, context_mac2_len);
-
-	if (static_dh_r) {
-		r = get_mac_len(suite->edhoc_aead, mac_2_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
-	} else {
-		r = get_hash_len(suite->edhoc_hash, mac_2_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
-	}
-
-	r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, "MAC_2",
-		     context_mac2, context_mac2_len, mac_2, *mac_2_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-
-	PRINT_ARRAY("mac_2", mac_2, *mac_2_len);
 	return edhoc_no_error;
 }
 
@@ -396,8 +345,9 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	/*calculate MAC_2*/
 	uint32_t mac_2_len;
 	uint8_t mac_2[SHA_DEFAULT_SIZE];
-	r = mac2_calc(c, static_dh_r, &suite, PRK_3e2m, sizeof(PRK_3e2m), th2,
-		      sizeof(th2), mac_2, &mac_2_len);
+	r = mac(PRK_3e2m, sizeof(PRK_3e2m), th2, sizeof(th2), c->id_cred_r.ptr,
+		c->id_cred_r.len, c->cred_r.ptr, c->cred_r.len, c->ead_2.ptr,
+		c->ead_2.len, "MAC_2", static_dh_r, &suite, mac_2, &mac_2_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}

@@ -16,29 +16,13 @@
 #endif
 
 
-static bool encode_repeated_th3_data_3(
-		cbor_state_t *state, const struct th3_data_3_ *input)
-{
-	cbor_print("%s\n", __func__);
-
-	bool tmp_result = (((((*input)._th3_data_3_choice == _th3_data_3_bstr) ? ((bstrx_encode(state, (&(*input)._th3_data_3_bstr))))
-	: (((*input)._th3_data_3_choice == _th3_data_3_int) ? ((intx32_encode(state, (&(*input)._th3_data_3_int))))
-	: false))));
-
-	if (!tmp_result)
-		cbor_trace();
-
-	return tmp_result;
-}
-
 static bool encode_th3(
 		cbor_state_t *state, const struct th3 *input)
 {
 	cbor_print("%s\n", __func__);
 
 	bool tmp_result = (((((bstrx_encode(state, (&(*input)._th3_th_2))))
-	&& ((bstrx_encode(state, (&(*input)._th3_CIPHERTEXT_2))))
-	&& present_encode(&((*input)._th3_data_3_present), (void *)encode_repeated_th3_data_3, state, (&(*input)._th3_data_3)))));
+	&& ((bstrx_encode(state, (&(*input)._th3_CIPHERTEXT_2)))))));
 
 	if (!tmp_result)
 		cbor_trace();
@@ -53,9 +37,9 @@ bool cbor_encode_th3(
 		const struct th3 *input,
 		uint32_t *payload_len_out)
 {
-	cbor_state_t states[3];
+	cbor_state_t states[2];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 3);
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 2);
 
 	bool ret = encode_th3(states, input);
 

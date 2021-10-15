@@ -21,7 +21,7 @@
 #include "../cbor/encode_id_cred_x.h"
 
 /**
- * @brief 	Encodes IS_CRED_x as a CBOR map
+ * @brief 	Encodes ID_CRED_x as a CBOR map
  * @param	label the map label
  * @param	algo the hash algorithm used in x5t. This parameter kan take any 
  * 			othe value when xchain or kid are used
@@ -44,9 +44,9 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 
 	switch (label) {
 	case kid:
-		// map._id_cred_x_map_kid_present = true;
-		// map._id_cred_x_map_kid._id_cred_x_map_kid_choice = id;
-		// map._id_cred_x_map_kid._id_cred_x_map_kid.len = id_len;
+		map._id_cred_x_map_kid_present = true;
+		map._id_cred_x_map_kid._id_cred_x_map_kid = *((int32_t *)id);
+		//map._id_cred_x_map_kid._id_cred_x_map_kid.len = id_len;
 		break;
 	case x5chain:
 		map._id_cred_x_map_x5chain_present = true;
@@ -126,11 +126,10 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 	} else {
 		/*Note that if ID_CRED_x contains a single 'kid' parameter,
             i.e., ID_CRED_R = { 4 : kid_x }, only the byte string kid_x
-            is conveyed in the plaintext encoded as a bstr_identifier,
-            see Section 3.3.4 and Section 5.1.*/
+            is conveyed in the plaintext encoded as a bstr or int*/
 		if (p._plaintext_ID_CRED_x_choice ==
 		    _plaintext_ID_CRED_x_bstr) {
-			r = id_cred_x_encode(kid, p._plaintext_ID_CRED_x_int,
+			r = id_cred_x_encode(kid, 0,
 					     p._plaintext_ID_CRED_x_bstr.value,
 					     p._plaintext_ID_CRED_x_bstr.len,
 					     id_cred_x, id_cred_x_len);
@@ -138,7 +137,7 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 				return r;
 			}
 		} else {
-			int _kid = p._plaintext_ID_CRED_x_int + 24;
+			int _kid = p._plaintext_ID_CRED_x_int;
 			r = id_cred_x_encode(kid, 0, &_kid, 1, id_cred_x,
 					     id_cred_x_len);
 			if (r != edhoc_no_error) {

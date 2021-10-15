@@ -10,4 +10,4 @@
 ; This file should be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
 
-m3 = ( ? C_R: bstr / int, CIPHERTEXT_3: bstr, )
+m3 = ( CIPHERTEXT_3: bstr, )

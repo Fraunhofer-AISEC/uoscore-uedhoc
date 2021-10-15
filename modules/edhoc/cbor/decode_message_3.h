@@ -19,9 +19,9 @@
 #endif
 
 
-bool cbor_decode_m3(
+bool cbor_decode_m3_CIPHERTEXT_3(
 		const uint8_t *payload, uint32_t payload_len,
-		struct m3 *result,
+		cbor_string_type_t *result,
 		uint32_t *payload_len_out);
 
 

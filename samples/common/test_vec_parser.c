@@ -146,7 +146,7 @@ int get_C_X_decode(enum C_X_TYPE C_X, uint8_t vec_num, char *test_vec_buf,
 	if (cx._cx_C_X_choice == _cx_C_X_int) {
 		c_x_out->type = INT;
 		c_x_out->mem.c_x_int = cx._cx_C_X_int;
-		PRINTF("C_I_raw (int): %d\n", c_x_out->mem.c_x_int);
+		PRINTF("C_x_raw (int): %d\n", c_x_out->mem.c_x_int);
 	} else {
 		c_x_init(c_x_out, cx_buf, cx_buf_len);
 		c_x_out->type = BSTR;
@@ -158,7 +158,7 @@ int get_C_X_decode(enum C_X_TYPE C_X, uint8_t vec_num, char *test_vec_buf,
 			printf("the buffer for C_X is to small");
 			return -1;
 		}
-		PRINT_ARRAY("C_I_raw (bstr):", c_x_out->mem.c_x_bstr.ptr,
+		PRINT_ARRAY("C_x_raw (bstr):", c_x_out->mem.c_x_bstr.ptr,
 			    c_x_out->mem.c_x_bstr.len);
 	}
 	return 0;
@@ -185,7 +185,7 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 	byte_array_init(bufs->id_cred, sizeof(bufs->id_cred), &c->id_cred);
 	byte_array_init(bufs->cred, sizeof(bufs->cred), &c->cred);
 	// byte_array_init(bufs->pk, sizeof(bufs->pk), &c->pk);
-	// byte_array_init(bufs->g, sizeof(bufs->g), &c->g);
+	byte_array_init(bufs->g, sizeof(bufs->g), &c->g);
 	// byte_array_init(bufs->ca, sizeof(bufs->ca), &c->ca);
 	// byte_array_init(bufs->ca_pk, sizeof(bufs->ca_pk), &c->ca_pk);
 
@@ -193,10 +193,14 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 		get_element(test_vec_buf, t, r, "id_cred_i", vec_num,
 			    &c->id_cred);
 		get_element(test_vec_buf, t, r, "cred_i", vec_num, &c->cred);
+		get_element(test_vec_buf, t, r, "g_i_raw", vec_num, &c->g);
+	} else {
+		get_element(test_vec_buf, t, r, "id_cred_r", vec_num,
+			    &c->id_cred);
+		get_element(test_vec_buf, t, r, "cred_r", vec_num, &c->cred);
+		get_element(test_vec_buf, t, r, "g_r_raw", vec_num, &c->g);
 	}
 
-	// PRINT_ARRAY("id_cred", c->id_cred.ptr, c->id_cred.len);
-	// PRINT_ARRAY("cred", c->cred.ptr, c->cred.len);
 	return 0;
 }
 

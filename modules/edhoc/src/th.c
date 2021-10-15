@@ -85,46 +85,34 @@ th2_input_encode(uint8_t *hash_msg1, uint32_t hash_msg1_len, uint8_t *g_y,
  * @param   th3_input ouput buffer for the data structure
  * @param   th3_input_len length of th3_input
  */
-static inline enum edhoc_error
-th3_input_encode(uint8_t *th2, uint8_t th2_len, uint8_t *ciphertext_2,
-		 uint16_t ciphertext_2_len, uint8_t *data_3, uint8_t data_3_len,
-		 uint8_t *th3_input, uint16_t *th3_input_len)
+static inline enum edhoc_error th3_input_encode(uint8_t *th2, uint8_t th2_len,
+						uint8_t *ciphertext_2,
+						uint16_t ciphertext_2_len,
+						uint8_t *th3_input,
+						uint16_t *th3_input_len)
 {
-	// bool success;
-	// struct th3 th3;
+	bool success;
+	struct th3 th3;
 
-	// /*Encode th2*/
-	// th3._th3_th2.value = th2;
-	// th3._th3_th2.len = th2_len;
+	/*Encode th2*/
+	th3._th3_th_2.value = th2;
+	th3._th3_th_2.len = th2_len;
 
-	// /*Encode ciphertext_2*/
-	// th3._th3_CIPHERTEXT_2.value = ciphertext_2;
-	// th3._th3_CIPHERTEXT_2.len = ciphertext_2_len;
+	/*Encode ciphertext_2*/
+	th3._th3_CIPHERTEXT_2.value = ciphertext_2;
+	th3._th3_CIPHERTEXT_2.len = ciphertext_2_len;
 
-	// /*Encode C_R*/
-	// if (data_3_len) {
-	// 	th3._th3_data_3_present = true;
-	// 	if (data_3_len == 1) {
-	// 		th3._th3_data_3._th3_data_3_choice = _th3_data_3_int;
-	// 		th3._th3_data_3._th3_data_3_int = *data_3 - 24;
-	// 	} else {
-	// 		th3._th3_data_3._th3_data_3_choice = _th3_data_3_bstr;
-	// 		th3._th3_data_3._th3_data_3_bstr.value = data_3;
-	// 		th3._th3_data_3._th3_data_3_bstr.len = data_3_len;
-	// 	}
-	// }
+	size_t payload_len_out;
+	success = cbor_encode_th3(th3_input, *th3_input_len, &th3,
+				  &payload_len_out);
 
-	// size_t payload_len_out;
-	// success = cbor_encode_th3(th3_input, *th3_input_len, &th3,
-	// 			  &payload_len_out);
+	if (!success) {
+		return cbor_encoding_error;
+	}
+	*th3_input_len = payload_len_out;
 
-	// if (!success) {
-	// 	return cbor_encoding_error;
-	// }
-	// *th3_input_len = payload_len_out;
-
-	// PRINT_ARRAY("Input to calculate TH_3 (CBOR Sequence)", th3_input,
-	// 	    *th3_input_len);
+	PRINT_ARRAY("Input to calculate TH_3 (CBOR Sequence)", th3_input,
+		    *th3_input_len);
 	return edhoc_no_error;
 }
 
@@ -199,14 +187,13 @@ enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
 
 enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 			       uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
-			       uint8_t *data_3, uint8_t data_3_len,
 			       uint8_t *th3)
 {
-	uint8_t th3_input[th2_len + ciphertext_2_len + data_3_len + 6];
+	uint8_t th3_input[th2_len + ciphertext_2_len + 4];
 	uint16_t th3_input_len = sizeof(th3_input);
-	enum edhoc_error r =
-		th3_input_encode(th2, th2_len, ciphertext_2, ciphertext_2_len,
-				 data_3, data_3_len, th3_input, &th3_input_len);
+	enum edhoc_error r;
+	r = th3_input_encode(th2, th2_len, ciphertext_2, ciphertext_2_len,
+			     th3_input, &th3_input_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
@@ -214,7 +201,7 @@ enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 	if (r != edhoc_no_error) {
 		return r;
 	}
-	PRINT_ARRAY("TH3", th3, 32);
+	PRINT_ARRAY("TH3", th3, SHA_DEFAULT_SIZE);
 	return edhoc_no_error;
 }
 

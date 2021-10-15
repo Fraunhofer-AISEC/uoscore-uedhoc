@@ -15,22 +15,7 @@
 
 #define DEFAULT_MAX_QTY 3
 
-struct m3_C_R_ {
- 	union {
-		cbor_string_type_t _m3_C_R_bstr;
-		int32_t _m3_C_R_int;
-	};
-	enum {
-		_m3_C_R_bstr,
-		_m3_C_R_int,
-	} _m3_C_R_choice;
-};
 
-struct m3 {
- 	struct m3_C_R_ _m3_C_R;
-	uint32_t _m3_C_R_present;
-	cbor_string_type_t _m3_CIPHERTEXT_3;
-};
 
 
 #endif /* TYPES_ENCODE_MESSAGE_3_H__ */

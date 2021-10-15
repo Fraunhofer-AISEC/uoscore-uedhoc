@@ -17,7 +17,7 @@
 #include "error.h"
 
 /**
- * @brief   decodes id_cred to kid
+ * @brief   Decodes id_cred to kid
  * @param   id_cred ID_CRED_x
  * @param   id_cred_len length of id_cred
  * @param   _kid output pointer

@@ -19,9 +19,9 @@
 #endif
 
 
-bool cbor_encode_m3(
+bool cbor_encode_m3_CIPHERTEXT_3(
 		uint8_t *payload, uint32_t payload_len,
-		const struct m3 *input,
+		const cbor_string_type_t *input,
 		uint32_t *payload_len_out);
 
 

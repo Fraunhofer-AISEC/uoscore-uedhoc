@@ -19,9 +19,62 @@
 #include "../inc/print_util.h"
 #include "../inc/suites.h"
 #include "../inc/cose.h"
+#include "../inc/memcpy_s.h"
 #include "../cbor/encode_enc_structure.h"
 #include "../cbor/encode_sig_structure.h"
 #include "../cbor/encode_bstr_type.h"
+
+enum edhoc_error mac(
+	const uint8_t *prk, uint8_t prk_len,
+	const uint8_t *th, uint8_t th_len,
+	const uint8_t *id_cred, uint32_t id_cred_len, 
+	const uint8_t *cred, uint32_t cred_len, 
+	const uint8_t *ead, uint32_t ead_len,
+	const char *mac_label, bool static_dh, struct suite *suite, 
+	uint8_t *mac, uint32_t *mac_len)
+{
+	enum edhoc_error r;
+	uint32_t context_mac_len =
+		id_cred_len + cred_len + ead_len;
+	uint8_t context_mac[context_mac_len];
+	r = _memcpy_s(context_mac, sizeof(context_mac), id_cred, id_cred_len);
+	if (r != edhoc_no_error) {
+		return r;
+	}
+	r = _memcpy_s(context_mac + id_cred_len, sizeof(context_mac) - id_cred_len, cred, cred_len);
+	if (r != edhoc_no_error) {
+		return r;
+	}
+	r = _memcpy_s(context_mac + id_cred_len + cred_len,
+		      sizeof(context_mac) - id_cred_len - cred_len,
+		      ead, ead_len);
+	if (r != edhoc_no_error) {
+		return r;
+	}
+
+	PRINT_ARRAY("MAC context", context_mac, context_mac_len);
+
+	if (static_dh) {
+		r = get_mac_len(suite->edhoc_aead, mac_len);
+		if (r != edhoc_no_error) {
+			return r;
+		}
+	} else {
+		r = get_hash_len(suite->edhoc_hash, mac_len);
+		if (r != edhoc_no_error) {
+			return r;
+		}
+	}
+
+	r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, mac_label,
+		     context_mac, context_mac_len, mac, *mac_len);
+	if (r != edhoc_no_error) {
+		return r;
+	}
+
+	PRINT_ARRAY("MAC 2/3", mac, *mac_len);
+	return edhoc_no_error;
+}
 
 enum edhoc_error encode_byte_string(const uint8_t *in, const uint8_t in_len,
 				    uint8_t *out, uint16_t *out_len)

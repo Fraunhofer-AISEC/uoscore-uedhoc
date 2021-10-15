@@ -15,22 +15,9 @@
 
 #define DEFAULT_MAX_QTY 3
 
-struct th3_data_3_ {
- 	union {
-		cbor_string_type_t _th3_data_3_bstr;
-		int32_t _th3_data_3_int;
-	};
-	enum {
-		_th3_data_3_bstr,
-		_th3_data_3_int,
-	} _th3_data_3_choice;
-};
-
 struct th3 {
  	cbor_string_type_t _th3_th_2;
 	cbor_string_type_t _th3_CIPHERTEXT_2;
-	struct th3_data_3_ _th3_data_3;
-	uint32_t _th3_data_3_present;
 };
 
 
