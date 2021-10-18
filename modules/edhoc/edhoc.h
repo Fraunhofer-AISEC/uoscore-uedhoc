@@ -206,7 +206,6 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
  * @param   out_len length of the derived key
  */
 enum edhoc_error edhoc_exporter(enum hash_alg app_hash_alg,
-				enum aead_alg app_aead_alg,
 				const uint8_t *prk_4x3m, uint16_t prk_4x3m_len,
 				const uint8_t *th4, uint16_t th4_len,
 				const char *label, uint8_t *out,

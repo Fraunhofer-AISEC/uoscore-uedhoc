@@ -75,4 +75,6 @@ enum edhoc_error get_hash_len(enum hash_alg alg, uint32_t *len);
  * 
  */
 enum edhoc_error get_mac_len(enum aead_alg alg, uint32_t *len);
+
+
 #endif
