@@ -62,35 +62,47 @@ enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
 	return edhoc_no_error;
 }
 
-enum edhoc_error get_hash_len(enum hash_alg alg, uint32_t *len)
+uint32_t get_hash_len(enum hash_alg alg)
 {
-	enum edhoc_error err = edhoc_no_error;
 	switch (alg) {
 	case SHA_256:
-		*len = 32;
-		break;
-
-	default:
-		err = unsupported_hash_algorithm;
+		return 32;
 		break;
 	}
-	return err;
+	return 0;
 }
 
-enum edhoc_error get_mac_len(enum aead_alg alg, uint32_t *len)
+uint32_t get_mac_len(enum aead_alg alg)
 {
-	enum edhoc_error err = edhoc_no_error;
 	switch (alg) {
 	case AES_CCM_16_128_128:
-		*len = 16;
+		return 16;
 		break;
 	case AES_CCM_16_64_128:
-		*len = 8;
-		break;
-
-	default:
-		err = unsupported_aead_algorithm;
+		return 8;
 		break;
 	}
-	return err;
+	return 0;
+}
+
+uint32_t get_aead_key_len(enum aead_alg alg)
+{
+	switch (alg) {
+	case AES_CCM_16_128_128:
+	case AES_CCM_16_64_128:
+		return 16;
+		break;
+	}
+	return 0;
+}
+
+uint32_t get_aead_iv_len(enum aead_alg alg)
+{
+	switch (alg) {
+	case AES_CCM_16_128_128:
+	case AES_CCM_16_64_128:
+		return 13;
+		break;
+	}
+	return 0;
 }

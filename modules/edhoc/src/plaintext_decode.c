@@ -32,7 +32,7 @@
 static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 					 const void *id, uint64_t id_len,
 					 uint8_t *id_cred_x,
-					 uint64_t *id_cred_x_len)
+					 uint32_t *id_cred_x_len)
 {
 	bool success;
 	struct id_cred_x_map map;
@@ -75,10 +75,10 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 }
 
 enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
-				 uint8_t *id_cred_x, uint64_t *id_cred_x_len,
+				 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
 				 uint8_t *sign_or_mac,
-				 uint64_t *sign_or_mac_len, uint8_t *ad,
-				 uint64_t *ad_len)
+				 uint32_t *sign_or_mac_len, uint8_t *ad,
+				 uint32_t *ad_len)
 {
 	enum edhoc_error r;
 	bool success;

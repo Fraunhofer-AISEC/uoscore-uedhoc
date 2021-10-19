@@ -79,7 +79,8 @@ enum edhoc_error plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
 {
 	enum edhoc_error r;
 
-	uint16_t l, enc_sgn_or_mac_len = sgn_or_mac_len + 2;
+	uint16_t l;
+	uint64_t enc_sgn_or_mac_len = sgn_or_mac_len + 2;
 	uint8_t kid_buf[KID_DEFAULT_SIZE];
 	uint32_t kid_len = sizeof(kid_buf);
 	r = id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len);

@@ -133,6 +133,8 @@ int main()
 	uint32_t err_msg_len = sizeof(err_msg);
 	uint8_t ad_2[AD_DEFAULT_SIZE];
 	uint64_t ad_2_len = sizeof(ad_2);
+	uint8_t ad_4[AD_DEFAULT_SIZE];
+	uint64_t ad_4_len = sizeof(ad_2);
 
 	/* test vector inputs */
 	const uint8_t TEST_VEC_NUM = 1;
@@ -229,8 +231,8 @@ int main()
 	}
 
 	r = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
-				ad_2, &ad_2_len, PRK_4x3m, sizeof(PRK_4x3m),
-				th4, sizeof(th4));
+				ad_2, &ad_2_len, ad_4, &ad_4_len, PRK_4x3m,
+				sizeof(PRK_4x3m), th4, sizeof(th4));
 	if (r != edhoc_no_error) {
 		printf("Error in edhoc_initiator_run, (Error code %d)\n", r);
 	}

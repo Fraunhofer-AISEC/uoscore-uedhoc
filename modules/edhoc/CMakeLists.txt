@@ -18,7 +18,7 @@ zephyr_library_sources(
     src/signature_or_mac_msg.c
     src/prk.c
     src/edhoc_exporter.c
-    src/a_Xae_encode.c
+    src/associated_data_encode.c
     src/plaintext.c
     src/edhoc_method_type.c
 )

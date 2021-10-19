@@ -42,6 +42,7 @@ struct edhoc_responder_context_bufs {
 	uint8_t g_r[G_I_DEFAULT_SIZE];
 	uint8_t r[G_I_DEFAULT_SIZE];
 	uint8_t ead_2[AD_DEFAULT_SIZE];
+	uint8_t ead_4[AD_DEFAULT_SIZE];
 	uint8_t id_cred_r[ID_CRED_DEFAULT_SIZE];
 	uint8_t cred_r[CERT_DEFAUT_SIZE];
 	uint8_t sk_r[PK_DEFAULT_SIZE];

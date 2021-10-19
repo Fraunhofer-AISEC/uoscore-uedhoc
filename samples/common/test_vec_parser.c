@@ -223,6 +223,9 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 		return -1;
 	}
 
+	/*use message 4 in all tests*/
+	c->msg4 = true;
+
 	byte_array_init(method_buf, sizeof(method_buf), &method);
 	byte_array_init(bufs->suites_i, sizeof(bufs->suites_i), &c->suites_i);
 	byte_array_init(bufs->ead_1, sizeof(bufs->ead_1), &c->ead_1);
@@ -268,6 +271,9 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 		return -1;
 	}
 
+	/*use message 4 in all tests*/
+	c->msg4 = true;
+
 	byte_array_init(bufs->suites_r, sizeof(bufs->suites_r), &c->suites_r);
 	byte_array_init(bufs->g_y, sizeof(bufs->g_y), &c->g_y);
 	byte_array_init(bufs->y, sizeof(bufs->y), &c->y);
@@ -275,14 +281,14 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	byte_array_init(bufs->g_r, sizeof(bufs->g_r), &c->g_r);
 	byte_array_init(bufs->r, sizeof(bufs->r), &c->r);
 	byte_array_init(bufs->ead_2, sizeof(bufs->ead_2), &c->ead_2);
+	byte_array_init(bufs->ead_4, sizeof(bufs->ead_4), &c->ead_4);
 	byte_array_init(bufs->id_cred_r, sizeof(bufs->id_cred_r),
 			&c->id_cred_r);
 	byte_array_init(bufs->cred_r, sizeof(bufs->cred_r), &c->cred_r);
 
 	get_element(test_vec_buf, t, r, "suites_r", vec_num, &c->suites_r);
-	//get_element(test_vec_buf, t, r, "c_r_raw", vec_num, &c->c_r);
-	//get_element(test_vec_buf, t, r, "c_r", vec_num, &c->c_r);
-	get_element(test_vec_buf, t, r, "ead_1", vec_num, &c->ead_2);
+	get_element(test_vec_buf, t, r, "ead_2", vec_num, &c->ead_2);
+	get_element(test_vec_buf, t, r, "ead_4", vec_num, &c->ead_4);
 	get_element(test_vec_buf, t, r, "id_cred_r", vec_num, &c->id_cred_r);
 	get_element(test_vec_buf, t, r, "cred_r", vec_num, &c->cred_r);
 	get_element(test_vec_buf, t, r, "g_y_raw", vec_num, &c->g_y);

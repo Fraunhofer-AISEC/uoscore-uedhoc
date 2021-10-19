@@ -11,7 +11,6 @@
 #ifndef PLAINTEXT_H
 #define PLAINTEXT_H
 
-
 #include <stdint.h>
 
 #include "error.h"
@@ -38,10 +37,10 @@ enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
  * @param   ad_len length of ad
  */
 enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
-				 uint8_t *id_cred_x, uint64_t *id_cred_x_len,
+				 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
 				 uint8_t *sign_or_mac,
-				 uint64_t *sign_or_mac_len, uint8_t *ad,
-				 uint64_t *ad_len);
+				 uint32_t *sign_or_mac_len, uint8_t *ad,
+				 uint32_t *ad_len);
 
 /**
  * @brief   Encodes a plaintext 

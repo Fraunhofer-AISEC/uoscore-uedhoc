@@ -31,6 +31,7 @@
 #define MSG_1_DEFAULT_SIZE 64
 #define MSG_2_DEFAULT_SIZE 128
 #define MSG_3_DEFAULT_SIZE 100
+#define MSG_4_DEFAULT_SIZE 100
 #define CIPHERTEXT2_DEFAULT_SIZE 100
 #define CIPHERTEXT3_DEFAULT_SIZE 100
 #define A_2M_DEFAULT_SIZE 200
@@ -46,14 +47,16 @@
 #define MSG_1_DEFAULT_SIZE 256
 #define MSG_2_DEFAULT_SIZE 256
 #define MSG_3_DEFAULT_SIZE 256
+#define MSG_4_DEFAULT_SIZE 256
 #define CIPHERTEXT2_DEFAULT_SIZE 256
 #define CIPHERTEXT3_DEFAULT_SIZE 256
+#define CIPHERTEXT4_DEFAULT_SIZE 256
 #define A_2M_DEFAULT_SIZE 512
 #define M_3_DEFAULT_SIZE 512
 #define CRED_DEFAULT_SIZE 256
 #define SGN_OR_MAC_DEFAULT_SIZE 128
 #define ID_CRED_DEFAULT_SIZE 256
-#define PRK_3AE_DEFAULT_SIZE 256
+#define PLAINTEXT_DEFAULT_SIZE 256
 #define CERT_DEFAUT_SIZE 256
 #endif
 
@@ -73,8 +76,8 @@
 #define AD_DEFAULT_SIZE 32
 #define PRK_DEFAULT_SIZE 32
 #define INFO_DEFAULT_SIZE 250
-#define A_3AE_DEFAULT_SIZE 64
-#define A_2AE_DEFAULT_SIZE 64
+#define ASSOCIATED_DATA_DEFAULT_SIZE 64
+//#define A_2AE_DEFAULT_SIZE 64
 #define KID_DEFAULT_SIZE 8
 #define SHA_DEFAULT_SIZE 32
 #define AEAD_KEY_DEFAULT_SIZE 16
@@ -91,6 +94,7 @@ struct other_party_cred {
 };
 
 struct edhoc_responder_context {
+	bool msg4; /*if true massage 4 will be send by the responder*/
 	struct c_x c_r; /*connection identifier of the responder*/
 	struct byte_array suites_r;
 	struct byte_array g_y; /*ephemeral dh public key*/
@@ -99,6 +103,7 @@ struct edhoc_responder_context {
 	struct byte_array g_r; /* static DH pk -> use only with method 1 or 3*/
 	struct byte_array r; /* static DH sk -> use only with method 1 or 3*/
 	struct byte_array ead_2;
+	struct byte_array ead_4;
 	struct byte_array id_cred_r;
 	struct byte_array cred_r;
 	struct byte_array sk_r; /*sign key -use with method 0 and 2*/
@@ -107,6 +112,7 @@ struct edhoc_responder_context {
 };
 
 struct edhoc_initiator_context {
+	bool msg4; /*if true massage 4 will be send by the responder*/
 	struct c_x c_i; /*connection identifier of the initiator*/
 	enum method_type method;
 	//uint8_t corr;
@@ -158,7 +164,8 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 				     struct other_party_cred *cred_r_array,
 				     uint16_t num_cred_r, uint8_t *err_msg,
 				     uint32_t *err_msg_len, uint8_t *ead_2,
-				     uint64_t *ead_2_len, uint8_t *prk_4x3m,
+				     uint64_t *ead_2_len, uint8_t *ead_4,
+				     uint64_t *ead_4_len, uint8_t *prk_4x3m,
 				     uint8_t prk_4x3m_len, uint8_t *th4,
 				     uint8_t th4_len);
 

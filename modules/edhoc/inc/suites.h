@@ -68,13 +68,15 @@ enum edhoc_error get_suite(enum suite_label label, struct suite *suite);
  * 
  * 
  */
-enum edhoc_error get_hash_len(enum hash_alg alg, uint32_t *len);
+uint32_t get_hash_len(enum hash_alg alg);
 
 /**
  * 
  * 
  */
-enum edhoc_error get_mac_len(enum aead_alg alg, uint32_t *len);
+uint32_t get_mac_len(enum aead_alg alg);
 
+uint32_t get_aead_key_len(enum aead_alg alg);
+uint32_t get_aead_iv_len(enum aead_alg alg);
 
 #endif

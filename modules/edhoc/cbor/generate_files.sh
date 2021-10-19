@@ -83,5 +83,8 @@ python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c th.cddl code -e -t t
 #encode byte_string
 python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c primitive_types.cddl code -e -t bstr_type --oc encode_bstr_type.c --oh encode_bstr_type.h
 
+#decode byte_string
+python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c primitive_types.cddl code -d -t bstr_type --oc decode_bstr_type.c --oh decode_bstr_type.h
+
 #encode int
 python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c primitive_types.cddl code -e -t int_type --oc encode_int_type.c --oh encode_int_type.h

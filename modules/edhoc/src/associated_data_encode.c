@@ -15,7 +15,7 @@
 #include "../inc/print_util.h"
 #include "../inc/cose.h"
 
-enum edhoc_error a_Xae_encode(uint8_t *thX, const uint16_t thX_len,
+enum edhoc_error associated_data_encode(uint8_t *thX, const uint16_t thX_len,
 			      uint8_t *out, uint16_t *out_len)
 {
 	enum edhoc_error r;

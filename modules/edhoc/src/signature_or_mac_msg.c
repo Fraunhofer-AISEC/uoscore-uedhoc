@@ -24,30 +24,28 @@
 #include "../cbor/encode_sig_structure.h"
 #include "../cbor/encode_bstr_type.h"
 
-enum edhoc_error mac(
-	const uint8_t *prk, uint8_t prk_len,
-	const uint8_t *th, uint8_t th_len,
-	const uint8_t *id_cred, uint32_t id_cred_len, 
-	const uint8_t *cred, uint32_t cred_len, 
-	const uint8_t *ead, uint32_t ead_len,
-	const char *mac_label, bool static_dh, struct suite *suite, 
-	uint8_t *mac, uint32_t *mac_len)
+enum edhoc_error mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
+		     uint8_t th_len, const uint8_t *id_cred,
+		     uint32_t id_cred_len, const uint8_t *cred,
+		     uint32_t cred_len, const uint8_t *ead, uint32_t ead_len,
+		     const char *mac_label, bool static_dh, struct suite *suite,
+		     uint8_t *mac, uint32_t *mac_len)
 {
 	enum edhoc_error r;
-	uint32_t context_mac_len =
-		id_cred_len + cred_len + ead_len;
+	uint32_t context_mac_len = id_cred_len + cred_len + ead_len;
 	uint8_t context_mac[context_mac_len];
 	r = _memcpy_s(context_mac, sizeof(context_mac), id_cred, id_cred_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
-	r = _memcpy_s(context_mac + id_cred_len, sizeof(context_mac) - id_cred_len, cred, cred_len);
+	r = _memcpy_s(context_mac + id_cred_len,
+		      sizeof(context_mac) - id_cred_len, cred, cred_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 	r = _memcpy_s(context_mac + id_cred_len + cred_len,
-		      sizeof(context_mac) - id_cred_len - cred_len,
-		      ead, ead_len);
+		      sizeof(context_mac) - id_cred_len - cred_len, ead,
+		      ead_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
@@ -55,15 +53,10 @@ enum edhoc_error mac(
 	PRINT_ARRAY("MAC context", context_mac, context_mac_len);
 
 	if (static_dh) {
-		r = get_mac_len(suite->edhoc_aead, mac_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		*mac_len = get_mac_len(suite->edhoc_aead);
+
 	} else {
-		r = get_hash_len(suite->edhoc_hash, mac_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		*mac_len = get_hash_len(suite->edhoc_hash);
 	}
 
 	r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, mac_label,
@@ -76,8 +69,8 @@ enum edhoc_error mac(
 	return edhoc_no_error;
 }
 
-enum edhoc_error encode_byte_string(const uint8_t *in, const uint8_t in_len,
-				    uint8_t *out, uint16_t *out_len)
+enum edhoc_error encode_byte_string(const uint8_t *in, uint32_t in_len,
+				    uint8_t *out, uint64_t *out_len)
 {
 	bool ok;
 	size_t payload_len_out;
@@ -89,6 +82,27 @@ enum edhoc_error encode_byte_string(const uint8_t *in, const uint8_t in_len,
 		return cbor_encoding_error;
 	}
 	*out_len = payload_len_out;
+
+	return edhoc_no_error;
+}
+
+enum edhoc_error decode_byte_string(const uint8_t *in, const uint32_t in_len,
+				    uint8_t *out, uint32_t *out_len)
+{
+	bool ok;
+	cbor_string_type_t str;
+	size_t decode_len = 0;
+	enum edhoc_error r;
+
+	ok = cbor_decode_bstr_type_b_str(in, in_len, &str, &decode_len);
+	if (!ok) {
+		return cbor_decoding_error;
+	}
+	r = _memcpy_s(out, *out_len, str.value, str.len);
+	if (r != edhoc_no_error) {
+		return r;
+	}
+	*out_len = str.len;
 
 	return edhoc_no_error;
 }
