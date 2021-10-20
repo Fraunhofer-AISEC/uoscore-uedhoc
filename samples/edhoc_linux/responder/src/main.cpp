@@ -35,7 +35,7 @@ char buffer[MAXLINE];
 CoapPDU *recvPDU;
 
 /*comment this out to use DH keys from the test vectors*/
-//#define USE_RANDOM_EPHEMERAL_DH_KEY
+#define USE_RANDOM_EPHEMERAL_DH_KEY
 
 #ifdef USE_IPV6
 struct sockaddr_in6 client_addr;
@@ -222,51 +222,34 @@ int main()
 	uint32_t seed;
 	uint8_t G_Y_random[32];
 	uint8_t Y_random[32];
-
-	/*create a random seed*/
-	FILE *fp;
-	fp = fopen("/dev/urandom", "r");
-	uint64_t seed_len = fread((uint8_t *)&seed, 1, sizeof(seed), fp);
-	fclose(fp);
-	PRINT_ARRAY("seed", (uint8_t *)&seed, seed_len);
-
-	/*create ephemeral DH keys from seed*/
-	r = ephemeral_dh_key_gen(X25519, seed, Y_random, G_Y_random);
-	if (r != edhoc_no_error) {
-		printf("Error in ephemeral_dh_key_gen, (Error code %d)\n", r);
-	}
-	PRINT_ARRAY("secret ephemeral DH key", Y_random, sizeof(Y_random));
-	PRINT_ARRAY("public ephemeral DH key", G_Y_random, sizeof(G_Y_random));
+	c_r.g_y.ptr = G_Y_random;
+	c_r.g_y.len = sizeof(G_Y_random);
+	c_r.y.ptr = Y_random;
+	c_r.y.len = sizeof(Y_random);
 #endif
-
-	// 	struct other_party_cred cred_i = { { ID_CRED_I_LEN, ID_CRED_I },
-	// 					   { CRED_I_LEN, CRED_I },
-	// 					   { PK_I_LEN, PK_I },
-	// 					   { G_I_LEN, G_I },
-	// 					   { CA_LEN, CA },
-	// 					   { CA_PK_LEN, CA_PK } };
-	// 	uint16_t cred_num = 1;
-	// 	struct edhoc_responder_context c_r = { { SUITES_R_LEN, SUITES_R },
-	// #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
-	// 					       { sizeof(G_Y_random),
-	// 						 G_Y_random },
-	// 					       { sizeof(Y_random), Y_random },
-	// #else
-	// 					       { G_Y_LEN, G_Y },
-	// 					       { Y_LEN, Y },
-	// #endif
-	// 					       { C_R_LEN, C_R },
-	// 					       { G_R_LEN, G_R },
-	// 					       { R_LEN, R },
-	// 					       { AD_2_LEN, AD_2 },
-	// 					       { ID_CRED_R_LEN, ID_CRED_R },
-	// 					       { CRED_R_LEN, CRED_R },
-	// 					       { SK_R_LEN, SK_R },
-	// 					       { PK_R_LEN, PK_R } };
 
 	start_coap_server();
 
 	while (1) {
+#ifdef USE_RANDOM_EPHEMERAL_DH_KEY
+		/*create ephemeral DH keys from seed*/
+		/*create a random seed*/
+		FILE *fp;
+		fp = fopen("/dev/urandom", "r");
+		uint64_t seed_len =
+			fread((uint8_t *)&seed, 1, sizeof(seed), fp);
+		fclose(fp);
+		PRINT_ARRAY("seed", (uint8_t *)&seed, seed_len);
+
+		r = ephemeral_dh_key_gen(X25519, seed, Y_random, G_Y_random);
+		if (r != edhoc_no_error) {
+			printf("Error in ephemeral_dh_key_gen, (Error code %d)\n",
+			       r);
+		}
+		PRINT_ARRAY("secret ephemeral DH key", c_r.g_y.ptr,
+			    c_r.g_y.len);
+		PRINT_ARRAY("public ephemeral DH key", c_r.y.ptr, c_r.y.len);
+#endif
 		r = edhoc_responder_run(&c_r, &cred_i, cred_num, err_msg,
 					&err_msg_len, (uint8_t *)&ad_1,
 					&ad_1_len, (uint8_t *)&ad_3, &ad_3_len,

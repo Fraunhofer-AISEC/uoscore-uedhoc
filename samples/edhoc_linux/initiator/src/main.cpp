@@ -29,7 +29,7 @@ extern "C" {
 #define USE_IPV4
 
 /*comment this out to use DH keys from the test vectors*/
-//#define USE_RANDOM_EPHEMERAL_DH_KEY
+#define USE_RANDOM_EPHEMERAL_DH_KEY
 
 /**
  * @brief	Initializes sockets for CoAP client.
@@ -193,37 +193,14 @@ int main()
 	if (r != edhoc_no_error) {
 		printf("Error in ephemeral_dh_key_gen, (Error code %d)\n", r);
 	}
-	PRINT_ARRAY("secret ephemeral DH key", X_random, sizeof(X_random));
-	PRINT_ARRAY("public ephemeral DH key", G_X_random, sizeof(G_X_random));
-#endif
+	c_i.g_x.ptr = G_X_random;
+	c_i.g_x.len = sizeof(G_X_random);
+	c_i.x.ptr = X_random;
+	c_i.x.len = sizeof(X_random);
+	PRINT_ARRAY("secret ephemeral DH key", c_i.g_x.ptr, c_i.g_x.len);
+	PRINT_ARRAY("public ephemeral DH key", c_i.x.ptr, c_i.x.len);
 
-	// 	struct other_party_cred cred_r = { { ID_CRED_R_LEN, ID_CRED_R },
-	// 					   { CRED_R_LEN, CRED_R },
-	// 					   { PK_R_LEN, PK_R },
-	// 					   { G_R_LEN, G_R },
-	// 					   { CA_LEN, CA },
-	// 					   { CA_PK_LEN, CA_PK } };
-	// 	uint16_t cred_num = 1;
-	// 	struct edhoc_initiator_context c_i = { METHOD_TYPE,
-	// 					       CORR,
-	// 					       { SUITES_I_LEN, SUITES_I },
-	// 					       { C_I_LEN, C_I },
-	// 					       { AD_1_LEN, AD_1 },
-	// 					       { AD_3_LEN, AD_3 },
-	// 					       { ID_CRED_I_LEN, ID_CRED_I },
-	// 					       { CRED_I_LEN, CRED_I },
-	// #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
-	// 					       { sizeof(G_X_random),
-	// 						 G_X_random },
-	// 					       { sizeof(X_random), X_random },
-	// #else
-	// 					       { G_X_LEN, G_X },
-	// 					       { X_LEN, X },
-	// #endif
-	// 					       { G_I_LEN, G_I },
-	// 					       { I_LEN, I },
-	// 					       { SK_I_LEN, SK_I },
-	// 					       { PK_I_LEN, PK_I } };
+#endif
 
 	err = start_coap_client();
 	if (err != 0) {
