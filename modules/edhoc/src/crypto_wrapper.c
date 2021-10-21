@@ -274,42 +274,41 @@ shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
 		// 	}
 	}
 #endif
-		return edhoc_no_error;
-	}
+	return edhoc_no_error;
+}
 
-	enum edhoc_error __attribute__((weak))
-	ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t * sk,
-			     uint8_t * pk)
-	{
-		uint8_t extended_seed[32];
-		if (curve == X25519) {
+enum edhoc_error __attribute__((weak))
+ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
+		     uint8_t *pk)
+{
+	uint8_t extended_seed[32];
+	if (curve == X25519) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
-			struct tc_sha256_state_struct s;
-			tc_sha256_init(&s);
-			tc_sha256_update(&s, (uint8_t *)&seed, sizeof(seed));
-			tc_sha256_final(extended_seed, &s);
+		struct tc_sha256_state_struct s;
+		tc_sha256_init(&s);
+		tc_sha256_update(&s, (uint8_t *)&seed, sizeof(seed));
+		tc_sha256_final(extended_seed, &s);
 
-			compact_x25519_keygen(sk, pk, extended_seed);
+		compact_x25519_keygen(sk, pk, extended_seed);
 #endif
-		} else {
-			return unsupported_ecdh_curve;
-		}
-		return edhoc_no_error;
+	} else {
+		return unsupported_ecdh_curve;
 	}
+	return edhoc_no_error;
+}
 
-	enum edhoc_error __attribute__((weak))
-	hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
-	     uint8_t *out)
-	{
-		/*all currently prosed suites use sha256*/
-		if (alg == SHA_256) {
+enum edhoc_error __attribute__((weak))
+hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
+{
+	/*all currently prosed suites use sha256*/
+	if (alg == SHA_256) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
-			struct tc_sha256_state_struct s;
-			tc_sha256_init(&s);
-			tc_sha256_update(&s, in, in_len);
-			tc_sha256_final(out, &s);
+		struct tc_sha256_state_struct s;
+		tc_sha256_init(&s);
+		tc_sha256_update(&s, in, in_len);
+		tc_sha256_final(out, &s);
 #endif
-		}
-
-		return edhoc_no_error;
 	}
+
+	return edhoc_no_error;
+}

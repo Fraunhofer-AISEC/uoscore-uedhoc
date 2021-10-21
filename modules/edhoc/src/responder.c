@@ -27,6 +27,7 @@
 #include "../inc/th.h"
 #include "../inc/txrx_wrapper.h"
 #include "../inc/ciphertext.h"
+#include "../inc/suites.h"
 #include "../cbor/decode_message_1.h"
 #include "../cbor/encode_message_2.h"
 #include "../cbor/decode_bstr_type.h"
@@ -134,59 +135,7 @@ static inline bool selected_suite_is_supported(uint8_t selected,
 	return false;
 }
 
-/**
- * @brief   Parses message 3
- * @param   corr correlation parameter
- * @param   msg3 buffer containing message 3
- * @param   msg3_len length of msg3
- * @param   c_r connection identifier of the responder
- * @param   c_r_len length of c_r
- * @param   ciphertext_3 ciphertext 3
- * @param   ciphertext_3_len length of ciphertext_3
- */
-// static inline enum edhoc_error
-// msg3_parse(uint8_t corr, uint8_t *msg3, uint16_t msg3_len, uint8_t *c_r,
-// 	   uint64_t *c_r_len, uint8_t *ciphertext_3, uint64_t *ciphertext_3_len)
-// {
-// 	enum edhoc_error r;
-// 	bool ok;
-// 	struct m3 m;
-// 	size_t decode_len = 0;
 
-// 	ok = cbor_decode_m3(msg3, msg3_len, &m, &decode_len);
-// 	if (!ok) {
-// 		return cbor_decoding_error;
-// 	}
-
-// 	if (corr != 2 && corr != 3) {
-// 		/*C_R is present*/
-// 		if (*c_r_len == 1) {
-// 			/*C_R is encoded as int*/
-// 			c_r[0] = m._m3_C_R._m3_C_R_int;
-// 		} else {
-// 			r = _memcpy_s(c_r, *c_r_len,
-// 				      m._m3_C_R._m3_C_R_bstr.value,
-// 				      m._m3_C_R._m3_C_R_bstr.len);
-// 			if (r != edhoc_no_error) {
-// 				return r;
-// 			}
-
-// 			*c_r_len = m._m3_C_R._m3_C_R_bstr.len;
-// 		}
-// 		PRINT_ARRAY("msg3 C_R", c_r, *c_r_len);
-// 	}
-
-// 	r = _memcpy_s(ciphertext_3, *ciphertext_3_len, m._m3_CIPHERTEXT_3.value,
-// 		      m._m3_CIPHERTEXT_3.len);
-// 	if (r != edhoc_no_error) {
-// 		return r;
-// 	}
-
-// 	*ciphertext_3_len = m._m3_CIPHERTEXT_3.len;
-
-// 	PRINT_ARRAY("msg3 CIPHERTEXT_3", ciphertext_3, *ciphertext_3_len);
-// 	return edhoc_no_error;
-// };
 
 /**
  * @brief   Encodes message 2
@@ -304,13 +253,6 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	/******************* create and send message 2*************************/
 
 	uint8_t th2[SHA_DEFAULT_SIZE];
-	//uint64_t tmp_c_i_len;
-	// if ((corr == 1) || (corr = 3)) {
-	// 	tmp_c_i_len = 0;
-	// } else {
-	// 	tmp_c_i_len = c_i_len;
-	// }
-
 	r = th2_calculate(suite.edhoc_hash, msg1, msg1_len, c->g_y.ptr,
 			  c->g_y.len, &c->c_r, th2);
 	if (r != edhoc_no_error) {
@@ -343,82 +285,29 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	}
 	PRINT_ARRAY("prk_3e2m", PRK_3e2m, sizeof(PRK_3e2m));
 
-	/*calculate MAC_2*/
-	uint32_t mac_2_len;
-	uint8_t mac_2[SHA_DEFAULT_SIZE];
-	r = mac(PRK_3e2m, sizeof(PRK_3e2m), th2, sizeof(th2), c->id_cred_r.ptr,
-		c->id_cred_r.len, c->cred_r.ptr, c->cred_r.len, c->ead_2.ptr,
-		c->ead_2.len, "MAC_2", static_dh_r, &suite, mac_2, &mac_2_len);
+	/*compute signature_or_MAC_2*/
+	uint32_t sign_or_mac_2_len = get_signature_len(suite.edhoc_sign_curve);
+	uint8_t sign_or_mac_2[sign_or_mac_2_len];
+	r = signature_or_mac(GENERATE, static_dh_r, &suite, c->sk_r.ptr,
+			     c->sk_r.len, c->pk_r.ptr, c->pk_r.len, PRK_3e2m,
+			     sizeof(PRK_3e2m), th2, sizeof(th2),
+			     c->id_cred_r.ptr, c->id_cred_r.len, c->cred_r.ptr,
+			     c->cred_r.len, c->ead_2.ptr, c->ead_2.len, "MAC_2",
+			     sign_or_mac_2, &sign_or_mac_2_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	uint8_t *sign_or_mac_2 = mac_2;
-	uint32_t sign_or_mac_2_len = mac_2_len;
-
-	// uint8_t m_2[A_2M_DEFAULT_SIZE];
-	// uint16_t m_2_len = sizeof(m_2);
-	// uint8_t sign_or_mac_2[64];
-	// uint32_t sign_or_mac_2_len = sizeof(sign_or_mac_2);
-
-	//PRINT_ARRAY("CRED_R", c->cred_r.ptr, c->cred_r.len);
-
-	// r = signature_or_mac_msg_create(
-	// 	static_dh_r, suite, "K_2m", "IV_2m", (uint8_t *)&PRK_3e2m,
-	// 	sizeof(PRK_3e2m), (uint8_t *)&th2, sizeof(th2),
-	// 	c->id_cred_r.ptr, c->id_cred_r.len, c->cred_r.ptr,
-	// 	c->cred_r.len, c->ead_2.ptr, c->ead_2.len, m_2, &m_2_len,
-	// 	sign_or_mac_2, (uint8_t *)&sign_or_mac_2_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-
-	// /*Signature_or_mac_2*/
-	// if (!static_dh_r) {
-	// 	/*Calculate a signature*/
-	// 	sign_or_mac_2_len = 64;
-	// 	r = sign(suite.edhoc_sign_curve, c->sk_r.ptr, c->sk_r.len,
-	// 		 c->pk_r.ptr, c->pk_r.len, m_2, m_2_len, sign_or_mac_2,
-	// 		 &sign_or_mac_2_len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	PRINT_ARRAY("Signature_or_MAC_2", sign_or_mac_2,
-	// 		    sign_or_mac_2_len);
-	// }
-
-	/*Calculate PLAINTEXT_2*/
-	uint16_t PLAINTEXT_2_len =
-		c->id_cred_r.len + sign_or_mac_2_len + 2 + c->ead_2.len;
-	uint8_t PLAINTEXT_2[PLAINTEXT_2_len];
-
-	PRINT_ARRAY("ID_CRED_R", c->id_cred_r.ptr, c->id_cred_r.len);
-	r = plaintext_encode(c->id_cred_r.ptr, c->id_cred_r.len, sign_or_mac_2,
-			     sign_or_mac_2_len, c->ead_2.ptr, c->ead_2.len,
-			     PLAINTEXT_2, &PLAINTEXT_2_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("PLAINTEXT_2", PLAINTEXT_2, PLAINTEXT_2_len);
-
-	/*Calculate KEYSTREAM_2*/
-	uint8_t KEYSTREAM_2[PLAINTEXT_2_len];
-	r = okm_calc(suite.edhoc_hash, (uint8_t *)&PRK_2e, sizeof(PRK_2e),
-		     (uint8_t *)&th2, sizeof(th2), "KEYSTREAM_2", NULL, 0,
-		     KEYSTREAM_2, sizeof(KEYSTREAM_2));
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
-
-	/*Ciphertext 2 calculate*/
-	uint8_t ciphertext_2[PLAINTEXT_2_len];
+	/*compute ciphertext_2*/
+	uint8_t ciphertext_2[CIPHERTEXT2_DEFAULT_SIZE];
 	uint32_t ciphertext_2_len = sizeof(ciphertext_2);
-
-	for (uint16_t i = 0; i < ciphertext_2_len; i++) {
-		ciphertext_2[i] = PLAINTEXT_2[i] ^ KEYSTREAM_2[i];
+	r = ciphertext_gen(CIPHERTEXT2, suite.edhoc_hash, c->id_cred_r.ptr,
+			   c->id_cred_r.len, sign_or_mac_2, sign_or_mac_2_len,
+			   c->ead_2.ptr, c->ead_2.len, PRK_2e, sizeof(PRK_2e),
+			   th2, sizeof(th2), ciphertext_2, &ciphertext_2_len);
+	if (r != edhoc_no_error) {
+		return r;
 	}
-	PRINT_ARRAY("ciphertext_2", ciphertext_2, ciphertext_2_len);
 
 	/*message 2 create and send*/
 	uint8_t msg2[MSG_2_DEFAULT_SIZE];
@@ -433,7 +322,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		return r;
 	}
 
-	// /********message 3 receive and process******************************/
+	/********message 3 receive and process*********************************/
 	uint8_t msg3[MSG_3_DEFAULT_SIZE];
 	uint32_t msg3_len = sizeof(msg3);
 	r = rx(msg3, &msg3_len);
@@ -441,8 +330,6 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		return r;
 	}
 
-	//uint8_t c_r[c->c_r.len];
-	//uint64_t c_r_len = sizeof(c_r);
 	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
 	uint32_t ciphertext_3_len = sizeof(ciphertext_3);
 
@@ -470,72 +357,20 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		return r;
 	}
 
-	uint8_t K_3[AEAD_KEY_DEFAULT_SIZE];
-	uint8_t IV_3[AEAD_IV_DEFAULT_SIZE];
-
-	/*Calculate K_3*/
-	r = okm_calc(suite.edhoc_hash, PRK_3e2m, sizeof(PRK_3e2m),
-		     (uint8_t *)&th3, sizeof(th3), "K_3", NULL, 0, K_3,
-		     sizeof(K_3));
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("K_3", K_3, sizeof(K_3));
-
-	/*Calculate IV_3*/
-	r = okm_calc(suite.edhoc_hash, PRK_3e2m, sizeof(PRK_3e2m),
-		     (uint8_t *)&th3, sizeof(th3), "IV_3", NULL, 0, IV_3,
-		     sizeof(IV_3));
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("IV_3", IV_3, sizeof(IV_3));
-
-	/*Associated data A_3ae*/
-	uint8_t A_3ae[ASSOCIATED_DATA_DEFAULT_SIZE];
-	uint16_t A_3ae_len = sizeof(A_3ae);
-	r = associated_data_encode(th3, sizeof(th3), (uint8_t *)&A_3ae,
-				   &A_3ae_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-
-	uint8_t tag[16];
-	uint8_t mac_len = 8;
-	//todo move that to a separate function
-	if (suite.edhoc_aead == AES_CCM_16_128_128) {
-		mac_len = 16;
-	}
-	uint8_t P_3ae[ciphertext_3_len - mac_len];
-	//memcpy(tag, &ciphertext_3[ciphertext_3_len - mac_len], mac_len);
-	r = _memcpy_s(tag, sizeof(tag),
-		      &ciphertext_3[ciphertext_3_len - mac_len], mac_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	r = aead(DECRYPT, ciphertext_3, ciphertext_3_len, K_3, sizeof(K_3),
-		 IV_3, sizeof(IV_3), A_3ae, A_3ae_len, P_3ae, sizeof(P_3ae),
-		 tag, mac_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("P_3ae", P_3ae, sizeof(P_3ae));
-
 	uint8_t id_cred_i[ID_CRED_DEFAULT_SIZE];
 	uint32_t id_cred_i_len = sizeof(id_cred_i);
 	uint8_t sign_or_mac[SGN_OR_MAC_DEFAULT_SIZE];
 	uint32_t sign_or_mac_len = sizeof(sign_or_mac);
-	r = plaintext_split(P_3ae, sizeof(P_3ae), id_cred_i, &id_cred_i_len,
-			    sign_or_mac, &sign_or_mac_len, ead_3, ead_3_len);
+	r = ciphertext_decrypt_split(CIPHERTEXT3, &suite, PRK_3e2m,
+				     sizeof(PRK_3e2m), th3, sizeof(th3),
+				     ciphertext_3, ciphertext_3_len, id_cred_i,
+				     &id_cred_i_len, sign_or_mac,
+				     &sign_or_mac_len, ead_3,
+				     (uint32_t *)ead_3_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	PRINT_ARRAY("ID_CRED_I", id_cred_i, id_cred_i_len);
-	PRINT_ARRAY("sign_or_mac", sign_or_mac, sign_or_mac_len);
-	if (*ead_3_len) {
-		PRINT_ARRAY("ead_3", ead_3, *ead_3_len);
-	}
 
 	/*check the authenticity of the initiator*/
 	uint8_t cred_i[CRED_DEFAULT_SIZE];
@@ -564,57 +399,16 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	}
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
-	//uint8_t m_3[A_2M_DEFAULT_SIZE];
-	//uint16_t m_3_len = sizeof(m_3);
-	uint8_t mac_3[16];
-	uint32_t mac_3_len = sizeof(mac_3);
-	// r = signature_or_mac_msg_create(static_dh_i, suite, "K_3m", "IV_3m",
-	// 				prk_4x3m, prk_4x3m_len, (uint8_t *)&th3,
-	// 				sizeof(th3), id_cred_i, id_cred_i_len,
-	// 				cred_i, cred_i_len, ead_3, *ead_3_len,
-	// 				m_3, &m_3_len, mac_3, &mac_3_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-
-	r = mac(prk_4x3m, prk_4x3m_len, th3, sizeof(th3), id_cred_i,
-		id_cred_i_len, cred_i, cred_i_len, ead_3, *ead_3_len, "MAC_3",
-		static_dh_r, &suite, mac_3, &mac_3_len);
+	r = signature_or_mac(VERIFY, static_dh_i, &suite, NULL, 0, pk, pk_len,
+			     prk_4x3m, prk_4x3m_len, th3, sizeof(th3),
+			     id_cred_i, id_cred_i_len, cred_i, cred_i_len,
+			     ead_3, *(uint32_t *)ead_3_len, "MAC_3",
+			     sign_or_mac, &sign_or_mac_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	if (static_dh_i) {
-		/*check inner mac MAC_3*/
-		if (0 != memcmp(mac_3, sign_or_mac, mac_3_len)) {
-			PRINT_MSG("Initiator authentication failed!");
-			// r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,
-			// 	       NULL, 0);
-			// if (r != edhoc_no_error) {
-			// 	return r;
-			// }
-			return responder_authentication_failed;
-		} else {
-			PRINT_MSG("Initiator authentication ok!\n");
-		}
-	} else {
-		// /*the initiator authenticates with a signature*/
-		// bool verified = false;
-		// r = verify(suite.edhoc_sign_curve, pk, pk_len, (uint8_t *)&m_3,
-		// 	   m_3_len, (uint8_t *)&sign_or_mac, sign_or_mac_len,
-		// 	   &verified);
-		// if (verified) {
-		// 	PRINT_MSG("Initiator authentication okful!\n");
-		// } else {
-		// 	PRINT_MSG("Initiator authentication failed!\n");
-		// 	r = tx_err_msg(RESPONDER, corr, c_i, c_i_len, NULL, 0,
-		// 		       NULL, 0);
-		// 	if (r != edhoc_no_error) {
-		// 		return r;
-		// 	}
-		// 	return responder_authentication_failed;
-		// }
-	}
+
 
 	/*TH4*/
 	r = th4_calculate(suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
@@ -626,7 +420,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	/******************************create and send msg4********************/
 	if (c->msg4) {
 		/*Ciphertext 4 calculate*/
-		uint8_t ciphertext_4[PLAINTEXT_2_len];
+		uint8_t ciphertext_4[CIPHERTEXT4_DEFAULT_SIZE];
 		uint32_t ciphertext_4_len = sizeof(ciphertext_4);
 		uint8_t msg4[MSG_4_DEFAULT_SIZE];
 		uint64_t msg4_len = sizeof(msg2);

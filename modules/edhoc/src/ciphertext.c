@@ -146,8 +146,10 @@ enum edhoc_error ciphertext_decrypt_split(
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
 	uint32_t tag_len = get_mac_len(suite->edhoc_aead);
-	//uint8_t tag[tag_len];
-	uint32_t plaintext_len = ciphertext_len - tag_len;
+	uint32_t plaintext_len = ciphertext_len;
+	if (ctxt != CIPHERTEXT2) {
+		plaintext_len -= tag_len;
+	}
 	uint8_t plaintext[plaintext_len];
 	r = ciphertext_encrypt_decrypt(ctxt, DECRYPT, ciphertext,
 				       ciphertext_len, key, key_len, iv, iv_len,
@@ -158,13 +160,15 @@ enum edhoc_error ciphertext_decrypt_split(
 		return r;
 	}
 
+	PRINT_ARRAY("plaintext", plaintext, plaintext_len);
+
 	if (ctxt == CIPHERTEXT4 && plaintext_len != 0) {
 		r = decode_byte_string(plaintext, plaintext_len, ead, ead_len);
 		;
 		if (r != edhoc_no_error) {
 			return r;
 		}
-		PRINT_ARRAY("EAD_4", ead, ead_len);
+		PRINT_ARRAY("EAD_4", ead, *ead_len);
 	} else if (ctxt == CIPHERTEXT4 && plaintext_len == 0) {
 		ead = NULL;
 		*ead_len = 0;
@@ -175,6 +179,12 @@ enum edhoc_error ciphertext_decrypt_split(
 				    signature_or_mac_len, ead, ead_len);
 		if (r != edhoc_no_error) {
 			return r;
+		}
+		PRINT_ARRAY("ID_CRED", id_cred, *id_cred_len);
+		PRINT_ARRAY("sign_or_mac", signature_or_mac,
+			    *signature_or_mac_len);
+		if (*ead_len) {
+			PRINT_ARRAY("ead", ead, *ead_len);
 		}
 	}
 
@@ -188,6 +198,7 @@ enum edhoc_error ciphertext_decrypt_split(
  * @param
  * 
  */
+//todo refactore this function simalar to ciphertext_decrypt_split
 enum edhoc_error ciphertext_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
 				uint8_t *id_cred, uint32_t id_cred_len,
 				uint8_t *signature_or_mac,

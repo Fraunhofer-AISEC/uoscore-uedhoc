@@ -184,7 +184,7 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 
 	byte_array_init(bufs->id_cred, sizeof(bufs->id_cred), &c->id_cred);
 	byte_array_init(bufs->cred, sizeof(bufs->cred), &c->cred);
-	// byte_array_init(bufs->pk, sizeof(bufs->pk), &c->pk);
+	byte_array_init(bufs->pk, sizeof(bufs->pk), &c->pk);
 	byte_array_init(bufs->g, sizeof(bufs->g), &c->g);
 	// byte_array_init(bufs->ca, sizeof(bufs->ca), &c->ca);
 	// byte_array_init(bufs->ca_pk, sizeof(bufs->ca_pk), &c->ca_pk);
@@ -194,11 +194,13 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 			    &c->id_cred);
 		get_element(test_vec_buf, t, r, "cred_i", vec_num, &c->cred);
 		get_element(test_vec_buf, t, r, "g_i_raw", vec_num, &c->g);
+		get_element(test_vec_buf, t, r, "pk_i_raw", vec_num, &c->pk);
 	} else {
 		get_element(test_vec_buf, t, r, "id_cred_r", vec_num,
 			    &c->id_cred);
 		get_element(test_vec_buf, t, r, "cred_r", vec_num, &c->cred);
 		get_element(test_vec_buf, t, r, "g_r_raw", vec_num, &c->g);
+		get_element(test_vec_buf, t, r, "pk_r_raw", vec_num, &c->pk);
 	}
 
 	return 0;
@@ -237,6 +239,8 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	byte_array_init(bufs->x, sizeof(bufs->x), &c->x);
 	byte_array_init(bufs->g_i, sizeof(bufs->g_i), &c->g_i);
 	byte_array_init(bufs->i, sizeof(bufs->i), &c->i);
+	byte_array_init(bufs->pk_i, sizeof(bufs->pk_i), &c->pk_i);
+	byte_array_init(bufs->sk_i, sizeof(bufs->sk_i), &c->sk_i);
 
 	get_element(test_vec_buf, t, r, "method", vec_num, &method);
 	c->method = method_buf[0];
@@ -249,6 +253,8 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	get_element(test_vec_buf, t, r, "x_raw", vec_num, &c->x);
 	get_element(test_vec_buf, t, r, "g_i_raw", vec_num, &c->g_i);
 	get_element(test_vec_buf, t, r, "i_raw", vec_num, &c->i);
+	get_element(test_vec_buf, t, r, "pk_i_raw", vec_num, &c->pk_i);
+	get_element(test_vec_buf, t, r, "sk_i_raw", vec_num, &c->sk_i);
 
 	return get_C_X_decode(C_I, vec_num, test_vec_buf, r, t, bufs->c_i,
 			      sizeof(bufs->c_i), &c->c_i);
@@ -277,7 +283,6 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	byte_array_init(bufs->suites_r, sizeof(bufs->suites_r), &c->suites_r);
 	byte_array_init(bufs->g_y, sizeof(bufs->g_y), &c->g_y);
 	byte_array_init(bufs->y, sizeof(bufs->y), &c->y);
-	//byte_array_init(bufs->c_r, sizeof(bufs->c_r), &c->c_r);
 	byte_array_init(bufs->g_r, sizeof(bufs->g_r), &c->g_r);
 	byte_array_init(bufs->r, sizeof(bufs->r), &c->r);
 	byte_array_init(bufs->ead_2, sizeof(bufs->ead_2), &c->ead_2);
@@ -285,6 +290,8 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	byte_array_init(bufs->id_cred_r, sizeof(bufs->id_cred_r),
 			&c->id_cred_r);
 	byte_array_init(bufs->cred_r, sizeof(bufs->cred_r), &c->cred_r);
+	byte_array_init(bufs->sk_r, sizeof(bufs->sk_r), &c->sk_r);
+	byte_array_init(bufs->pk_r, sizeof(bufs->pk_r), &c->pk_r);
 
 	get_element(test_vec_buf, t, r, "suites_r", vec_num, &c->suites_r);
 	get_element(test_vec_buf, t, r, "ead_2", vec_num, &c->ead_2);
@@ -295,7 +302,8 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	get_element(test_vec_buf, t, r, "y_raw", vec_num, &c->y);
 	get_element(test_vec_buf, t, r, "g_r_raw", vec_num, &c->g_r);
 	get_element(test_vec_buf, t, r, "r_raw", vec_num, &c->r);
-	//get_element(test_vec_buf, t, r, "sk_i", vec_num, &c->sk_i);
+	get_element(test_vec_buf, t, r, "sk_r_raw", vec_num, &c->sk_r);
+	get_element(test_vec_buf, t, r, "pk_r_raw", vec_num, &c->pk_r);
 
 	return get_C_X_decode(C_R, vec_num, test_vec_buf, r, t, bufs->c_r,
 			      sizeof(bufs->c_r), &c->c_r);

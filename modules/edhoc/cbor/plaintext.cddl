@@ -18,7 +18,7 @@ map = {
 ;	? x5bag: 32 => bstr,
 	? x5chain: 33 => bstr, 
 	? x5t: 34 => [int, bstr], 
-;	? x5u: 35 => bstr, 
+	? x5u: 35 => bstr, 
 }
 
 ;map and id_cred_x_map are identical. 
@@ -28,7 +28,7 @@ id_cred_x_map = {
 ;	? x5bag: 32 => bstr,
 	? x5chain: 33 => bstr, 
 	? x5t: 34 => [int, bstr], 
-;	? x5u: 35 => bstr, 
+	? x5u: 35 => bstr, 
 }
 
 

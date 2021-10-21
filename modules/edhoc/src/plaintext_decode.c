@@ -41,6 +41,7 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 	map._id_cred_x_map_kid_present = 0;
 	map._id_cred_x_map_x5chain_present = 0;
 	map._id_cred_x_map_x5t_present = 0;
+	map._id_cred_x_map_x5u_present = 0;
 
 	switch (label) {
 	case kid:

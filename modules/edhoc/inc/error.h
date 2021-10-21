@@ -33,19 +33,21 @@ enum edhoc_error {
 	unsupported_aead_algorithm = 10,
 	unsupported_hash_algorithm = 11,
 
-	responder_authentication_failed = 12,
-	aead_authentication_failed = 13,
-	certificate_authentication_failed = 14,
+	responder_authentication_failed = 12, /*todo remove this eventually*/
+	signature_authentication_failed = 13,
+	mac_authentication_failed = 14,
+	aead_authentication_failed = 15,
+	certificate_authentication_failed = 16,
 
-	credential_not_found = 15,
-	no_such_ca = 16,
+	credential_not_found = 17,
+	no_such_ca = 18,
 
-	message_buff_to_small = 17,
-	dest_buffer_to_small = 18,
+	message_buff_to_small = 19,
+	dest_buffer_to_small = 20,
 
-	cbor_encoding_error = 19,
-	cbor_decoding_error = 20,
-	suites_i_list_to_long = 21,
+	cbor_encoding_error = 21,
+	cbor_decoding_error = 22,
+	suites_i_list_to_long = 23,
 
 };
 

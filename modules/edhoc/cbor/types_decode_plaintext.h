@@ -28,6 +28,10 @@ struct map_x5t_ {
 	cbor_string_type_t _map_x5t_bstr;
 };
 
+struct map_x5u {
+ 	cbor_string_type_t _map_x5u;
+};
+
 struct map {
  	struct map_kid _map_kid;
 	uint32_t _map_kid_present;
@@ -35,6 +39,8 @@ struct map {
 	uint32_t _map_x5chain_present;
 	struct map_x5t_ _map_x5t;
 	uint32_t _map_x5t_present;
+	struct map_x5u _map_x5u;
+	uint32_t _map_x5u_present;
 };
 
 struct plaintext {

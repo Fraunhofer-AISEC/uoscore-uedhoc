@@ -28,6 +28,10 @@ struct id_cred_x_map_x5t_ {
 	cbor_string_type_t _id_cred_x_map_x5t_bstr;
 };
 
+struct id_cred_x_map_x5u {
+ 	cbor_string_type_t _id_cred_x_map_x5u;
+};
+
 struct id_cred_x_map {
  	struct id_cred_x_map_kid _id_cred_x_map_kid;
 	uint32_t _id_cred_x_map_kid_present;
@@ -35,6 +39,8 @@ struct id_cred_x_map {
 	uint32_t _id_cred_x_map_x5chain_present;
 	struct id_cred_x_map_x5t_ _id_cred_x_map_x5t;
 	uint32_t _id_cred_x_map_x5t_present;
+	struct id_cred_x_map_x5u _id_cred_x_map_x5u;
+	uint32_t _id_cred_x_map_x5u_present;
 };
 
 

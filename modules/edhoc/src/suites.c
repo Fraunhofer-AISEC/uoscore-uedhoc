@@ -106,3 +106,14 @@ uint32_t get_aead_iv_len(enum aead_alg alg)
 	}
 	return 0;
 }
+
+uint32_t get_signature_len(enum sign_alg_curve alg)
+{
+	switch (alg) {
+	case Ed25519_SIGN:
+	case P_256_SIGN:
+		return 64;
+		break;
+	}
+	return 0;
+}

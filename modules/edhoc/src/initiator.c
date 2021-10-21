@@ -76,7 +76,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 		if (r != edhoc_no_error) {
 			return r;
 		}
-		PRINTF("C_R is an int: %d", c_r->mem.c_x_int);
+		PRINTF("C_R is an int: %d\n", c_r->mem.c_x_int);
 	} else {
 		r = c_x_set(BSTR, m._m2_C_R_bstr.value, m._m2_C_R_bstr.len, 0,
 			    c_r);
@@ -137,7 +137,7 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 		/* ead_1 unprotected opaque auxiliary data */
 		m1._message_1_ead_1.value = c->ead_1.ptr;
 		m1._message_1_ead_1.len = c->ead_1.len;
-		m1._message_1_ead_1_present = c->ead_1.len;
+		m1._message_1_ead_1_present = true;
 	} else {
 		m1._message_1_ead_1_present = 0;
 	}
@@ -166,14 +166,13 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	enum edhoc_error r;
 
 	struct suite suite;
-	bool auth_method_static_dh_i = false, static_dh_r = false;
+	bool static_dh_i = false, static_dh_r = false;
 	r = get_suite((enum suite_label)c->suites_i.ptr[0], &suite);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	authentication_type_get(c->method, &auth_method_static_dh_i,
-				&static_dh_r);
+	authentication_type_get(c->method, &static_dh_i, &static_dh_r);
 
 	uint8_t msg1[MSG_1_DEFAULT_SIZE];
 	uint32_t msg1_len = sizeof(msg1);
@@ -181,9 +180,6 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint32_t msg2_len = sizeof(msg2);
 	uint8_t msg4[MSG_4_DEFAULT_SIZE];
 	uint32_t msg4_len = sizeof(msg2);
-
-	//uint8_t c_i[c->c_i.len];
-	//uint64_t c_i_len = sizeof(c_i);
 
 	/*in a given selected cipher suite the length of G_X and G_Y is equal*/
 	uint8_t g_y[c->g_x.len];
@@ -260,39 +256,16 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	}
 	PRINT_ARRAY("PRK_2e", PRK_2e, sizeof(PRK_2e));
 
-	/*Derive KEYSTREAM_2*/
-	//todo move this to a separate function
-	uint64_t KEYSTREAM_2_len = ciphertext2_len;
-	uint8_t KEYSTREAM_2[KEYSTREAM_2_len];
-	r = okm_calc(suite.edhoc_hash, (uint8_t *)&PRK_2e, sizeof(PRK_2e),
-		     (uint8_t *)&th2, sizeof(th2), "KEYSTREAM_2", NULL, 0,
-		     KEYSTREAM_2, KEYSTREAM_2_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
-
-	uint8_t PLAINTEXT_2[ciphertext2_len];
-	for (uint16_t i = 0; i < KEYSTREAM_2_len; i++) {
-		PLAINTEXT_2[i] = ciphertext2[i] ^ KEYSTREAM_2[i];
-	}
-	PRINT_ARRAY("PLAINTEXT_2", PLAINTEXT_2, sizeof(PLAINTEXT_2));
-
 	uint8_t sign_or_mac[SGN_OR_MAC_DEFAULT_SIZE];
-	uint64_t sign_or_mac_len = sizeof(sign_or_mac);
+	uint32_t sign_or_mac_len = sizeof(sign_or_mac);
 	uint8_t id_cred_r[ID_CRED_DEFAULT_SIZE];
-	uint64_t id_cred_r_len = sizeof(id_cred_r);
-
-	r = plaintext_split(PLAINTEXT_2, sizeof(PLAINTEXT_2), id_cred_r,
-			    &id_cred_r_len, sign_or_mac, &sign_or_mac_len,
-			    ead_2, ead_2_len);
+	uint32_t id_cred_r_len = sizeof(id_cred_r);
+	r = ciphertext_decrypt_split(
+		CIPHERTEXT2, &suite, PRK_2e, sizeof(PRK_2e), th2, sizeof(th2),
+		ciphertext2, ciphertext2_len, id_cred_r, &id_cred_r_len,
+		sign_or_mac, &sign_or_mac_len, ead_2, (uint32_t *)ead_2_len);
 	if (r != edhoc_no_error) {
 		return r;
-	}
-	PRINT_ARRAY("ID_CRED_R", id_cred_r, id_cred_r_len);
-	PRINT_ARRAY("sign_or_mac", sign_or_mac, sign_or_mac_len);
-	if (*ead_2_len) {
-		PRINT_ARRAY("ead_2", ead_2, *ead_2_len);
 	}
 
 	/*check the authenticity of the responder*/
@@ -322,78 +295,17 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		return r;
 	}
 	PRINT_ARRAY("prk_3e2m", PRK_3e2m, sizeof(PRK_3e2m));
-
-	// uint8_t m_2[A_2M_DEFAULT_SIZE];
-	// uint16_t m_2_len = sizeof(m_2);
-	// uint8_t mac_2[16];
-	// uint8_t mac_2_len = sizeof(mac_2);
-	// r = signature_or_mac_msg_create(static_dh_r, suite, "K_2m",
-	// 				"IV_2m", (uint8_t *)&PRK_3e2m,
-	// 				sizeof(PRK_3e2m), (uint8_t *)&th2,
-	// 				sizeof(th2), id_cred_r, id_cred_r_len,
-	// 				cred_r, cred_r_len, ead_2, *ead_2_len,
-	// 				m_2, &m_2_len, mac_2, &mac_2_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-
-	/*calculate MAC_2*/
-	uint32_t mac_2_len;
-	uint8_t mac_2[SHA_DEFAULT_SIZE];
-	r = mac(PRK_3e2m, sizeof(PRK_3e2m), th2, sizeof(th2), id_cred_r,
-		id_cred_r_len, cred_r, cred_r_len, ead_2, *ead_2_len, "MAC_2",
-		static_dh_r, &suite, mac_2, &mac_2_len);
+	//todo why static_dh_r?
+	r = signature_or_mac(VERIFY, static_dh_r, &suite, NULL, 0, pk, pk_len,
+			     PRK_3e2m, sizeof(PRK_3e2m), th2, sizeof(th2),
+			     id_cred_r, id_cred_r_len, cred_r, cred_r_len,
+			     ead_2, *(uint32_t *)ead_2_len, "MAC_2",
+			     sign_or_mac, &sign_or_mac_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
 
-	// uint8_t *sign_or_mac_2 = mac_2;
-	// uint32_t sign_or_mac_2_len = mac_2_len;
-
-	// /*check the authenticity of message 2*/
-	// uint8_t diag_msg[] = { "Responder authentication FIALED!\n" };
-	if (static_dh_r) {
-		if (!memcmp(mac_2, sign_or_mac, mac_2_len)) {
-			PRINT_MSG("Responder authentication ok!\n");
-		} else {
-			// r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
-			// 	       diag_msg, strlen((char *)diag_msg), NULL,
-			// 	       0);
-			// if (r != edhoc_no_error) {
-			// 	return r;
-			// }
-			return responder_authentication_failed;
-		}
-	} else {
-		/*the responder authenticates with a signature*/
-		// bool verified = false;
-		// r = verify(suite.edhoc_sign_curve, pk, pk_len, (uint8_t *)&m_2,
-		// 	   m_2_len, (uint8_t *)&sign_or_mac, sign_or_mac_len,
-		// 	   &verified);
-		// if (verified) {
-		// 	PRINT_MSG("Responder authentication okful!\n");
-		// } else {
-		// 	r = tx_err_msg(INITIATOR, c->corr, c_r, c_r_len,
-		// 		       diag_msg, strlen((char *)diag_msg), NULL,
-		// 		       0);
-		// 	if (r != edhoc_no_error) {
-		// 		return r;
-		// 	}
-		// 	return responder_authentication_failed;
-		//}
-	}
-
 	/********msg3 create and send**************************************/
-
-	// uint8_t *data_3;
-	// uint8_t data_3_len;
-	// if (c->corr == 2 || c->corr == 3) {
-	// 	data_3 = NULL;
-	// 	data_3_len = 0;
-	// } else {
-	// 	data_3 = c_r;
-	// 	data_3_len = c_r_len;
-	// }
 	uint8_t th3[32];
 	r = th3_calculate(suite.edhoc_hash, (uint8_t *)&th2, sizeof(th2),
 			  ciphertext2, ciphertext2_len, th3);
@@ -402,7 +314,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	}
 
 	/*derive prk_4x3m*/
-	r = prk_derive(static_dh_r, suite, (uint8_t *)&PRK_3e2m,
+	r = prk_derive(static_dh_i, suite, (uint8_t *)&PRK_3e2m,
 		       sizeof(PRK_3e2m), g_y, sizeof(g_y), c->i.ptr, c->i.len,
 		       prk_4x3m);
 	if (r != edhoc_no_error) {
@@ -410,149 +322,19 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	}
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
-	/*calculate MAC_3*/
-	uint32_t mac_3_len;
-	uint8_t mac_3[SHA_DEFAULT_SIZE];
-	r = mac(prk_4x3m, prk_4x3m_len, th3, sizeof(th3), c->id_cred_i.ptr,
-		c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len, c->ead_3.ptr,
-		c->ead_3.len, "MAC_3", static_dh_r, &suite, mac_3, &mac_3_len);
+	/*calculate Signature_or_MAC_3*/
+	uint32_t sign_or_mac_3_len = get_signature_len(suite.edhoc_sign_curve);
+	uint8_t sign_or_mac_3[sign_or_mac_3_len];
+
+	r = signature_or_mac(GENERATE, static_dh_i, &suite, c->sk_i.ptr,
+			     c->sk_i.len, c->pk_i.ptr, c->pk_i.len, prk_4x3m,
+			     prk_4x3m_len, th3, sizeof(th3), c->id_cred_i.ptr,
+			     c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len,
+			     c->ead_3.ptr, c->ead_3.len, "MAC_3", sign_or_mac_3,
+			     &sign_or_mac_3_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}
-
-	uint8_t *sign_or_mac_3 = mac_3;
-	uint32_t sign_or_mac_3_len = mac_3_len;
-
-	// uint8_t m_3[M_3_DEFAULT_SIZE];
-	// uint16_t m_3_len = sizeof(m_3);
-	// uint8_t sign_or_mac_3[64];
-	// uint32_t sign_or_mac_3_len = sizeof(sign_or_mac_3);
-	// r = signature_or_mac_msg_create(
-	// 	auth_method_static_dh_i, suite, "K_3m", "IV_3m", prk_4x3m,
-	// 	prk_4x3m_len, (uint8_t *)&th3, sizeof(th3), c->id_cred_i.ptr,
-	// 	c->id_cred_i.len, c->cred_i.ptr, c->cred_i.len, c->ead_3.ptr,
-	// 	c->ead_3.len, m_3, &m_3_len, sign_or_mac_3,
-	// 	(uint8_t *)&sign_or_mac_3_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-
-	// /*Calculate signature if the initiator authenticates with signature*/
-	// if (!auth_method_static_dh_i) {
-	// 	/*Calculate a signature*/
-	// 	sign_or_mac_3_len = sizeof(sign_or_mac_3);
-	// 	r = sign(suite.edhoc_sign_curve, c->sk_i.ptr, c->sk_i.len,
-	// 		 c->pk_i.ptr, c->pk_i.len, m_3, m_3_len, sign_or_mac_3,
-	// 		 &sign_or_mac_3_len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	PRINT_ARRAY("Signature_or_MAC_3", sign_or_mac_3,
-	// 		    sign_or_mac_3_len);
-	// }
-
-	/*Calculate P_3ae*/
-	// uint8_t sign_or_mac_3_enc[sign_or_mac_3_len + 2];
-	// uint16_t sign_or_mac_3_enc_len = sizeof(sign_or_mac_3_enc);
-	// r = encode_byte_string(sign_or_mac_3, sign_or_mac_3_len,
-	// 		       sign_or_mac_3_enc, &sign_or_mac_3_enc_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-
-	// uint8_t kid_buf[KID_DEFAULT_SIZE];
-	// uint32_t kid_len = sizeof(kid_buf);
-	// r = id_cred2kid(c->id_cred_i.ptr, c->id_cred_i.len, kid_buf, &kid_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-	// PRINT_ARRAY("kid", kid_buf, kid_len);
-
-	// uint8_t P_3ae[PRK_3AE_DEFAULT_SIZE];
-	// uint32_t P_3ae_len = sizeof(P_3ae);
-
-	// if (kid_len != 0) {
-	// 	r = _memcpy_s(P_3ae, P_3ae_len, kid_buf, kid_len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	r = _memcpy_s(P_3ae + kid_len, P_3ae_len - kid_len,
-	// 		      sign_or_mac_3_enc, sign_or_mac_3_enc_len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	P_3ae_len = sign_or_mac_3_enc_len + kid_len;
-	// } else {
-	// 	r = _memcpy_s(P_3ae, P_3ae_len, c->id_cred_i.ptr,
-	// 		      c->id_cred_i.len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	r = _memcpy_s(P_3ae + c->id_cred_i.len,
-	// 		      P_3ae_len - c->id_cred_i.len, sign_or_mac_3_enc,
-	// 		      sign_or_mac_3_enc_len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	P_3ae_len = c->id_cred_i.len + sign_or_mac_3_enc_len;
-	// }
-	// if (c->ead_3.len > 0) {
-	// 	r = _memcpy_s(P_3ae + P_3ae_len, sizeof(P_3ae), c->ead_3.ptr,
-	// 		      c->ead_3.len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	P_3ae_len += c->ead_3.len;
-	// }
-
-	// PRINT_ARRAY("P_3ae", P_3ae, P_3ae_len);
-
-	// /*Calculate K_3*/
-	// uint8_t K_3[16];
-	// r = okm_calc(suite.edhoc_hash, PRK_3e2m, sizeof(PRK_3e2m),
-	// 	     (uint8_t *)&th3, sizeof(th3), "K_3", NULL, 0, K_3,
-	// 	     sizeof(K_3));
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-	// PRINT_ARRAY("K_3", K_3, sizeof(K_3));
-
-	// /*Calculate IV_3*/
-	// uint8_t IV_3[13];
-	// r = okm_calc(suite.edhoc_hash, PRK_3e2m, sizeof(PRK_3e2m),
-	// 	     (uint8_t *)&th3, sizeof(th3), "IV_3", NULL, 0, IV_3,
-	// 	     sizeof(IV_3));
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-	// PRINT_ARRAY("IV_3", IV_3, sizeof(IV_3));
-
-	// /*Associated data A_3ae*/
-	// uint8_t A_3ae[A_3AE_DEFAULT_SIZE];
-	// uint16_t A_3ae_len = sizeof(A_3ae);
-	// r = associated_data_encode(th3, sizeof(th3), (uint8_t *)&A_3ae, &A_3ae_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-	// PRINT_ARRAY("A_3ae", A_3ae, A_3ae_len);
-
-	// /*Ciphertext 3 calculate*/
-	// uint8_t mac_len = 8;
-	// if (suite.edhoc_aead == AES_CCM_16_128_128) {
-	// 	mac_len = 16;
-	// }
-	// uint8_t tag[mac_len];
-	// uint32_t ciphertext_3_len = P_3ae_len;
-	// uint8_t ciphertext_3[ciphertext_3_len + mac_len];
-
-	// r = aead(ENCRYPT, P_3ae, P_3ae_len, K_3, sizeof(K_3), IV_3,
-	// 	 sizeof(IV_3), A_3ae, A_3ae_len, ciphertext_3, ciphertext_3_len,
-	// 	 tag, mac_len);
-	// if (r != edhoc_no_error) {
-	// 	return r;
-	// }
-
-	// PRINT_ARRAY("ciphertext_3", ciphertext_3, sizeof(ciphertext_3));
 
 	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
 	uint32_t ciphertext_3_len = sizeof(ciphertext_3);
@@ -608,7 +390,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	r = ciphertext_decrypt_split(CIPHERTEXT4, &suite, prk_4x3m,
 				     prk_4x3m_len, th4, th4_len, ciphertext_4,
 				     ciphertext_4_len, NULL, 0, NULL, 0, ead_4,
-				     ead_4_len);
+				     (uint32_t *)ead_4_len);
 	if (r != edhoc_no_error) {
 		return r;
 	}

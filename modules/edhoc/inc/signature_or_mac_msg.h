@@ -11,8 +11,11 @@
 #ifndef SIGNATURE_OR_MAC_MSG_H
 #define SIGNATURE_OR_MAC_MSG_H
 
+#include <stdbool.h>
 #include "error.h"
 #include "suites.h"
+
+enum sgn_or_mac_op { VERIFY, GENERATE };
 
 /**
  * @brief   Encodes an array of data to cbor byte string
@@ -66,4 +69,14 @@ enum edhoc_error mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
 		     uint32_t cred_len, const uint8_t *ead, uint32_t ead_len,
 		     const char *mac_label, bool static_dh, struct suite *suite,
 		     uint8_t *mac, uint32_t *mac_len);
+
+enum edhoc_error
+signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
+		 const uint8_t *sk, uint8_t sk_len, const uint8_t *pk,
+		 uint8_t pk_len, const uint8_t *prk, uint8_t prk_len,
+		 const uint8_t *th, uint8_t th_len, const uint8_t *id_cred,
+		 uint32_t id_cred_len, const uint8_t *cred, uint32_t cred_len,
+		 const uint8_t *ead, uint32_t ead_len, const char *mac_label,
+		 uint8_t *signature_or_mac, uint32_t *signature_or_mac_len);
+
 #endif

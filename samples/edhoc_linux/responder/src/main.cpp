@@ -35,7 +35,7 @@ char buffer[MAXLINE];
 CoapPDU *recvPDU;
 
 /*comment this out to use DH keys from the test vectors*/
-#define USE_RANDOM_EPHEMERAL_DH_KEY
+//#define USE_RANDOM_EPHEMERAL_DH_KEY
 
 #ifdef USE_IPV6
 struct sockaddr_in6 client_addr;
@@ -179,7 +179,7 @@ int main()
 	uint64_t ad_3_len = sizeof(ad_1);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 1;
+	const uint8_t TEST_VEC_NUM = 4;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_i;
 	struct edhoc_responder_context c_r;

@@ -60,15 +60,30 @@ static bool encode_repeated_id_cred_x_map_x5t(
 	return tmp_result;
 }
 
+static bool encode_repeated_id_cred_x_map_x5u(
+		cbor_state_t *state, const struct id_cred_x_map_x5u *input)
+{
+	cbor_print("%s\n", __func__);
+
+	bool tmp_result = ((((uintx32_put(state, (35))))
+	&& (bstrx_encode(state, (&(*input)._id_cred_x_map_x5u)))));
+
+	if (!tmp_result)
+		cbor_trace();
+
+	return tmp_result;
+}
+
 static bool encode_id_cred_x_map(
 		cbor_state_t *state, const struct id_cred_x_map *input)
 {
 	cbor_print("%s\n", __func__);
 	bool int_res;
 
-	bool tmp_result = (((map_start_encode(state, 3) && (int_res = (present_encode(&((*input)._id_cred_x_map_kid_present), (void *)encode_repeated_id_cred_x_map_kid, state, (&(*input)._id_cred_x_map_kid))
+	bool tmp_result = (((map_start_encode(state, 4) && (int_res = (present_encode(&((*input)._id_cred_x_map_kid_present), (void *)encode_repeated_id_cred_x_map_kid, state, (&(*input)._id_cred_x_map_kid))
 	&& present_encode(&((*input)._id_cred_x_map_x5chain_present), (void *)encode_repeated_id_cred_x_map_x5chain, state, (&(*input)._id_cred_x_map_x5chain))
-	&& present_encode(&((*input)._id_cred_x_map_x5t_present), (void *)encode_repeated_id_cred_x_map_x5t, state, (&(*input)._id_cred_x_map_x5t))), ((map_end_encode(state, 3)) && int_res)))));
+	&& present_encode(&((*input)._id_cred_x_map_x5t_present), (void *)encode_repeated_id_cred_x_map_x5t, state, (&(*input)._id_cred_x_map_x5t))
+	&& present_encode(&((*input)._id_cred_x_map_x5u_present), (void *)encode_repeated_id_cred_x_map_x5u, state, (&(*input)._id_cred_x_map_x5u))), ((map_end_encode(state, 4)) && int_res)))));
 
 	if (!tmp_result)
 		cbor_trace();
