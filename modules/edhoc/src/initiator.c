@@ -167,7 +167,8 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	struct suite suite;
 	bool static_dh_i = false, static_dh_r = false;
-	r = get_suite((enum suite_label)c->suites_i.ptr[0], &suite);
+	r = get_suite((enum suite_label)c->suites_i.ptr[c->suites_i.len - 1],
+		      &suite);
 	if (r != edhoc_no_error) {
 		return r;
 	}
@@ -338,7 +339,7 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
 	uint32_t ciphertext_3_len = sizeof(ciphertext_3);
-	r = ciphertext_gen(CIPHERTEXT3, suite.edhoc_hash, c->id_cred_i.ptr,
+	r = ciphertext_gen(CIPHERTEXT3, &suite, c->id_cred_i.ptr,
 			   c->id_cred_i.len, sign_or_mac_3, sign_or_mac_3_len,
 			   c->ead_3.ptr, c->ead_3.len, PRK_3e2m,
 			   sizeof(PRK_3e2m), th3, sizeof(th3), ciphertext_3,

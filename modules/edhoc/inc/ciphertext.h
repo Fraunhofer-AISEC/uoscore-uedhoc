@@ -13,7 +13,7 @@
 #define CIPHERTEXT_H
 enum ciphertext { CIPHERTEXT2, CIPHERTEXT3, CIPHERTEXT4 };
 
-enum edhoc_error ciphertext_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
+enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 				uint8_t *id_cred, uint32_t id_cred_len,
 				uint8_t *signature_or_mac,
 				uint32_t signature_or_mac_len, uint8_t *ead,

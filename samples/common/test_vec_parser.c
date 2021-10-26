@@ -9,6 +9,7 @@
 #include "../../modules/edhoc/edhoc.h"
 #include "test_vec_parser.h"
 #include "cbor/decode_c_x.h"
+#include "cbor/decode_suites_i.h"
 #include "../../modules/edhoc/inc/memcpy_s.h"
 
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s)
@@ -61,6 +62,7 @@ int str2bytes(char *str, uint32_t str_len, struct byte_array *bytes)
 		return -1;
 	}
 	bytes->len = str_len / 2;
+
 	char *pos = str;
 	for (uint32_t i = 0; i < str_len / 2; i++) {
 		sscanf(pos, "%2hhx", &bytes->ptr[i]);
@@ -112,25 +114,60 @@ int get_element(char *test_vec_buf, jsmntok_t *t, uint32_t element_total_count,
 			char *stat_str = test_vec_buf + t[i + 1].start;
 			printf("%s: %.*s\n", element_name, len, stat_str);
 			str2bytes(stat_str, len, element);
+			//PRINT_ARRAY("--", element->ptr, element->len);
 		}
 	}
 
 	return 0;
 }
 
-int get_C_X_decode(enum C_X_TYPE C_X, uint8_t vec_num, char *test_vec_buf,
-		   int r, jsmntok_t *t, uint8_t *cx_buf, uint32_t cx_buf_len,
+int get_suites_decode(char *test_vec_buf, jsmntok_t *t,
+		      uint32_t element_total_count, char *suite_name,
+		      uint8_t vec_num, struct byte_array *suites_i)
+{
+	uint8_t tmp_buf[32];
+	struct byte_array tmp;
+	byte_array_init(tmp_buf, sizeof(tmp_buf), &tmp);
+	get_element(test_vec_buf, t, element_total_count, suite_name, vec_num,
+		    &tmp);
+
+	bool ok;
+	size_t decode_len = 0;
+	struct suites_ s;
+
+	ok = cbor_decode_suites(tmp.ptr, tmp.len, &s, &decode_len);
+	if (!ok) {
+		printf("Cannot decode suites\n");
+		return -1;
+	}
+
+	if (s._suites_choice == _suites_int) {
+		*suites_i->ptr = s._suites_int;
+		suites_i->len = 1;
+		PRINTF("SUITES_I_raw (int): %d\n", *suites_i->ptr);
+	} else {
+		if (suites_i->len < s._suites__int_int_count) {
+			return -1;
+		}
+		for (uint8_t i = 0; i < s._suites__int_int_count; i++) {
+			*(suites_i->ptr + i) = s._suites__int_int[i];
+		}
+		suites_i->len = s._suites__int_int_count;
+		PRINT_ARRAY("SUITES_I_raw", suites_i->ptr, suites_i->len);
+	}
+
+	return 0;
+}
+
+int get_C_X_decode(uint8_t vec_num, char *test_vec_buf, int r, jsmntok_t *t,
+		   uint8_t *cx_buf, char *cx_name, uint32_t cx_buf_len,
 		   struct c_x *c_x_out)
 {
 	/* get c_i or c_x and decode it to int/bstr */
 	uint8_t c_x_tmp_buf[32];
 	struct byte_array c_x_tmp;
 	byte_array_init(c_x_tmp_buf, sizeof(c_x_tmp_buf), &c_x_tmp);
-	if (C_X == C_I) {
-		get_element(test_vec_buf, t, r, "c_i", vec_num, &c_x_tmp);
-	} else {
-		get_element(test_vec_buf, t, r, "c_r", vec_num, &c_x_tmp);
-	}
+	get_element(test_vec_buf, t, r, cx_name, vec_num, &c_x_tmp);
 
 	bool ok;
 	size_t decode_len = 0;
@@ -190,12 +227,16 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 	// byte_array_init(bufs->ca_pk, sizeof(bufs->ca_pk), &c->ca_pk);
 
 	if (other_party_role == INITIATOR) {
+		PRINT_MSG(
+			"Reading the parametes of the other party (initiator)...\n");
 		get_element(test_vec_buf, t, r, "id_cred_i", vec_num,
 			    &c->id_cred);
 		get_element(test_vec_buf, t, r, "cred_i", vec_num, &c->cred);
 		get_element(test_vec_buf, t, r, "g_i_raw", vec_num, &c->g);
 		get_element(test_vec_buf, t, r, "pk_i_raw", vec_num, &c->pk);
 	} else {
+		PRINT_MSG(
+			"\nReading the parametes of the other party (responder)...\n");
 		get_element(test_vec_buf, t, r, "id_cred_r", vec_num,
 			    &c->id_cred);
 		get_element(test_vec_buf, t, r, "cred_r", vec_num, &c->cred);
@@ -211,6 +252,7 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	struct edhoc_initiator_context *c, uint8_t vec_num, char *test_vec_buf,
 	uint32_t test_vec_buf_len)
 {
+	PRINT_MSG("\nReading the parametes of the initiator...\n");
 	int r;
 	jsmn_parser p;
 	jsmntok_t t[20000]; /* We expect no more than 20000 tokens */
@@ -244,7 +286,6 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 
 	get_element(test_vec_buf, t, r, "method", vec_num, &method);
 	c->method = method_buf[0];
-	get_element(test_vec_buf, t, r, "suites_i", vec_num, &c->suites_i);
 	get_element(test_vec_buf, t, r, "ead_1", vec_num, &c->ead_1);
 	get_element(test_vec_buf, t, r, "ead_3", vec_num, &c->ead_3);
 	get_element(test_vec_buf, t, r, "id_cred_i", vec_num, &c->id_cred_i);
@@ -256,7 +297,9 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	get_element(test_vec_buf, t, r, "pk_i_raw", vec_num, &c->pk_i);
 	get_element(test_vec_buf, t, r, "sk_i_raw", vec_num, &c->sk_i);
 
-	return get_C_X_decode(C_I, vec_num, test_vec_buf, r, t, bufs->c_i,
+	get_suites_decode(test_vec_buf, t, r, "suites_i", vec_num,
+			  &c->suites_i);
+	return get_C_X_decode(vec_num, test_vec_buf, r, t, bufs->c_i, "c_i",
 			      sizeof(bufs->c_i), &c->c_i);
 }
 
@@ -265,6 +308,7 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	struct edhoc_responder_context *c, uint8_t vec_num, char *test_vec_buf,
 	uint32_t test_vec_buf_len)
 {
+	PRINT_MSG("\nReading the parametes of the responder...\n");
 	int r;
 	jsmn_parser p;
 	jsmntok_t t[20000]; /* We expect no more than 20000 tokens */
@@ -305,6 +349,8 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	get_element(test_vec_buf, t, r, "sk_r_raw", vec_num, &c->sk_r);
 	get_element(test_vec_buf, t, r, "pk_r_raw", vec_num, &c->pk_r);
 
-	return get_C_X_decode(C_R, vec_num, test_vec_buf, r, t, bufs->c_r,
+	get_suites_decode(test_vec_buf, t, r, "suites_r", vec_num,
+			  &c->suites_r);
+	return get_C_X_decode(vec_num, test_vec_buf, r, t, bufs->c_r, "c_r",
 			      sizeof(bufs->c_r), &c->c_r);
 }

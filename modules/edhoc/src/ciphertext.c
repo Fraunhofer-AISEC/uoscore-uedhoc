@@ -199,7 +199,7 @@ enum edhoc_error ciphertext_decrypt_split(
  * 
  */
 //todo refactore this function simalar to ciphertext_decrypt_split
-enum edhoc_error ciphertext_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
+enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 				uint8_t *id_cred, uint32_t id_cred_len,
 				uint8_t *signature_or_mac,
 				uint32_t signature_or_mac_len, uint8_t *ead,
@@ -280,7 +280,7 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
 		/*Derive KEYSTREAM_2*/
 		uint64_t KEYSTREAM_2_len = plaintext_len;
 		uint8_t KEYSTREAM_2[KEYSTREAM_2_len];
-		r = okm_calc(edhoc_hash, prk, prk_len, th, th_len,
+		r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
 			     "KEYSTREAM_2", NULL, 0, KEYSTREAM_2,
 			     KEYSTREAM_2_len);
 		if (r != edhoc_no_error) {
@@ -301,16 +301,16 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
 	//todo take the length of the key and nonce from the ciphersuite
 	uint8_t K[16], N[13];
 	if (ctxt == CIPHERTEXT3) {
-		r = okm_calc(edhoc_hash, prk, prk_len, th, th_len, "K_3", NULL,
-			     0, K, sizeof(K));
+		r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, "K_3",
+			     NULL, 0, K, sizeof(K));
 		if (r != edhoc_no_error) {
 			return r;
 		}
 		PRINT_ARRAY("K_3", K, sizeof(K));
 
 		/*Calculate IV_3*/
-		r = okm_calc(edhoc_hash, prk, prk_len, th, th_len, "IV_3", NULL,
-			     0, N, sizeof(N));
+		r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
+			     "IV_3", NULL, 0, N, sizeof(N));
 		if (r != edhoc_no_error) {
 			return r;
 		}
@@ -341,11 +341,7 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
 	/*Ciphertext 3 calculate*/
-	uint8_t mac_len = 8;
-	//todo move this to separate function
-	// if (suite.edhoc_aead == AES_CCM_16_128_128) {
-	// 	mac_len = 16;
-	// }
+	uint8_t mac_len = get_mac_len(suite->edhoc_aead);
 	uint8_t tag[mac_len];
 	// uint32_t ciphertext_3_len = plaintext_len;
 	// uint8_t ciphertext_3[ciphertext_3_len + mac_len];

@@ -135,8 +135,6 @@ static inline bool selected_suite_is_supported(uint8_t selected,
 	return false;
 }
 
-
-
 /**
  * @brief   Encodes message 2
  * @param   corr corelation parameter
@@ -226,23 +224,20 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		return r;
 	}
 
-	// if (!(selected_suite_is_supported(suites_i[0], &c->suites_r))) {
-	// 	r = tx_err_msg(RESPONDER, method, c_i, c_i_len, NULL, 0,
-	// 		       c->suites_r.ptr, c->suites_r.len);
-	// 	if (r != edhoc_no_error) {
-	// 		return r;
-	// 	}
-	// 	/*After an error message is sent the protocol must be discontinued*/
-	// 	return error_message_sent;
-	// }
+	if (!(selected_suite_is_supported(suites_i[suites_i_len - 1],
+					  &c->suites_r))) {
+		// r = tx_err_msg(RESPONDER, method, c_i, c_i_len, NULL, 0,
+		// 	       c->suites_r.ptr, c->suites_r.len);
+		// if (r != edhoc_no_error) {
+		// 	return r;
+		// }
+		/*After an error message is sent the protocol must be discontinued*/
+		return error_message_sent;
+	}
 
-	/*get the method*/
-	//enum method_type method = method_corr >> 2;
-	/*get corr*/
-	//uint8_t corr = method_corr - 4 * method;
 	/*get cipher suite*/
 	struct suite suite;
-	r = get_suite((enum suite_label)suites_i[0], &suite);
+	r = get_suite((enum suite_label)suites_i[suites_i_len - 1], &suite);
 	if (r != edhoc_no_error) {
 		return r;
 	}
@@ -301,7 +296,7 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	/*compute ciphertext_2*/
 	uint8_t ciphertext_2[CIPHERTEXT2_DEFAULT_SIZE];
 	uint32_t ciphertext_2_len = sizeof(ciphertext_2);
-	r = ciphertext_gen(CIPHERTEXT2, suite.edhoc_hash, c->id_cred_r.ptr,
+	r = ciphertext_gen(CIPHERTEXT2, &suite, c->id_cred_r.ptr,
 			   c->id_cred_r.len, sign_or_mac_2, sign_or_mac_2_len,
 			   c->ead_2.ptr, c->ead_2.len, PRK_2e, sizeof(PRK_2e),
 			   th2, sizeof(th2), ciphertext_2, &ciphertext_2_len);
@@ -333,8 +328,6 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
 	uint32_t ciphertext_3_len = sizeof(ciphertext_3);
 
-	//r = msg3_parse(corr, msg3, msg3_len, c_r, &c_r_len, ciphertext_3,
-	//	       &ciphertext_3_len);
 	// if (r == error_message_received) {
 	// 	/*provide the error message to the caller*/
 	// 	r = _memcpy_s(err_msg, *err_msg_len, msg3, msg3_len);
@@ -370,7 +363,6 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 	if (r != edhoc_no_error) {
 		return r;
 	}
-
 
 	/*check the authenticity of the initiator*/
 	uint8_t cred_i[CRED_DEFAULT_SIZE];
@@ -408,8 +400,6 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		return r;
 	}
 
-
-
 	/*TH4*/
 	r = th4_calculate(suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
 			  ciphertext_3_len, th4);
@@ -424,8 +414,8 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		uint32_t ciphertext_4_len = sizeof(ciphertext_4);
 		uint8_t msg4[MSG_4_DEFAULT_SIZE];
 		uint64_t msg4_len = sizeof(msg2);
-		r = ciphertext_gen(CIPHERTEXT4, suite.edhoc_hash, NULL, 0, NULL,
-				   0, c->ead_4.ptr, c->ead_4.len, prk_4x3m,
+		r = ciphertext_gen(CIPHERTEXT4, &suite, NULL, 0, NULL, 0,
+				   c->ead_4.ptr, c->ead_4.len, prk_4x3m,
 				   prk_4x3m_len, th4, th4_len, ciphertext_4,
 				   &ciphertext_4_len);
 		if (r != edhoc_no_error) {

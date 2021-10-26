@@ -41,7 +41,7 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 	struct tc_ccm_mode_struct c;
 	struct tc_aes_key_sched_struct sched;
 	tc_aes128_set_encrypt_key(&sched, key);
-	tc_ccm_config(&c, &sched, nonce, nonce_len, 8);
+	tc_ccm_config(&c, &sched, nonce, nonce_len, tag_len);
 
 	if (op == DECRYPT) {
 		result = tc_ccm_decryption_verification(
