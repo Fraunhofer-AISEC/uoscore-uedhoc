@@ -189,14 +189,15 @@ static inline enum edhoc_error msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
-				     struct other_party_cred *cred_i_array,
-				     uint16_t num_cred_i, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ead_1,
-				     uint64_t *ead_1_len, uint8_t *ead_3,
-				     uint64_t *ead_3_len, uint8_t *prk_4x3m,
-				     uint16_t prk_4x3m_len, uint8_t *th4,
-				     uint16_t th4_len)
+enum edhoc_error
+edhoc_responder_run(struct edhoc_responder_context *c,
+		    struct other_party_cred *cred_i_array, uint16_t num_cred_i,
+		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_1,
+		    uint64_t *ead_1_len, uint8_t *ead_3, uint64_t *ead_3_len,
+		    uint8_t *prk_4x3m, uint16_t prk_4x3m_len, uint8_t *th4,
+		    uint16_t th4_len,
+		    enum edhoc_error (*tx)(uint8_t *data, uint32_t data_len),
+		    enum edhoc_error (*rx)(uint8_t *data, uint32_t *data_len))
 {
 	enum edhoc_error r;
 	/**************** receive and process message 1 ***********************/
@@ -414,26 +415,17 @@ enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
 		uint32_t ciphertext_4_len = sizeof(ciphertext_4);
 		uint8_t msg4[MSG_4_DEFAULT_SIZE];
 		uint64_t msg4_len = sizeof(msg2);
-		r = ciphertext_gen(CIPHERTEXT4, &suite, NULL, 0, NULL, 0,
+		TRY(ciphertext_gen(CIPHERTEXT4, &suite, NULL, 0, NULL, 0,
 				   c->ead_4.ptr, c->ead_4.len, prk_4x3m,
 				   prk_4x3m_len, th4, th4_len, ciphertext_4,
-				   &ciphertext_4_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+				   &ciphertext_4_len));
 
-		r = encode_byte_string(ciphertext_4, ciphertext_4_len, msg4,
-				       &msg4_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(encode_byte_string(ciphertext_4, ciphertext_4_len, msg4,
+				       &msg4_len));
 
 		PRINT_ARRAY("Message 4 ", msg4, msg4_len);
 
-		r = tx(msg4, msg4_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(tx(msg4, msg4_len));
 	}
 
 	return edhoc_no_error;

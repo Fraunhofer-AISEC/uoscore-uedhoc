@@ -64,14 +64,70 @@ static int start_coap_client(void)
 	return 0;
 }
 
+// /**
+//  * @brief	Creates CoAP packet and sends supplied payload over network.
+//  * @param	msg pointer to message payload
+//  * @param	msg_len length of message payload
+//  * @param
+//  * @retval
+//  */
+// void send_coap(uint8_t *msg, uint32_t msg_len)
+// {
+// 	/*construct a CoAP packet*/
+// 	static uint16_t mid = 0;
+// 	static uint32_t token = 0;
+// 	CoapPDU *pdu = new CoapPDU();
+// 	pdu->reset();
+// 	pdu->setVersion(1);
+// 	pdu->setType(CoapPDU::COAP_CONFIRMABLE);
+// 	pdu->setCode(CoapPDU::COAP_POST);
+// 	pdu->setToken((uint8_t *)&(++token), sizeof(token));
+// 	pdu->setMessageID(mid++);
+// 	pdu->setURI((char *)".well-known/edhoc", 17);
+// 	pdu->setPayload(msg, msg_len);
+
+// 	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
+
+// 	delete pdu;
+// }
+
+// /**
+//  * @brief	Waits for CoAP response packet and provides payload to callee.
+//  * @param	msg buffer to store received message payload
+//  * @param	msg_len integer to store length of received message payload
+//  * @param
+//  * @retval
+//  */
+// void recv_coap(uint8_t **msg, uint32_t *msg_len)
+// {
+// 	int n;
+// 	char buffer[MAXLINE];
+// 	CoapPDU *recvPDU;
+// 	/* receive */
+// 	n = recv(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL);
+// 	if (n < 0) {
+// 		printf("recv error");
+// 	}
+
+// 	recvPDU = new CoapPDU((uint8_t *)buffer, n);
+
+// 	if (recvPDU->validate()) {
+// 		recvPDU->printHuman();
+// 	}
+
+// 	*msg = recvPDU->getPayloadPointer();
+// 	*msg_len = recvPDU->getPayloadLength();
+
+// 	delete recvPDU;
+// }
+
 /**
- * @brief	Creates CoAP packet and sends supplied payload over network.
- * @param	msg pointer to message payload
- * @param	msg_len length of message payload
- * @param
- * @retval	
+ * @brief	Callback function called inside the frontend when data needs to 
+ * 		be send over the network. We use here CoAP as transport 
+ * @param	data pointer to the data that needs to be send
+ * @param	data_len lenhgt of the data in bytes
  */
-void send_coap(uint8_t *msg, uint32_t msg_len)
+enum edhoc_error tx(uint8_t *data, uint32_t data_len)
 {
 	/*construct a CoAP packet*/
 	static uint16_t mid = 0;
@@ -84,21 +140,21 @@ void send_coap(uint8_t *msg, uint32_t msg_len)
 	pdu->setToken((uint8_t *)&(++token), sizeof(token));
 	pdu->setMessageID(mid++);
 	pdu->setURI((char *)".well-known/edhoc", 17);
-	pdu->setPayload(msg, msg_len);
+	pdu->setPayload(data, data_len);
 
 	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
 
 	delete pdu;
+	return edhoc_no_error;
 }
 
 /**
- * @brief	Waits for CoAP response packet and provides payload to callee.
- * @param	msg buffer to store received message payload
- * @param	msg_len integer to store length of received message payload
- * @param
- * @retval	
+ * @brief	Callback function called inside the frontend when data needs to 
+ * 		be received over the network. We use here CoAP as transport 
+ * @param	data pointer to the data that needs to be received
+ * @param	data_len lenhgt of the data in bytes
  */
-void recv_coap(uint8_t **msg, uint32_t *msg_len)
+enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
 	int n;
 	char buffer[MAXLINE];
@@ -115,10 +171,20 @@ void recv_coap(uint8_t **msg, uint32_t *msg_len)
 		recvPDU->printHuman();
 	}
 
-	*msg = recvPDU->getPayloadPointer();
-	*msg_len = recvPDU->getPayloadLength();
+	uint32_t payload_len = recvPDU->getPayloadLength();
+	printf("data_len: %d\n", *data_len);
+	printf("payload_len: %d\n", payload_len);
+
+	if (*data_len >= payload_len) {
+		memcpy(data, recvPDU->getPayloadPointer(), payload_len);
+		*data_len = payload_len;
+	} else {
+		printf("insufficient space in buffer");
+		return dest_buffer_to_small;
+	}
 
 	delete recvPDU;
+	return edhoc_no_error;
 }
 
 int main()
@@ -137,7 +203,7 @@ int main()
 	uint64_t ad_4_len = sizeof(ad_2);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 8;
+	const uint8_t TEST_VEC_NUM = 13;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_r;
 	struct edhoc_initiator_context c_i;
@@ -209,7 +275,7 @@ int main()
 
 	r = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, ad_4, &ad_4_len, PRK_4x3m,
-				sizeof(PRK_4x3m), th4, sizeof(th4));
+				sizeof(PRK_4x3m), th4, sizeof(th4), tx, rx);
 	if (r != edhoc_no_error) {
 		printf("Error in edhoc_initiator_run, (Error code %d)\n", r);
 	}

@@ -94,32 +94,33 @@ enum edhoc_error tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 			    uint8_t err_msg_str_len, uint8_t *suites,
 			    uint8_t suites_len)
 {
-	enum edhoc_error r;
-	uint8_t err_msg_buf[ERR_MSG_DEFAULT_SIZE];
-	struct byte_array err_msg = {
-		.len = sizeof(err_msg_buf),
-		.ptr = err_msg_buf,
-	};
+	// enum edhoc_error r;
+	// uint8_t err_msg_buf[ERR_MSG_DEFAULT_SIZE];
+	// struct byte_array err_msg = {
+	// 	.len = sizeof(err_msg_buf),
+	// 	.ptr = err_msg_buf,
+	// };
 
-	struct error_msg err_struct = {
-		.diag_msg.ptr = err_msg_str,
-		.diag_msg.len = err_msg_str_len,
-		.suites_r.ptr = suites,
-		.suites_r.len = suites_len,
-	};
+	// struct error_msg err_struct = {
+	// 	.diag_msg.ptr = err_msg_str,
+	// 	.diag_msg.len = err_msg_str_len,
+	// 	.suites_r.ptr = suites,
+	// 	.suites_r.len = suites_len,
+	// };
 
-	if ((role == RESPONDER && (corr == 0 || corr == 2)) ||
-	    (role == INITIATOR && (corr == 0 || corr == 1))) {
-		err_struct.c_x.ptr = c_x;
-		err_struct.c_x.len = c_x_len;
-	} else {
-		err_struct.c_x.ptr = NULL;
-		err_struct.c_x.len = 0;
-	}
+	// if ((role == RESPONDER && (corr == 0 || corr == 2)) ||
+	//     (role == INITIATOR && (corr == 0 || corr == 1))) {
+	// 	err_struct.c_x.ptr = c_x;
+	// 	err_struct.c_x.len = c_x_len;
+	// } else {
+	// 	err_struct.c_x.ptr = NULL;
+	// 	err_struct.c_x.len = 0;
+	// }
 
-	r = err_msg_crate(&err_struct, &err_msg);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	return tx(err_msg.ptr, err_msg.len);
+	// r = err_msg_crate(&err_struct, &err_msg);
+	// if (r != edhoc_no_error) {
+	// 	return r;
+	// }
+	// return tx(err_msg.ptr, err_msg.len);
+	return edhoc_no_error;
 }

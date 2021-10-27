@@ -805,6 +805,7 @@
    test_vector_10: {
       "method": "03",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "6fb8289321158027b1fec6d27d26902ace0f10a58d9719ebae25b8ad93d41769",
       "g_x_raw": "481b22896464f3dfcfa6794525190a2ee1cee61b06e3ee20d4fdd591fdc1d669",
       "g_x": "5820481b22896464f3dfcfa6794525190a2ee1cee61b06e3ee20d4fdd591fdc1d669",
@@ -894,6 +895,7 @@
    test_vector_11: {
       "method": "00",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "eb73eb825949751fedc3e19c7e4db8abe0cc04089260bf781fce1380d8744838",
       "g_x_raw": "148ea8b2dd409f728445eb9af9953cf4af5226d9a5689c7dfba02ca8351bf940",
       "g_x": "5820148ea8b2dd409f728445eb9af9953cf4af5226d9a5689c7dfba02ca8351bf940",
@@ -983,6 +985,7 @@
    test_vector_12: {
       "method": "03",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "d60715f01158a5dc8d57809a11efe5e9128d6288384b0df7bfd57a03f43ba06d",
       "g_x_raw": "da8899b1326dd54e709a76981d5ed88affcf4fc8f1de7386bed043ec3ca28370",
       "g_x": "5820da8899b1326dd54e709a76981d5ed88affcf4fc8f1de7386bed043ec3ca28370",
@@ -1072,6 +1075,7 @@
    test_vector_13: {
       "method": "00",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "fc519273c01dcac094de78a0539d45fe36a944a24d11ce8c8781994202bf8a46",
       "g_x_raw": "9f38d3ec373ca0d3888b4e1bf3201d00c6d8fa9b01cd866dd0662351aeafd712",
       "g_x": "58209f38d3ec373ca0d3888b4e1bf3201d00c6d8fa9b01cd866dd0662351aeafd712",

@@ -154,14 +154,15 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	return edhoc_no_error;
 }
 
-enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
-				     struct other_party_cred *cred_r_array,
-				     uint16_t num_cred_r, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ead_2,
-				     uint64_t *ead_2_len, uint8_t *ead_4,
-				     uint64_t *ead_4_len, uint8_t *prk_4x3m,
-				     uint8_t prk_4x3m_len, uint8_t *th4,
-				     uint8_t th4_len)
+enum edhoc_error
+edhoc_initiator_run(const struct edhoc_initiator_context *c,
+		    struct other_party_cred *cred_r_array, uint16_t num_cred_r,
+		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_2,
+		    uint64_t *ead_2_len, uint8_t *ead_4, uint64_t *ead_4_len,
+		    uint8_t *prk_4x3m, uint8_t prk_4x3m_len, uint8_t *th4,
+		    uint8_t th4_len,
+		    enum edhoc_error (*tx)(uint8_t *data, uint32_t data_len),
+		    enum edhoc_error (*rx)(uint8_t *data, uint32_t *data_len))
 {
 	enum edhoc_error r;
 

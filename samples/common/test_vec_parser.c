@@ -84,13 +84,15 @@ static int get_test_ver_range(jsmntok_t *t, uint32_t element_total_count,
 			if (vec_cnt == vec_num) {
 				//at i the test vector with vec_num starts
 				*start_pos = i;
-				while (1) {
-					i++;
-					if (t[i].type == JSMN_OBJECT) {
-						*end_pos = i;
-						return 0;
-					}
-				}
+				*end_pos = i + (2 * t[i].size);
+				return 0;
+				// while (1) {
+				// 	i++;
+				// 	if (t[i].type == JSMN_PRIMITIVE) {
+				// 		*end_pos = i;
+				// 		return 0;
+				// 	}
+				// }
 			}
 		}
 	}
@@ -101,13 +103,15 @@ static int get_test_ver_range(jsmntok_t *t, uint32_t element_total_count,
 int get_element(char *test_vec_buf, jsmntok_t *t, uint32_t element_total_count,
 		char *element_name, uint8_t vec_num, struct byte_array *element)
 {
-	uint32_t start_pos, end_pos;
+	uint32_t start_pos = 0, end_pos = 0;
 	uint32_t i;
 
 	if (get_test_ver_range(t, element_total_count, &start_pos, &end_pos,
 			       vec_num) != 0) {
 		return -1;
 	}
+
+	//printf("start_pos: %d, end_pos: %d\n", start_pos, end_pos);
 	for (i = start_pos; i < end_pos; i++) {
 		if (jsoneq(test_vec_buf, &t[i], element_name) == 0) {
 			uint32_t len = t[i + 1].end - t[i + 1].start;
@@ -115,6 +119,7 @@ int get_element(char *test_vec_buf, jsmntok_t *t, uint32_t element_total_count,
 			printf("%s: %.*s\n", element_name, len, stat_str);
 			str2bytes(stat_str, len, element);
 			//PRINT_ARRAY("--", element->ptr, element->len);
+			return 0;
 		}
 	}
 
@@ -231,9 +236,10 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 			"Reading the parametes of the other party (initiator)...\n");
 		get_element(test_vec_buf, t, r, "id_cred_i", vec_num,
 			    &c->id_cred);
-		get_element(test_vec_buf, t, r, "cred_i", vec_num, &c->cred);
 		get_element(test_vec_buf, t, r, "g_i_raw", vec_num, &c->g);
 		get_element(test_vec_buf, t, r, "pk_i_raw", vec_num, &c->pk);
+		get_element(test_vec_buf, t, r, "cred_i", vec_num, &c->cred);
+
 	} else {
 		PRINT_MSG(
 			"\nReading the parametes of the other party (responder)...\n");

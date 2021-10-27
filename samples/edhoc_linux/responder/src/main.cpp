@@ -29,10 +29,10 @@ extern "C" {
 
 #define USE_IPV4
 
-CoapPDU *edhocPDU = new CoapPDU();
+CoapPDU *txPDU = new CoapPDU();
 
 char buffer[MAXLINE];
-CoapPDU *recvPDU;
+CoapPDU *rxPDU;
 
 /*comment this out to use DH keys from the test vectors*/
 //#define USE_RANDOM_EPHEMERAL_DH_KEY
@@ -84,7 +84,6 @@ static int start_coap_server(void)
 
 	return 0;
 }
-
 /**
  * @brief	Sends CoAP packet over network.
  * @param	pdu pointer to CoAP packet
@@ -94,7 +93,6 @@ static int send_coap_reply(CoapPDU *pdu)
 {
 	int r;
 
-	PRINT_ARRAY("CoAP message", pdu->getPDUPointer(), pdu->getPDULength());
 	r = sendto(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0,
 		   (struct sockaddr *)&client_addr, client_addr_len);
 	if (r < 0) {
@@ -107,28 +105,15 @@ static int send_coap_reply(CoapPDU *pdu)
 	return 0;
 }
 
-/**
- * @brief	Adds payload to CoAP response packet and sends it over network.
- * @param	msg pointer to message payload
- * @param	msg_len length of message payload
- * @param
- * @retval	
- */
-void send_coap(uint8_t *msg, uint32_t msg_len)
+enum edhoc_error tx(uint8_t *data, uint32_t data_len)
 {
-	edhocPDU->setCode(CoapPDU::COAP_CHANGED);
-	edhocPDU->setPayload(msg, msg_len);
-	send_coap_reply(edhocPDU);
+	txPDU->setCode(CoapPDU::COAP_CHANGED);
+	txPDU->setPayload(data, data_len);
+	send_coap_reply(txPDU);
+	return edhoc_no_error;
 }
 
-/**
- * @brief	Receives CoAP request packet and supplies the payload to the callee.
- * @param	msg buffer to store message payload
- * @param	msg_len integer to store length of the received message payload	
- * @param
- * @retval	
- */
-void recv_coap(uint8_t **msg, uint32_t *msg_len)
+enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
 	int n;
 
@@ -138,30 +123,118 @@ void recv_coap(uint8_t **msg, uint32_t *msg_len)
 
 	n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 0,
 		     (struct sockaddr *)&client_addr, &client_addr_len);
-	if (n < 0)
+	if (n < 0) {
 		printf("recv error");
-
-	recvPDU = new CoapPDU((uint8_t *)buffer, n);
-
-	if (recvPDU->validate()) {
-		recvPDU->printHuman();
 	}
 
-	edhocPDU->reset();
-	edhocPDU->setVersion(recvPDU->getVersion());
-	edhocPDU->setMessageID(recvPDU->getMessageID());
-	edhocPDU->setToken(recvPDU->getTokenPointer(),
-			   recvPDU->getTokenLength());
+	rxPDU = new CoapPDU((uint8_t *)buffer, n);
 
-	if (recvPDU->getType() == CoapPDU::COAP_CONFIRMABLE) {
-		edhocPDU->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+	if (rxPDU->validate()) {
+		rxPDU->printHuman();
+	}
+
+	PRINT_ARRAY("CoAP message", rxPDU->getPayloadPointer(),
+		    rxPDU->getPayloadLength());
+
+	uint32_t payload_len = rxPDU->getPayloadLength();
+	if (*data_len >= payload_len) {
+		memcpy(data, rxPDU->getPayloadPointer(), payload_len);
+		*data_len = payload_len;
 	} else {
-		edhocPDU->setType(CoapPDU::COAP_NON_CONFIRMABLE);
+		printf("insufficient space in buffer");
 	}
 
-	*msg = recvPDU->getPayloadPointer();
-	*msg_len = recvPDU->getPayloadLength();
+	txPDU->reset();
+	txPDU->setVersion(rxPDU->getVersion());
+	txPDU->setMessageID(rxPDU->getMessageID());
+	txPDU->setToken(rxPDU->getTokenPointer(), rxPDU->getTokenLength());
+
+	if (rxPDU->getType() == CoapPDU::COAP_CONFIRMABLE) {
+		txPDU->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+	} else {
+		txPDU->setType(CoapPDU::COAP_NON_CONFIRMABLE);
+	}
+
+	delete rxPDU;
+	return edhoc_no_error;
 }
+// /**
+//  * @brief	Sends CoAP packet over network.
+//  * @param	pdu pointer to CoAP packet
+//  * @retval	error code
+//  */
+// static int send_coap_reply(CoapPDU *pdu)
+// {
+// 	int r;
+
+// 	PRINT_ARRAY("CoAP message", pdu->getPDUPointer(), pdu->getPDULength());
+// 	r = sendto(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0,
+// 		   (struct sockaddr *)&client_addr, client_addr_len);
+// 	if (r < 0) {
+// 		printf("Error: failed to send reply (Code: %d, ErrNo: %d)\n", r,
+// 		       errno);
+// 		return r;
+// 	}
+
+// 	printf("CoAP reply sent!\n");
+// 	return 0;
+// }
+
+// /**
+//  * @brief	Adds payload to CoAP response packet and sends it over network.
+//  * @param	msg pointer to message payload
+//  * @param	msg_len length of message payload
+//  * @param
+//  * @retval
+//  */
+// void send_coap(uint8_t *msg, uint32_t msg_len)
+// {
+// 	edhocPDU->setCode(CoapPDU::COAP_CHANGED);
+// 	edhocPDU->setPayload(msg, msg_len);
+// 	send_coap_reply(edhocPDU);
+// }
+
+// /**
+//  * @brief	Receives CoAP request packet and supplies the payload to the callee.
+//  * @param	msg buffer to store message payload
+//  * @param	msg_len integer to store length of the received message payload
+//  * @param
+//  * @retval
+//  */
+// void recv_coap(uint8_t **msg, uint32_t *msg_len)
+// {
+// 	int n;
+
+// 	/* receive */
+// 	client_addr_len = sizeof(client_addr);
+// 	memset(&client_addr, 0, sizeof(client_addr));
+
+// 	n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 0,
+// 		     (struct sockaddr *)&client_addr, &client_addr_len);
+// 	if (n < 0)
+// 		printf("recv error");
+
+// 	recvPDU = new CoapPDU((uint8_t *)buffer, n);
+
+// 	if (recvPDU->validate()) {
+// 		recvPDU->printHuman();
+// 	}
+
+// 	edhocPDU->reset();
+// 	edhocPDU->setVersion(recvPDU->getVersion());
+// 	edhocPDU->setMessageID(recvPDU->getMessageID());
+// 	edhocPDU->setToken(recvPDU->getTokenPointer(),
+// 			   recvPDU->getTokenLength());
+
+// 	if (recvPDU->getType() == CoapPDU::COAP_CONFIRMABLE) {
+// 		edhocPDU->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+// 	} else {
+// 		edhocPDU->setType(CoapPDU::COAP_NON_CONFIRMABLE);
+// 	}
+
+// 	*msg = recvPDU->getPayloadPointer();
+// 	*msg_len = recvPDU->getPayloadLength();
+// }
 
 int main()
 {
@@ -179,7 +252,7 @@ int main()
 	uint64_t ad_3_len = sizeof(ad_1);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 8;
+	const uint8_t TEST_VEC_NUM = 13;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_i;
 	struct edhoc_responder_context c_r;
@@ -254,7 +327,7 @@ int main()
 					&err_msg_len, (uint8_t *)&ad_1,
 					&ad_1_len, (uint8_t *)&ad_3, &ad_3_len,
 					PRK_4x3m, sizeof(PRK_4x3m), th4,
-					sizeof(th4));
+					sizeof(th4), tx, rx);
 		if (r != edhoc_no_error) {
 			printf("error responder run (Error Code %d)\n", r);
 		}

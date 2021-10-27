@@ -111,9 +111,9 @@ CFLAGS += -DCDDL_CBOR_CANONICAL
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
-# CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-# CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-# LDFLAGS += -fsanitize=address -static-libasan
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS += -fsanitize=address -static-libasan
 
 ###########################################
 # default action: build all

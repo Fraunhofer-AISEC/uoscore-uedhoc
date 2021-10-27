@@ -160,14 +160,15 @@ ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
  * @param   th4 transcript hash4 used in the exporter interface
  * @param   th4_len length of th4
  */
-enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
-				     struct other_party_cred *cred_r_array,
-				     uint16_t num_cred_r, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ead_2,
-				     uint64_t *ead_2_len, uint8_t *ead_4,
-				     uint64_t *ead_4_len, uint8_t *prk_4x3m,
-				     uint8_t prk_4x3m_len, uint8_t *th4,
-				     uint8_t th4_len);
+enum edhoc_error
+edhoc_initiator_run(const struct edhoc_initiator_context *c,
+		    struct other_party_cred *cred_r_array, uint16_t num_cred_r,
+		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_2,
+		    uint64_t *ead_2_len, uint8_t *ead_4, uint64_t *ead_4_len,
+		    uint8_t *prk_4x3m, uint8_t prk_4x3m_len, uint8_t *th4,
+		    uint8_t th4_len,
+		    enum edhoc_error (*tx)(uint8_t *data, uint32_t data_len),
+		    enum edhoc_error (*rx)(uint8_t *data, uint32_t *data_len));
 
 /**
  * @brief   Executes the EDHOC protocol on the responder side
@@ -189,14 +190,15 @@ enum edhoc_error edhoc_initiator_run(const struct edhoc_initiator_context *c,
  * @param   th4 transcript hash4 used in the exporter interface
  * @param   th4_len length of th4
  */
-enum edhoc_error edhoc_responder_run(struct edhoc_responder_context *c,
-				     struct other_party_cred *cred_i_array,
-				     uint16_t num_cred_i, uint8_t *err_msg,
-				     uint32_t *err_msg_len, uint8_t *ead_1,
-				     uint64_t *ead_1_len, uint8_t *ead_3,
-				     uint64_t *ead_3_len, uint8_t *prk_4x3m,
-				     uint16_t prk_4x3m_len, uint8_t *th4,
-				     uint16_t th4_len);
+enum edhoc_error
+edhoc_responder_run(struct edhoc_responder_context *c,
+		    struct other_party_cred *cred_i_array, uint16_t num_cred_i,
+		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_1,
+		    uint64_t *ead_1_len, uint8_t *ead_3, uint64_t *ead_3_len,
+		    uint8_t *prk_4x3m, uint16_t prk_4x3m_len, uint8_t *th4,
+		    uint16_t th4_len,
+		    enum edhoc_error (*tx)(uint8_t *data, uint32_t data_len),
+		    enum edhoc_error (*rx)(uint8_t *data, uint32_t *data_len));
 
 /**
  * @brief   used to create application specific symmetric keys using the 

@@ -51,4 +51,16 @@ enum edhoc_error {
 
 };
 
+/*This macro checks if a function returns an error and if so it propages 
+	the error to the caller function*/
+#define TRY(x)                                                                 \
+	do {                                                                   \
+		int retval = (x);                                              \
+		if (retval != edhoc_no_error) {                                \
+			PRINTF("Runtime error: %s error code %d at %s:%d\n",   \
+			       #x, retval, __FILE__, __LINE__);                \
+			return retval;                                         \
+		}                                                              \
+	} while (0)
+
 #endif

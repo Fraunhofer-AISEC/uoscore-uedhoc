@@ -207,69 +207,53 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 				uint8_t *th, uint8_t th_len,
 				uint8_t *ciphertext, uint32_t *ciphertext_len)
 {
-	enum edhoc_error r;
-
 	/*Encode plaintext*/
 	uint8_t plaintext[PLAINTEXT_DEFAULT_SIZE];
 	uint32_t plaintext_len = sizeof(plaintext);
 
 	uint8_t signature_or_mac_enc[signature_or_mac_len + 2];
 	uint64_t signature_or_mac_enc_len = sizeof(signature_or_mac_enc);
-	r = encode_byte_string(signature_or_mac, signature_or_mac_len,
-			       signature_or_mac_enc, &signature_or_mac_enc_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(encode_byte_string(signature_or_mac, signature_or_mac_len,
+			       signature_or_mac_enc,
+			       &signature_or_mac_enc_len));
 
 	if (ctxt != CIPHERTEXT4) {
 		uint8_t kid_buf[KID_DEFAULT_SIZE];
 		uint32_t kid_len = sizeof(kid_buf);
-		r = id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len));
+
 		PRINT_ARRAY("kid", kid_buf, kid_len);
 
 		if (kid_len != 0) {
 			/*id_cred_x is a KID*/
-			r = _memcpy_s(plaintext, plaintext_len, kid_buf,
-				      kid_len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
-			r = _memcpy_s(plaintext + kid_len,
+			TRY(_memcpy_s(plaintext, plaintext_len, kid_buf,
+				      kid_len));
+
+			TRY(_memcpy_s(plaintext + kid_len,
 				      plaintext_len - kid_len,
 				      signature_or_mac_enc,
-				      signature_or_mac_enc_len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
+				      signature_or_mac_enc_len));
+
 			plaintext_len = signature_or_mac_enc_len + kid_len;
 		} else {
 			/*id_cred_x is NOT a KID*/
-			r = _memcpy_s(plaintext, plaintext_len, id_cred,
-				      id_cred_len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
-			r = _memcpy_s(plaintext + id_cred_len,
+			TRY(_memcpy_s(plaintext, plaintext_len, id_cred,
+				      id_cred_len));
+
+			TRY(_memcpy_s(plaintext + id_cred_len,
 				      plaintext_len - id_cred_len,
 				      signature_or_mac_enc,
-				      signature_or_mac_enc_len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
+				      signature_or_mac_enc_len));
+
 			plaintext_len = id_cred_len + signature_or_mac_enc_len;
 		}
 	} else {
 		plaintext_len = 0;
 	}
 	if (ead_len > 0) {
-		r = _memcpy_s(plaintext + plaintext_len,
-			      sizeof(plaintext) - plaintext_len, ead, ead_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(_memcpy_s(plaintext + plaintext_len,
+			      sizeof(plaintext) - plaintext_len, ead, ead_len));
+
 		plaintext_len += ead_len;
 	}
 
@@ -280,12 +264,10 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 		/*Derive KEYSTREAM_2*/
 		uint64_t KEYSTREAM_2_len = plaintext_len;
 		uint8_t KEYSTREAM_2[KEYSTREAM_2_len];
-		r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
+		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
 			     "KEYSTREAM_2", NULL, 0, KEYSTREAM_2,
-			     KEYSTREAM_2_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+			     KEYSTREAM_2_len));
+
 		PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
 
 		/*encrypt*/
@@ -301,58 +283,39 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 	//todo take the length of the key and nonce from the ciphersuite
 	uint8_t K[16], N[13];
 	if (ctxt == CIPHERTEXT3) {
-		r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, "K_3",
-			     NULL, 0, K, sizeof(K));
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, "K_3",
+			     NULL, 0, K, sizeof(K)));
 		PRINT_ARRAY("K_3", K, sizeof(K));
 
 		/*Calculate IV_3*/
-		r = okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
-			     "IV_3", NULL, 0, N, sizeof(N));
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
+			     "IV_3", NULL, 0, N, sizeof(N)));
+
 		PRINT_ARRAY("IV_3", N, sizeof(N));
 	}
 
 	if (ctxt == CIPHERTEXT4) {
-		r = edhoc_exporter(SHA_256, prk, prk_len, th, th_len,
-				   "EDHOC_K_4", K, sizeof(K));
-		if (r != edhoc_no_error) {
-			return r;
-		}
-		r = edhoc_exporter(SHA_256, prk, prk_len, th, th_len,
-				   "EDHOC_IV_4", N, sizeof(N));
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(edhoc_exporter(SHA_256, prk, prk_len, th, th_len,
+				   "EDHOC_K_4", K, sizeof(K)));
+		TRY(edhoc_exporter(SHA_256, prk, prk_len, th, th_len,
+				   "EDHOC_IV_4", N, sizeof(N)));
 	}
 
 	/*Associated data*/
 	uint8_t associated_data[ASSOCIATED_DATA_DEFAULT_SIZE];
 	uint16_t associated_data_len = sizeof(associated_data);
-	r = associated_data_encode(th, th_len, (uint8_t *)&associated_data,
-				   &associated_data_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(associated_data_encode(th, th_len, (uint8_t *)&associated_data,
+				   &associated_data_len));
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
 	/*Ciphertext 3 calculate*/
 	uint8_t mac_len = get_mac_len(suite->edhoc_aead);
 	uint8_t tag[mac_len];
-	// uint32_t ciphertext_3_len = plaintext_len;
-	// uint8_t ciphertext_3[ciphertext_3_len + mac_len];
 	*ciphertext_len = plaintext_len;
 
-	r = aead(ENCRYPT, plaintext, plaintext_len, K, sizeof(K), N, sizeof(N),
+	TRY(aead(ENCRYPT, plaintext, plaintext_len, K, sizeof(K), N, sizeof(N),
 		 associated_data, associated_data_len, ciphertext,
-		 *ciphertext_len, tag, mac_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+		 *ciphertext_len, tag, mac_len));
 	*ciphertext_len += mac_len;
 	PRINT_ARRAY("ciphertext_2/3/4", ciphertext, *ciphertext_len);
 	return edhoc_no_error;
