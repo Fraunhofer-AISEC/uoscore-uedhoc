@@ -8,7 +8,6 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 */
-#include "main.h"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -64,62 +63,6 @@ static int start_coap_client(void)
 	return 0;
 }
 
-// /**
-//  * @brief	Creates CoAP packet and sends supplied payload over network.
-//  * @param	msg pointer to message payload
-//  * @param	msg_len length of message payload
-//  * @param
-//  * @retval
-//  */
-// void send_coap(uint8_t *msg, uint32_t msg_len)
-// {
-// 	/*construct a CoAP packet*/
-// 	static uint16_t mid = 0;
-// 	static uint32_t token = 0;
-// 	CoapPDU *pdu = new CoapPDU();
-// 	pdu->reset();
-// 	pdu->setVersion(1);
-// 	pdu->setType(CoapPDU::COAP_CONFIRMABLE);
-// 	pdu->setCode(CoapPDU::COAP_POST);
-// 	pdu->setToken((uint8_t *)&(++token), sizeof(token));
-// 	pdu->setMessageID(mid++);
-// 	pdu->setURI((char *)".well-known/edhoc", 17);
-// 	pdu->setPayload(msg, msg_len);
-
-// 	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
-
-// 	delete pdu;
-// }
-
-// /**
-//  * @brief	Waits for CoAP response packet and provides payload to callee.
-//  * @param	msg buffer to store received message payload
-//  * @param	msg_len integer to store length of received message payload
-//  * @param
-//  * @retval
-//  */
-// void recv_coap(uint8_t **msg, uint32_t *msg_len)
-// {
-// 	int n;
-// 	char buffer[MAXLINE];
-// 	CoapPDU *recvPDU;
-// 	/* receive */
-// 	n = recv(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL);
-// 	if (n < 0) {
-// 		printf("recv error");
-// 	}
-
-// 	recvPDU = new CoapPDU((uint8_t *)buffer, n);
-
-// 	if (recvPDU->validate()) {
-// 		recvPDU->printHuman();
-// 	}
-
-// 	*msg = recvPDU->getPayloadPointer();
-// 	*msg_len = recvPDU->getPayloadLength();
-
-// 	delete recvPDU;
-// }
 
 /**
  * @brief	Callback function called inside the frontend when data needs to 
@@ -213,34 +156,15 @@ int main()
 	char test_vec_buf[1024 * 120];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 
-	/*errors*/
-	enum edhoc_error r;
-	int err;
+	TRY(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len));
 
-	err = read_test_vectors(filename, test_vec_buf, &test_vec_buf_len);
-	if (err != 0) {
-		printf("cannot read test_vectors!\n");
-		return -1;
-	}
+	TRY(get_OTHER_PARTY_CRED_from_test_vec(RESPONDER, &other_party_bufs,
+					       &cred_r, TEST_VEC_NUM,
+					       test_vec_buf, test_vec_buf_len));
 
-	err = get_OTHER_PARTY_CRED_from_test_vec(RESPONDER, &other_party_bufs,
-						 &cred_r, TEST_VEC_NUM,
-						 test_vec_buf,
-						 test_vec_buf_len);
-	if (err != 0) {
-		printf("cannot get OTHER_PARTY_CRED\n");
-		return -1;
-	}
-
-	err = get_EDHOC_INITIATOR_CONTEXT_from_test_vec(&initiator_context_bufs,
-							&c_i, TEST_VEC_NUM,
-							test_vec_buf,
-							test_vec_buf_len);
-
-	if (err != 0) {
-		printf("cannot get INITIATOR_CONTEXT\n");
-		return -1;
-	}
+	TRY(get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
+		&initiator_context_bufs, &c_i, TEST_VEC_NUM, test_vec_buf,
+		test_vec_buf_len));
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
 	uint32_t seed;
@@ -255,10 +179,7 @@ int main()
 	PRINT_ARRAY("seed", (uint8_t *)&seed, seed_len);
 
 	/*create ephemeral DH keys from seed*/
-	r = ephemeral_dh_key_gen(X25519, seed, X_random, G_X_random);
-	if (r != edhoc_no_error) {
-		printf("Error in ephemeral_dh_key_gen, (Error code %d)\n", r);
-	}
+	TRY(ephemeral_dh_key_gen(X25519, seed, X_random, G_X_random));
 	c_i.g_x.ptr = G_X_random;
 	c_i.g_x.len = sizeof(G_X_random);
 	c_i.x.ptr = X_random;
@@ -268,27 +189,23 @@ int main()
 
 #endif
 
-	err = start_coap_client();
-	if (err != 0) {
-		printf("Error in start_coap_client, (Error code %d)\n", err);
-	}
+	TRY(start_coap_client());
 
-	r = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
+	TRY(edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, ad_4, &ad_4_len, PRK_4x3m,
-				sizeof(PRK_4x3m), th4, sizeof(th4), tx, rx);
-	if (r != edhoc_no_error) {
-		printf("Error in edhoc_initiator_run, (Error code %d)\n", r);
-	}
+				sizeof(PRK_4x3m), th4, sizeof(th4), tx, rx));
 
 	PRINT_ARRAY("PRK_4x3m", PRK_4x3m, sizeof(PRK_4x3m));
 	PRINT_ARRAY("th4", th4, sizeof(th4));
 
-	edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4, sizeof(th4),
-		       "OSCORE_Master_Secret", oscore_master_secret, 16);
+	TRY(edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4,
+			   sizeof(th4), "OSCORE_Master_Secret",
+			   oscore_master_secret, 16));
 	PRINT_ARRAY("OSCORE Master Secret", oscore_master_secret, 16);
 
-	edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4, sizeof(th4),
-		       "OSCORE_Master_Salt", oscore_master_salt, 8);
+	TRY(edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4,
+			   sizeof(th4), "OSCORE_Master_Salt",
+			   oscore_master_salt, 8));
 	PRINT_ARRAY("OSCORE Master Salt", oscore_master_salt, 8);
 
 	close(sockfd);
