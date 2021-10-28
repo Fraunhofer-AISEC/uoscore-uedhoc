@@ -8,6 +8,33 @@
 enum role { INITIATOR, RESPONDER };
 enum C_X_TYPE { C_I, C_R };
 
+struct messages_bufs {
+	uint8_t m1[MSG_1_DEFAULT_SIZE];
+	uint8_t m2[MSG_2_DEFAULT_SIZE];
+	uint8_t m3[MSG_3_DEFAULT_SIZE];
+	uint8_t m4[MSG_4_DEFAULT_SIZE];
+};
+
+struct messages {
+	struct byte_array m1;
+	struct byte_array m2;
+	struct byte_array m3;
+	struct byte_array m4;
+};
+
+struct results_bufs {
+	uint8_t prk_4x3m[PRK_DEFAULT_SIZE];
+	uint8_t th4[32];
+	uint8_t oscore_master_salt[8];
+	uint8_t oscore_master_secret[16];
+};
+struct results {
+	struct byte_array prk_4x3m;
+	struct byte_array th4;
+	struct byte_array oscore_master_salt;
+	struct byte_array oscore_master_secret;
+};
+
 struct other_party_cred_bufs {
 	uint8_t id_cred[ID_CRED_DEFAULT_SIZE];
 	uint8_t cred[CERT_DEFAUT_SIZE];
@@ -84,4 +111,12 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	struct edhoc_responder_context_bufs *bufs,
 	struct edhoc_responder_context *c, uint8_t vec_num, char *test_vec_buf,
 	uint32_t test_vec_buf_len);
+
+int get_RESULTS_from_test_vec(struct results_bufs *bufs, struct results *m,
+			      uint8_t vec_num, char *test_vec_buf,
+			      uint32_t test_vec_buf_len);
+
+int get_MESSAGES_from_test_vec(struct messages_bufs *bufs, struct messages *m,
+			       uint8_t vec_num, char *test_vec_buf,
+			       uint32_t test_vec_buf_len);
 #endif

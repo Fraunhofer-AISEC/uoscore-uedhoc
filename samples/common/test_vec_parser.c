@@ -28,7 +28,7 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s)
 int read_test_vectors(char *filename, char *test_vec_buf, uint32_t *len)
 {
 	long length;
-	printf("Opening file: %s\n", filename);
+	PRINTF("Opening file: %s\n", filename);
 
 	FILE *f = fopen(filename, "rb");
 
@@ -116,7 +116,7 @@ int get_element(char *test_vec_buf, jsmntok_t *t, uint32_t element_total_count,
 		if (jsoneq(test_vec_buf, &t[i], element_name) == 0) {
 			uint32_t len = t[i + 1].end - t[i + 1].start;
 			char *stat_str = test_vec_buf + t[i + 1].start;
-			printf("%s: %.*s\n", element_name, len, stat_str);
+			//printf("%s: %.*s\n", element_name, len, stat_str);
 			str2bytes(stat_str, len, element);
 			//PRINT_ARRAY("--", element->ptr, element->len);
 			return 0;
@@ -359,4 +359,68 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 			  &c->suites_r);
 	return get_C_X_decode(vec_num, test_vec_buf, r, t, bufs->c_r, "c_r",
 			      sizeof(bufs->c_r), &c->c_r);
+}
+
+int get_MESSAGES_from_test_vec(struct messages_bufs *bufs, struct messages *m,
+			       uint8_t vec_num, char *test_vec_buf,
+			       uint32_t test_vec_buf_len)
+{
+	int r;
+	jsmn_parser p;
+	jsmntok_t t[20000]; /* We expect no more than 20000 tokens */
+
+	jsmn_init(&p);
+	r = jsmn_parse(&p, test_vec_buf, test_vec_buf_len, t,
+		       sizeof(t) / sizeof(t[0]));
+	if (r < 0) {
+		printf("Failed to parse JSON: %d\n", r);
+		return -1;
+	}
+
+	byte_array_init(bufs->m1, sizeof(bufs->m1), &m->m1);
+	byte_array_init(bufs->m2, sizeof(bufs->m2), &m->m2);
+	byte_array_init(bufs->m3, sizeof(bufs->m2), &m->m3);
+	byte_array_init(bufs->m4, sizeof(bufs->m4), &m->m4);
+
+	get_element(test_vec_buf, t, r, "message_1", vec_num, &m->m1);
+	get_element(test_vec_buf, t, r, "message_2", vec_num, &m->m2);
+	get_element(test_vec_buf, t, r, "message_3", vec_num, &m->m3);
+	get_element(test_vec_buf, t, r, "message_4", vec_num, &m->m4);
+
+	return 0;
+}
+
+int get_RESULTS_from_test_vec(struct results_bufs *bufs, struct results *m,
+			      uint8_t vec_num, char *test_vec_buf,
+			      uint32_t test_vec_buf_len)
+{
+	int r;
+	jsmn_parser p;
+	jsmntok_t t[20000]; /* We expect no more than 20000 tokens */
+
+	jsmn_init(&p);
+	r = jsmn_parse(&p, test_vec_buf, test_vec_buf_len, t,
+		       sizeof(t) / sizeof(t[0]));
+	if (r < 0) {
+		printf("Failed to parse JSON: %d\n", r);
+		return -1;
+	}
+
+	byte_array_init(bufs->prk_4x3m, sizeof(bufs->prk_4x3m), &m->prk_4x3m);
+	byte_array_init(bufs->th4, sizeof(bufs->th4), &m->th4);
+	byte_array_init(bufs->oscore_master_salt,
+			sizeof(bufs->oscore_master_salt),
+			&m->oscore_master_salt);
+	byte_array_init(bufs->oscore_master_secret,
+			sizeof(bufs->oscore_master_secret),
+			&m->oscore_master_secret);
+
+	get_element(test_vec_buf, t, r, "prk_4x3m_raw", vec_num, &m->prk_4x3m);
+	get_element(test_vec_buf, t, r, "th_4_raw", vec_num, &m->th4);
+	get_element(test_vec_buf, t, r, "oscore_salt_raw", vec_num,
+		    &m->oscore_master_salt);
+	get_element(test_vec_buf, t, r, "oscore_secret_raw", vec_num,
+		    &m->oscore_master_secret);
+
+	return 0;
 }

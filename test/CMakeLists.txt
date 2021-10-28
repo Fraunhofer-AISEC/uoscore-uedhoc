@@ -5,8 +5,15 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(auto_test)
 
-FILE(GLOB app_sources src/*.c)
+FILE(GLOB app_sources 
+  src/*.c 
+  ../samples/common/test_vec_parser.c
+  ../samples/common/cbor/*.c)
 target_sources(app PRIVATE ${app_sources})
+
+include_directories(
+  ../externals/jsmn
+  ../externals/cddl-gen/include)
 
 # The external static library that we are linking with does not know
 # how to build for this platform so we export all the flags used in

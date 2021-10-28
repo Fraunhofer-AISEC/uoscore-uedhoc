@@ -56,7 +56,7 @@ enum edhoc_error {
 #define TRY(x)                                                                 \
 	do {                                                                   \
 		int retval = (x);                                              \
-		if (retval != edhoc_no_error) {                                \
+		if (retval != 0) {                                             \
 			PRINTF("Runtime error: %s error code %d at %s:%d\n",   \
 			       #x, retval, __FILE__, __LINE__);                \
 			return retval;                                         \

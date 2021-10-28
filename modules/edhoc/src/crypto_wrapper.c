@@ -73,41 +73,6 @@ sign(enum sign_alg_curve curve, const uint8_t *sk, const uint8_t sk_len,
 		edsign_sign(out, pk, sk, msg, msg_len);
 	}
 	if (curve == P_256_SIGN) {
-		//unsigned int digest[TC_SHA256_DIGEST_SIZE / 4];
-		uint8_t digest_bytes[TC_SHA256_DIGEST_SIZE];
-		struct tc_sha256_state_struct s;
-		int r;
-		r = tc_sha256_init(&s);
-		if (r != TC_CRYPTO_SUCCESS) {
-			return sha_failed;
-		};
-		r = tc_sha256_update(&s, msg, msg_len);
-		if (r != TC_CRYPTO_SUCCESS) {
-			return sha_failed;
-		};
-		r = tc_sha256_final(digest_bytes, &s);
-		if (r != TC_CRYPTO_SUCCESS) {
-			return sha_failed;
-		};
-		/* if digest larger than ECC scalar, drop the end
-		 * if digest smaller than ECC scalar, zero-pad front */
-		// int hash_dwords = TC_SHA256_DIGEST_SIZE / 4;
-		// if (NUM_ECC_WORDS < hash_dwords) {
-		// 	hash_dwords = NUM_ECC_WORDS;
-		// }
-
-		// memset(digest, 0, NUM_ECC_BYTES - 4 * hash_dwords);
-		// uECC_vli_bytesToNative(digest + (NUM_ECC_WORDS - hash_dwords),
-		// 		       digest_bytes, TC_SHA256_DIGEST_SIZE);
-
-		// unsigned int private[NUM_ECC_WORDS];
-		// uint8_t private_bytes[NUM_ECC_BYTES];
-
-		r = uECC_sign(sk, digest_bytes, sizeof(digest_bytes), out,
-			      uECC_secp256r1());
-		if (r != TC_CRYPTO_SUCCESS) {
-			return sign_failed;
-		};
 	}
 #endif
 	return edhoc_no_error;
@@ -198,34 +163,6 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 	return edhoc_no_error;
 }
 
-// static void decompress(const uint8_t *compressed, uint8_t *public_key,
-// 		       uECC_Curve curve)
-// {
-// #if uECC_VLI_NATIVE_LITTLE_ENDIAN
-// 	uECC_word_t *point = (uECC_word_t *)public_key;
-// #else
-// 	uECC_word_t point[4 * 2];
-// #endif
-// 	uECC_word_t *y = point + curve->num_words;
-// #if uECC_VLI_NATIVE_LITTLE_ENDIAN
-// 	bcopy(public_key, compressed + 1, curve->num_bytes);
-// #else
-// 	uECC_vli_bytesToNative(point, compressed + 1, curve->num_bytes);
-// #endif
-// 	curve->x_side(y, point, curve);
-// 	curve->mmod_fast(y, curve);
-
-// 	if ((y[0] & 0x01) != (compressed[0] & 0x01)) {
-// 		uECC_vli_sub(y, curve->p, y, curve->num_words);
-// 	}
-
-// #if uECC_VLI_NATIVE_LITTLE_ENDIAN == 0
-// 	uECC_vli_nativeToBytes(public_key, curve->num_bytes, point);
-// 	uECC_vli_nativeToBytes(public_key + curve->num_bytes, curve->num_bytes,
-// 			       y);
-// #endif
-// }
-
 enum edhoc_error __attribute__((weak))
 shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
 		     const uint32_t sk_len, const uint8_t *pk,
@@ -238,40 +175,6 @@ shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
 		c25519_prepare(e);
 		c25519_smult(shared_secret, pk, e);
 	} else if (curve == P_256_ECDH) {
-		// 	uint8_t G_X[] = { 0x47, 0x57, 0x76, 0xf8, 0x44, 0x97, 0x9a,
-		// 			  0xd0, 0xb4, 0x63, 0xc5, 0xa6, 0xa4, 0x34,
-		// 			  0x3a, 0x66, 0x3d, 0x17, 0xa3, 0xa8, 0x0e,
-		// 			  0x38, 0xa8, 0x1d, 0x3e, 0x34, 0x96, 0xf6,
-		// 			  0x06, 0x1f, 0xd7, 0x16 };
-
-		// 	uint8_t Y[] = { 0x73, 0x97, 0xba, 0x34, 0xa7, 0xb6, 0x0a, 0x4d,
-		// 			0x98, 0xef, 0x5e, 0x91, 0x56, 0x3f, 0xc8, 0x54,
-		// 			0x9f, 0x35, 0x54, 0x49, 0x4f, 0x1f, 0xeb, 0xd4,
-		// 			0x65, 0x36, 0x0c, 0x4b, 0x90, 0xe7, 0x41, 0x71 };
-		// 	uint8_t public_key[64];
-		// 	decompress(G_X, public_key, uECC_secp256r1());
-		// 	int r = uECC_shared_secret(public_key, Y, shared_secret,
-		// 				   uECC_secp256r1());
-		// 	PRINT_ARRAY("G_XY from G_X and Y", shared_secret, 32);
-
-		// 	uint8_t G_Y[] = { 0x81, 0xdf, 0x54, 0xb3, 0x75, 0x6a, 0xcf,
-		// 			  0xc8, 0xa1, 0xe9, 0xb0, 0x8b, 0xa1, 0x0d,
-		// 			  0xe4, 0xe7, 0xe7, 0xdd, 0x93, 0x45, 0x87,
-		// 			  0xa1, 0xec, 0xdb, 0x21, 0xb9, 0x2f, 0x8f,
-		// 			  0x22, 0xc3, 0xa3, 0x8d };
-
-		// 	uint8_t X[] = { 0x0a, 0xe7, 0x99, 0x77, 0x5c, 0xb1, 0x51, 0xbf,
-		// 			0xc2, 0x54, 0x87, 0x35, 0xf4, 0x4a, 0xcf, 0x1d,
-		// 			0x94, 0x29, 0xcf, 0x9a, 0x95, 0xdd, 0xcd, 0x2a,
-		// 			0x13, 0x9e, 0x3a, 0x28, 0xd8, 0x63, 0xa0, 0x81 };
-		// 	decompress(G_Y, public_key, uECC_secp256r1());
-		// 	r = uECC_shared_secret(public_key, X, shared_secret,
-		// 			       uECC_secp256r1());
-		// 	PRINT_ARRAY("G_XY from G_Y and X", shared_secret, 32);
-		// 	//int r = uECC_shared_secret(pk, sk,shared_secret, uECC_secp256r1());
-		// 	if (r != TC_CRYPTO_SUCCESS) {
-		// 		return dh_failed;
-		// 	}
 	}
 #endif
 	return edhoc_no_error;

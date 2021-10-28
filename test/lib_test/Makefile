@@ -58,6 +58,7 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 C_INCLUDES = -I../../externals/tinycrypt/lib/include
 C_INCLUDES += -I../../externals/cddl-gen/include
 
+
 ifeq	($(LIB_NAME), libuedhoc.a) 
 	C_INCLUDES += -I../../externals/tinycbor/src/ 
 	C_INCLUDES += -I../../externals/compact25519/src/c25519/ 

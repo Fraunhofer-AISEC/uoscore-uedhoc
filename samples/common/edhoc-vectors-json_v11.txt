@@ -2,6 +2,7 @@
    test_vector_1: {
       "method": "03",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "b3111998cb3f668663ed4251c78be6e95a4da127e4f6fee275e855d8d9dfd8ed",
       "g_x_raw": "3aa9eb3201b3367b8c8be38d91e57a2b433e67888c86d2ac006a520842ed5037",
       "g_x": "58203aa9eb3201b3367b8c8be38d91e57a2b433e67888c86d2ac006a520842ed5037",
@@ -91,6 +92,7 @@
    test_vector_2: {
       "method": "02",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "27e08be5632f9e1b3f3bb2d3ad04d7ea000e0dfb314beb6db72c5d7255aab4e8",
       "g_x_raw": "c199b9615a9296a034b060da80d9c07a6f10f95784aedc7d7ec070b41b588e18",
       "g_x": "5820c199b9615a9296a034b060da80d9c07a6f10f95784aedc7d7ec070b41b588e18",
@@ -180,6 +182,7 @@
    test_vector_3: {
       "method": "01",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "4ded6e99d022b98609ad87482fff0cd49965473e8dd21d90f9582ff457ad73ac",
       "g_x_raw": "a10736746b5f56248061ae63592acb8c884834c6761cb0a20683bff4039d965e",
       "g_x": "5820a10736746b5f56248061ae63592acb8c884834c6761cb0a20683bff4039d965e",
@@ -269,6 +272,7 @@
    test_vector_4: {
       "method": "00",
       "suites_i": "00",
+      "suites_r": "00",
       "x_raw": "b026b168429b213d6b421df6abd0641cd66dca2ee7fd5977104bb238182e5ea6",
       "g_x_raw": "e31ec15ee8039427dfc4727ef17e2e0e69c54437f3c5828019ef0a6388c12552",
       "g_x": "5820e31ec15ee8039427dfc4727ef17e2e0e69c54437f3c5828019ef0a6388c12552",

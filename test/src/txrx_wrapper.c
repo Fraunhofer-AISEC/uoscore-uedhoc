@@ -12,10 +12,8 @@
 #include <edhoc.h>
 #include <stdbool.h>
 #include <string.h>
-
+#include "edhoc_tests.h"
 bool rx_initiator_switch = false;
-
-extern struct byte_array M1, M2, M3;
 
 /**
  * memcpy_s (see [1]) may not be available in some setups thus our own 
@@ -35,32 +33,34 @@ static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
 
 enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
-	int r;
+	static uint8_t msg_cnt = 1;
 	if (rx_initiator_switch) {
 		PRINTF("TXRX wrapper test vectors\n");
-		/*The sender must get msg2*/
-		r = _memcpy_s(data, *data_len, M2.ptr, M2.len);
-		if (r != 0)
-			return message_buff_to_small;
-		*data_len = M2.len;
-
-	} else {
-		PRINTF("TXRX wrapper test vectors\n");
-		static uint8_t msg_cnt = 1;
-		/*The recipient must get msg1 and msg3*/
+		/*The initiator must get msg2 and msg4*/
 		if (msg_cnt == 1) {
-			/*message 1 */
-			r = _memcpy_s(data, *data_len, M1.ptr, M1.len);
-			if (r != 0)
-				return message_buff_to_small;
-			*data_len = M1.len;
+			/*message 2*/
+			TRY(_memcpy_s(data, *data_len, m.m2.ptr, m.m2.len));
+			*data_len = m.m2.len;
 			msg_cnt++;
 		} else {
-			/*message 2*/
-			r = _memcpy_s(data, *data_len, M3.ptr, M3.len);
-			if (r != 0)
-				return message_buff_to_small;
-			*data_len = M3.len;
+			/*message 4*/
+			TRY(_memcpy_s(data, *data_len, m.m4.ptr, m.m4.len));
+			*data_len = m.m4.len;
+			msg_cnt = 1;
+		}
+	} else {
+		PRINTF("TXRX wrapper test vectors\n");
+
+		/*The responder must get msg1 and msg3*/
+		if (msg_cnt == 1) {
+			/*message 1 */
+			TRY(_memcpy_s(data, *data_len, m.m1.ptr, m.m1.len));
+			*data_len = m.m1.len;
+			msg_cnt++;
+		} else {
+			/*message 3*/
+			TRY(_memcpy_s(data, *data_len, m.m3.ptr, m.m3.len));
+			*data_len = m.m3.len;
 			msg_cnt = 1;
 		}
 	}
@@ -68,6 +68,6 @@ enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 }
 
 enum edhoc_error tx(uint8_t *data, uint32_t data_len)
-{
+{ //to do add here a test
 	return edhoc_no_error;
 }
