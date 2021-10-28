@@ -35,15 +35,11 @@ static enum edhoc_error ciphertext_encrypt_decrypt(
 	const uint16_t aad_len, uint8_t *out, const uint16_t out_len,
 	uint8_t *tag, const uint16_t tag_len)
 {
-	enum edhoc_error r;
 	if (ctxt == CIPHERTEXT2) {
 		xor_arrays(in, key, key_len, out);
 	} else {
-		r = aead(op, in, in_len, key, key_len, nonce, nonce_len, aad,
-			 aad_len, out, out_len, tag, tag_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(aead(op, in, in_len, key, key_len, nonce, nonce_len, aad,
+			 aad_len, out, out_len, tag, tag_len));
 	}
 	return edhoc_no_error;
 }
@@ -58,46 +54,28 @@ ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
 		   uint8_t prk_len, uint8_t *th, uint8_t th_len, uint8_t *key,
 		   uint32_t key_len, uint8_t *iv, uint32_t iv_len)
 {
-	enum edhoc_error r;
 	switch (ctxt) {
 	case CIPHERTEXT2:
-		r = okm_calc(edhoc_hash, prk, prk_len, th, th_len,
-			     "KEYSTREAM_2", NULL, 0, key, key_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(okm_calc(edhoc_hash, prk, prk_len, th, th_len,
+			     "KEYSTREAM_2", NULL, 0, key, key_len));
 		PRINT_ARRAY("KEYSTREAM_2", key, key_len);
 		break;
 
 	case CIPHERTEXT3:
-		r = okm_calc(edhoc_hash, prk, prk_len, th, th_len, "K_3", NULL,
-			     0, key, key_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(okm_calc(edhoc_hash, prk, prk_len, th, th_len, "K_3", NULL,
+			     0, key, key_len));
 		PRINT_ARRAY("K_3", key, key_len);
-
-		r = okm_calc(edhoc_hash, prk, prk_len, th, th_len, "IV_3", NULL,
-			     0, iv, iv_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(okm_calc(edhoc_hash, prk, prk_len, th, th_len, "IV_3", NULL,
+			     0, iv, iv_len));
 		PRINT_ARRAY("IV_3", iv, iv_len);
 		break;
 
 	case CIPHERTEXT4:
-		r = edhoc_exporter(edhoc_hash, prk, prk_len, th, th_len,
-				   "EDHOC_K_4", key, key_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(edhoc_exporter(edhoc_hash, prk, prk_len, th, th_len,
+				   "EDHOC_K_4", key, key_len));
 		PRINT_ARRAY("K_4", key, key_len);
-
-		r = edhoc_exporter(edhoc_hash, prk, prk_len, th, th_len,
-				   "EDHOC_IV_4", iv, iv_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(edhoc_exporter(edhoc_hash, prk, prk_len, th, th_len,
+				   "EDHOC_IV_4", iv, iv_len));
 		PRINT_ARRAY("IV_4", iv, iv_len);
 		break;
 	}
@@ -117,8 +95,6 @@ enum edhoc_error ciphertext_decrypt_split(
 	uint8_t *signature_or_mac, uint32_t *signature_or_mac_len, uint8_t *ead,
 	uint32_t *ead_len)
 {
-	enum edhoc_error r;
-
 	/*generate key and iv (no iv in for ciphertext 2)*/
 	uint32_t key_len = get_aead_key_len(suite->edhoc_aead);
 	if (ctxt == CIPHERTEXT2) {
@@ -129,20 +105,15 @@ enum edhoc_error ciphertext_decrypt_split(
 	uint32_t iv_len = get_aead_iv_len(suite->edhoc_aead);
 	uint8_t iv[iv_len];
 
-	r = ciphertext_key_gen(ctxt, suite->edhoc_hash, prk, prk_len, th,
-			       th_len, key, key_len, iv, iv_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(ciphertext_key_gen(ctxt, suite->edhoc_hash, prk, prk_len, th,
+			       th_len, key, key_len, iv, iv_len));
 
 	/*Associated data*/
 	uint8_t associated_data[ASSOCIATED_DATA_DEFAULT_SIZE];
 	uint16_t associated_data_len = sizeof(associated_data);
-	r = associated_data_encode(th, th_len, (uint8_t *)&associated_data,
-				   &associated_data_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(associated_data_encode(th, th_len, (uint8_t *)&associated_data,
+				   &associated_data_len));
+
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
 	uint32_t tag_len = get_mac_len(suite->edhoc_aead);
@@ -151,35 +122,24 @@ enum edhoc_error ciphertext_decrypt_split(
 		plaintext_len -= tag_len;
 	}
 	uint8_t plaintext[plaintext_len];
-	r = ciphertext_encrypt_decrypt(ctxt, DECRYPT, ciphertext,
-				       ciphertext_len, key, key_len, iv, iv_len,
-				       associated_data, associated_data_len,
-				       plaintext, plaintext_len,
-				       ciphertext - tag_len, tag_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(ciphertext_encrypt_decrypt(
+		ctxt, DECRYPT, ciphertext, ciphertext_len, key, key_len, iv,
+		iv_len, associated_data, associated_data_len, plaintext,
+		plaintext_len, ciphertext - tag_len, tag_len));
 
 	PRINT_ARRAY("plaintext", plaintext, plaintext_len);
 
 	if (ctxt == CIPHERTEXT4 && plaintext_len != 0) {
-		r = decode_byte_string(plaintext, plaintext_len, ead, ead_len);
-		;
-		if (r != edhoc_no_error) {
-			return r;
-		}
+		TRY(decode_byte_string(plaintext, plaintext_len, ead, ead_len));
 		PRINT_ARRAY("EAD_4", ead, *ead_len);
 	} else if (ctxt == CIPHERTEXT4 && plaintext_len == 0) {
 		ead = NULL;
 		*ead_len = 0;
 		PRINT_MSG("No EAD_4\n");
 	} else {
-		r = plaintext_split(plaintext, plaintext_len, id_cred,
+		TRY(plaintext_split(plaintext, plaintext_len, id_cred,
 				    id_cred_len, signature_or_mac,
-				    signature_or_mac_len, ead, ead_len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+				    signature_or_mac_len, ead, ead_len));
 		PRINT_ARRAY("ID_CRED", id_cred, *id_cred_len);
 		PRINT_ARRAY("sign_or_mac", signature_or_mac,
 			    *signature_or_mac_len);

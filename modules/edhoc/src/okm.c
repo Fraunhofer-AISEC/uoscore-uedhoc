@@ -19,21 +19,13 @@ enum edhoc_error okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
 			  const char *label, uint8_t *context,
 			  uint32_t context_len, uint8_t *okm, uint64_t okm_len)
 {
-	enum edhoc_error r;
 	uint8_t info[INFO_DEFAULT_SIZE];
 	uint8_t info_len = sizeof(info);
 
-	r = create_hkdf_info(th, th_len, label, context, context_len, okm_len,
-			     (uint8_t *)&info, &info_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(create_hkdf_info(th, th_len, label, context, context_len, okm_len,
+			     (uint8_t *)&info, &info_len));
 	PRINT_ARRAY("info", info, info_len);
-
-	r = hkdf_expand(hash_alg, prk, prk_len, (uint8_t *)&info, info_len, okm,
-			okm_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(hkdf_expand(hash_alg, prk, prk_len, (uint8_t *)&info, info_len, okm,
+			okm_len));
 	return edhoc_no_error;
 }

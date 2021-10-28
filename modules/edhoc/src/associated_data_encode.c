@@ -16,14 +16,10 @@
 #include "../inc/cose.h"
 
 enum edhoc_error associated_data_encode(uint8_t *thX, const uint16_t thX_len,
-			      uint8_t *out, uint16_t *out_len)
+					uint8_t *out, uint16_t *out_len)
 {
-	enum edhoc_error r;
 	uint8_t context_str[] = { "Encrypt0" };
-	r = cose_enc_structure_encode(context_str, strlen((char *)context_str),
-				      NULL, 0, thX, thX_len, out, out_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
-	return edhoc_no_error;
+	return cose_enc_structure_encode(context_str,
+					 strlen((char *)context_str), NULL, 0,
+					 thX, thX_len, out, out_len);
 }

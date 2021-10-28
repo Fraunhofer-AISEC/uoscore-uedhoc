@@ -20,7 +20,6 @@ enum edhoc_error cose_enc_structure_encode(
 	uint16_t protected_len, const uint8_t *external_aad,
 	uint16_t external_aad_len, uint8_t *out, uint16_t *out_len)
 {
-	bool success_encoding;
 	struct enc_structure enc_structure;
 
 	enc_structure._enc_structure_context.value = context;
@@ -31,12 +30,9 @@ enum edhoc_error cose_enc_structure_encode(
 	enc_structure._enc_structure_external_aad.len = external_aad_len;
 
 	size_t payload_len_out;
-	success_encoding = cbor_encode_enc_structure(
-		out, *out_len, &enc_structure, &payload_len_out);
-
-	if (!success_encoding) {
-		return cbor_encoding_error;
-	}
+	TRY_EXPECT(cbor_encode_enc_structure(out, *out_len, &enc_structure,
+					     &payload_len_out),
+		   true);
 	*out_len = payload_len_out;
 	return edhoc_no_error;
 }
@@ -48,7 +44,6 @@ cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 			  uint16_t external_aad_len, const uint8_t *payload,
 			  uint16_t payload_len, uint8_t *out, uint16_t *out_len)
 {
-	bool success_encoding;
 	struct sig_structure sig_structure;
 
 	sig_structure._sig_structure_context.value = context;
@@ -61,12 +56,10 @@ cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 	sig_structure._sig_structure_payload.len = payload_len;
 
 	size_t payload_len_out;
-	success_encoding = cbor_encode_sig_structure(
-		out, *out_len, &sig_structure, &payload_len_out);
+	TRY_EXPECT(cbor_encode_sig_structure(out, *out_len, &sig_structure,
+					     &payload_len_out),
+		   true);
 
-	if (!success_encoding) {
-		return cbor_encoding_error;
-	}
 	*out_len = payload_len_out;
 	return edhoc_no_error;
 }

@@ -14,7 +14,6 @@
 
 void print_array(const uint8_t *in_data, uint16_t in_len)
 {
-	//fflush(stdout);
 	printf(" (size %u):", in_len);
 	for (uint16_t i = 0; i < in_len; i++) {
 		if (i % 16 == 0)
@@ -23,5 +22,4 @@ void print_array(const uint8_t *in_data, uint16_t in_len)
 			printf("%02X ", in_data[i]);
 	}
 	printf("\n");
-	//fflush(stdout);
 }

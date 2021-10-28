@@ -24,15 +24,12 @@
 enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 			     uint8_t *_kid, uint32_t *kid_len)
 {
-	//enum edhoc_error r;
-	bool ok;
 	struct id_cred_x_map map;
 	size_t payload_len_out;
 	size_t decode_len = 0;
-	ok = cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map, &decode_len);
-	if (!ok) {
-		return cbor_decoding_error;
-	}
+	TRY_EXPECT(cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
+					     &decode_len),
+		   true);
 
 	if (map._id_cred_x_map_kid_present != 0) {
 		// if (map._id_cred_x_map_kid._id_cred_x_map_kid.len == 1) {
@@ -56,13 +53,11 @@ enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 		// 		map._id_cred_x_map_kid._id_cred_x_map_kid.len;
 		// }
 		//*_kid = map._id_cred_x_map_kid._id_cred_x_map_kid;
-		ok = cbor_encode_int_type_i(
-			_kid, *kid_len,
-			&map._id_cred_x_map_kid._id_cred_x_map_kid,
-			&payload_len_out);
-		if (!ok) {
-			return cbor_encoding_error;
-		}
+		TRY_EXPECT(cbor_encode_int_type_i(
+				   _kid, *kid_len,
+				   &map._id_cred_x_map_kid._id_cred_x_map_kid,
+				   &payload_len_out),
+			   true);
 		*kid_len = payload_len_out;
 	} else {
 		*kid_len = 0;
@@ -77,39 +72,27 @@ enum edhoc_error plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
 				  uint16_t ad_len, uint8_t *plaintext,
 				  uint16_t *plaintext_len)
 {
-	enum edhoc_error r;
-
 	uint16_t l;
 	uint64_t enc_sgn_or_mac_len = sgn_or_mac_len + 2;
 	uint8_t kid_buf[KID_DEFAULT_SIZE];
 	uint32_t kid_len = sizeof(kid_buf);
-	r = id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len));
+
 	PRINT_ARRAY("kid", kid_buf, kid_len);
 	if (kid_len != 0) {
 		/*id cred contains a kid*/
-		r = _memcpy_s(plaintext, *plaintext_len, kid_buf, kid_len);
-		if (r != edhoc_no_error)
-			return r;
+		TRY(_memcpy_s(plaintext, *plaintext_len, kid_buf, kid_len));
 		l = kid_len;
 	} else {
-		r = _memcpy_s(plaintext, *plaintext_len, id_cred, id_cred_len);
-		if (r != edhoc_no_error)
-			return r;
+		TRY(_memcpy_s(plaintext, *plaintext_len, id_cred, id_cred_len));
 		l = id_cred_len;
 	}
 
-	r = encode_byte_string(sgn_or_mac, sgn_or_mac_len, plaintext + l,
-			       &enc_sgn_or_mac_len);
-	if (r != edhoc_no_error)
-		return r;
+	TRY(encode_byte_string(sgn_or_mac, sgn_or_mac_len, plaintext + l,
+			       &enc_sgn_or_mac_len));
 
-	r = _memcpy_s(plaintext + l + enc_sgn_or_mac_len,
-		      *plaintext_len - l - enc_sgn_or_mac_len, ad, ad_len);
-	if (r != edhoc_no_error)
-		return r;
+	TRY(_memcpy_s(plaintext + l + enc_sgn_or_mac_len,
+		      *plaintext_len - l - enc_sgn_or_mac_len, ad, ad_len));
 
 	*plaintext_len = l + enc_sgn_or_mac_len + ad_len;
 

@@ -34,15 +34,11 @@ static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
 				    uint16_t cred_num, uint8_t *pk,
 				    uint16_t *pk_len, bool *verified)
 {
-	enum edhoc_error r;
-	bool success;
 	size_t decode_len = 0;
 	struct cert c;
 
-	success = cbor_decode_cert(cert, cert_len, &c, &decode_len);
-	if (!success) {
-		return cbor_decoding_error;
-	}
+	TRY_EXPECT(cbor_decode_cert(cert, cert_len, &c, &decode_len), true);
+
 	PRINT_MSG("CBOR certificate parsed.\n");
 	PRINTF("Certificate type: %d\n", c._cert_type);
 	PRINT_ARRAY("Serial number", c._cert_serial_number.value,
@@ -70,10 +66,7 @@ static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
 		return no_such_ca;
 	}
 
-	r = _memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len);
-	if (r != edhoc_no_error) {
-		return r;
-	}
+	TRY(_memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len));
 	*pk_len = c._cert_pk.len;
 
 	return verify(Ed25519_SIGN, root_pk, root_pk_len, cert,
@@ -88,8 +81,7 @@ enum edhoc_error retrieve_cred(bool static_dh_auth,
 			       uint16_t *cred_len, uint8_t *pk,
 			       uint16_t *pk_len, uint8_t *g, uint16_t *g_len)
 {
-	enum edhoc_error r;
-	bool success, verified;
+	bool verified;
 	size_t decode_len = 0;
 	struct id_cred_x_map map;
 
@@ -100,30 +92,21 @@ enum edhoc_error retrieve_cred(bool static_dh_auth,
 		if (cred_array[i].id_cred.len == id_cred_len) {
 			if (0 == memcmp(cred_array[i].id_cred.ptr, id_cred,
 					id_cred_len)) {
-				r = _memcpy_s(cred, *cred_len,
+				TRY(_memcpy_s(cred, *cred_len,
 					      cred_array[i].cred.ptr,
-					      cred_array[i].cred.len);
-				if (r != edhoc_no_error) {
-					return r;
-				}
+					      cred_array[i].cred.len));
 				*cred_len = cred_array[i].cred.len;
 				if (static_dh_auth) {
 					*pk_len = 0;
-					r = _memcpy_s(g, *g_len,
+					TRY(_memcpy_s(g, *g_len,
 						      cred_array[i].g.ptr,
-						      cred_array[i].g.len);
-					if (r != edhoc_no_error) {
-						return r;
-					}
+						      cred_array[i].g.len));
 					*g_len = cred_array[i].g.len;
 				} else {
 					*g_len = 0;
-					r = _memcpy_s(pk, *pk_len,
+					TRY(_memcpy_s(pk, *pk_len,
 						      cred_array[i].pk.ptr,
-						      cred_array[i].pk.len);
-					if (r != edhoc_no_error) {
-						return r;
-					}
+						      cred_array[i].pk.len));
 					*pk_len = cred_array[i].pk.len;
 				}
 				return edhoc_no_error;
@@ -132,45 +115,37 @@ enum edhoc_error retrieve_cred(bool static_dh_auth,
 	}
 
 	/* Check if ID_CRED_x contains a certificate*/
-	success = cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
-					    &decode_len);
-	if (!success) {
-		return cbor_decoding_error;
-	}
+	TRY_EXPECT(cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
+					     &decode_len),
+		   true);
 	if (map._id_cred_x_map_x5chain_present != 0) {
 		PRINT_ARRAY(
 			"ID_CRED_x contains a certificate",
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len);
-		r = _memcpy_s(
+		TRY(_memcpy_s(
 			cred, *cred_len,
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
-			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len);
-		if (r != edhoc_no_error) {
-			return r;
-		}
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len));
 		*cred_len =
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len;
 		if (static_dh_auth) {
 			*pk_len = 0;
-			r = cert_verify(map._id_cred_x_map_x5chain
+			TRY(cert_verify(map._id_cred_x_map_x5chain
 						._id_cred_x_map_x5chain.value,
 					map._id_cred_x_map_x5chain
 						._id_cred_x_map_x5chain.len,
 					cred_array, cred_num, g, g_len,
-					&verified);
+					&verified));
 		} else {
 			*g_len = 0;
-			r = cert_verify(map._id_cred_x_map_x5chain
+			TRY(cert_verify(map._id_cred_x_map_x5chain
 						._id_cred_x_map_x5chain.value,
 					map._id_cred_x_map_x5chain
 						._id_cred_x_map_x5chain.len,
 					cred_array, cred_num, pk, pk_len,
-					&verified);
+					&verified));
 		}
-
-		if (r != edhoc_no_error)
-			return r;
 
 		if (verified) {
 			PRINT_MSG("Certificate verification successful!\n");

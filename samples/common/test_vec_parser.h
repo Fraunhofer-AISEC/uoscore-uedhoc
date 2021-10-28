@@ -86,17 +86,31 @@ struct edhoc_responder_context_bufs {
 int read_test_vectors(char *filename, char *test_vec_buf, uint32_t *len);
 
 /**
- * 
- * 
+ * @brief	Gets the parameters of the other party from the testvector file
+ * @param	other_party_role can be INITIATOR or RESPONDER
+ * @param	bufs buffers which will hold the parameters 
+ * 		during the run og the protocol
+ * @param	c is the output. To be used when the edhoc_initiaor/responder 
+ * 		functions are called
+ * @param	vec_num	the test vector we are testing
+ * @param	test_vec_buf  a buffer holding the test vectors as json string
+ * @param	test_vec_buf_len lenhgt of test_vec_buf
  */
 int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 				       struct other_party_cred_bufs *bufs,
 				       struct other_party_cred *c,
 				       uint8_t vec_num, char *test_vec_buf,
-				       uint32_t len);
+				       uint32_t test_vec_buf_len);
 /**
- * 
- * 
+ * @brief	Gets the parameters of the initiator from the testvector file
+ * @param	other_party_role can be INITIATOR or RESPONDER
+ * @param	bufs buffers which will hold the parameters 
+ * 		during the run og the protocol
+ * @param	c is the output. To be used when the edhoc_initiaor/responder 
+ * 		functions are called
+ * @param	vec_num	the test vector we are testing
+ * @param	test_vec_buf  a buffer holding the test vectors as json string
+ * @param	test_vec_buf_len lenhgt of test_vec_buf
  */
 int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	struct edhoc_initiator_context_bufs *bufs,
@@ -104,18 +118,45 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	uint32_t test_vec_buf_len);
 
 /**
- * 
- * 
+ * @brief	Gets the parameters of the responder from the testvector file
+ * @param	other_party_role can be INITIATOR or RESPONDER
+ * @param	bufs buffers which will hold the parameters 
+ * 		during the run og the protocol
+ * @param	c is the output. To be used when the edhoc_initiaor/responder 
+ * 		functions are called
+ * @param	vec_num	the test vector we are testing
+ * @param	test_vec_buf  a buffer holding the test vectors as json string
+ * @param	test_vec_buf_len lenhgt of test_vec_buf
  */
 int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	struct edhoc_responder_context_bufs *bufs,
 	struct edhoc_responder_context *c, uint8_t vec_num, char *test_vec_buf,
 	uint32_t test_vec_buf_len);
 
+/**
+ * @brief	Gets the EDHOC results from the testvector file
+ * @param	other_party_role can be INITIATOR or RESPONDER
+ * @param	bufs buffers which will hold the results 
+ * 		during the run og the protocol
+ * @param	m is the output. 
+ * @param	vec_num	the test vector we are testing
+ * @param	test_vec_buf  a buffer holding the test vectors as json string
+ * @param	test_vec_buf_len lenhgt of test_vec_buf
+ */
 int get_RESULTS_from_test_vec(struct results_bufs *bufs, struct results *m,
 			      uint8_t vec_num, char *test_vec_buf,
 			      uint32_t test_vec_buf_len);
 
+/**
+ * @brief	Gets the EDHOC messages from the testvector file
+ * @param	other_party_role can be INITIATOR or RESPONDER
+ * @param	bufs buffers which will hold the messages 
+ * 		during the run of the protocol
+ * @param	m is the output.
+ * @param	vec_num	the test vector we are testing
+ * @param	test_vec_buf  a buffer holding the test vectors as json string
+ * @param	test_vec_buf_len lenhgt of test_vec_buf
+ */
 int get_MESSAGES_from_test_vec(struct messages_bufs *bufs, struct messages *m,
 			       uint8_t vec_num, char *test_vec_buf,
 			       uint32_t test_vec_buf_len);

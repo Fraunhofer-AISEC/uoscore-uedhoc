@@ -37,27 +37,22 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
      uint8_t *out, const uint16_t out_len, uint8_t *tag, const uint16_t tag_len)
 {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
-	int result;
 	struct tc_ccm_mode_struct c;
 	struct tc_aes_key_sched_struct sched;
-	tc_aes128_set_encrypt_key(&sched, key);
-	tc_ccm_config(&c, &sched, nonce, nonce_len, tag_len);
+	TRY_EXPECT(tc_aes128_set_encrypt_key(&sched, key), 1);
+	TRY_EXPECT(tc_ccm_config(&c, &sched, nonce, nonce_len, tag_len), 1);
 
 	if (op == DECRYPT) {
-		result = tc_ccm_decryption_verification(
-			out, out_len, aad, aad_len, in, in_len, &c);
-
-		if (result == 0)
-			return aead_authentication_failed;
+		TRY_EXPECT(tc_ccm_decryption_verification(
+				   out, out_len, aad, aad_len, in, in_len, &c),
+			   1);
 
 	} else {
-		result = tc_ccm_generation_encryption(
-			out, (out_len + tag_len), aad, aad_len, in, in_len, &c);
-
+		TRY_EXPECT(tc_ccm_generation_encryption(
+				   out, (out_len + tag_len), aad, aad_len, in,
+				   in_len, &c),
+			   1);
 		memcpy(tag, out + out_len, tag_len);
-
-		if (result != 1)
-			return aead_failed;
 	}
 #endif
 	return edhoc_no_error;
@@ -113,13 +108,13 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 		memset(&h, 0x00, sizeof(h));
 		if (salt == NULL || salt_len == 0) {
 			uint8_t zero_salt[32] = { 0 };
-			tc_hmac_set_key(&h, zero_salt, 32);
+			TRY_EXPECT(tc_hmac_set_key(&h, zero_salt, 32), 1);
 		} else {
-			tc_hmac_set_key(&h, salt, salt_len);
+			TRY_EXPECT(tc_hmac_set_key(&h, salt, salt_len), 1);
 		}
-		tc_hmac_init(&h);
-		tc_hmac_update(&h, ikm, ikm_len);
-		tc_hmac_final(out, TC_SHA256_DIGEST_SIZE, &h);
+		TRY_EXPECT(tc_hmac_init(&h), 1);
+		TRY_EXPECT(tc_hmac_update(&h, ikm, ikm_len), 1);
+		TRY_EXPECT(tc_hmac_final(out, TC_SHA256_DIGEST_SIZE, &h), 1);
 #endif
 	}
 	return edhoc_no_error;
@@ -144,14 +139,15 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 		struct tc_hmac_state_struct h;
 		for (uint8_t i = 1; i <= iterations; i++) {
 			memset(&h, 0x00, sizeof(h));
-			tc_hmac_set_key(&h, prk, prk_len);
+			TRY_EXPECT(tc_hmac_set_key(&h, prk, prk_len), 1);
 			tc_hmac_init(&h);
 			if (i > 1) {
-				tc_hmac_update(&h, t, 32);
+				TRY_EXPECT(tc_hmac_update(&h, t, 32), 1);
 			}
-			tc_hmac_update(&h, info, info_len);
-			tc_hmac_update(&h, &i, 1);
-			tc_hmac_final(t, TC_SHA256_DIGEST_SIZE, &h);
+			TRY_EXPECT(tc_hmac_update(&h, info, info_len), 1);
+			TRY_EXPECT(tc_hmac_update(&h, &i, 1), 1);
+			TRY_EXPECT(tc_hmac_final(t, TC_SHA256_DIGEST_SIZE, &h),
+				   1);
 			if (out_len < i * 32) {
 				memcpy(&out[(i - 1) * 32], t, out_len % 32);
 			} else {
@@ -168,15 +164,16 @@ shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
 		     const uint32_t sk_len, const uint8_t *pk,
 		     const uint32_t pk_len, uint8_t *shared_secret)
 {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 	if (curve == X25519) {
+#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		uint8_t e[F25519_SIZE];
 		f25519_copy(e, sk);
 		c25519_prepare(e);
 		c25519_smult(shared_secret, pk, e);
+#endif
 	} else if (curve == P_256_ECDH) {
 	}
-#endif
+
 	return edhoc_no_error;
 }
 
@@ -188,9 +185,10 @@ ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
 	if (curve == X25519) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		struct tc_sha256_state_struct s;
-		tc_sha256_init(&s);
-		tc_sha256_update(&s, (uint8_t *)&seed, sizeof(seed));
-		tc_sha256_final(extended_seed, &s);
+		TRY_EXPECT(tc_sha256_init(&s), 1);
+		TRY_EXPECT(tc_sha256_update(&s, (uint8_t *)&seed, sizeof(seed)),
+			   1);
+		TRY_EXPECT(tc_sha256_final(extended_seed, &s), 1);
 
 		compact_x25519_keygen(sk, pk, extended_seed);
 #endif
@@ -207,9 +205,9 @@ hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 	if (alg == SHA_256) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		struct tc_sha256_state_struct s;
-		tc_sha256_init(&s);
-		tc_sha256_update(&s, in, in_len);
-		tc_sha256_final(out, &s);
+		TRY_EXPECT(tc_sha256_init(&s), 1);
+		TRY_EXPECT(tc_sha256_update(&s, in, in_len), 1);
+		TRY_EXPECT(tc_sha256_final(out, &s), 1);
 #endif
 	}
 

@@ -34,7 +34,6 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 					 uint8_t *id_cred_x,
 					 uint32_t *id_cred_x_len)
 {
-	bool success;
 	struct id_cred_x_map map;
 	size_t payload_len_out;
 
@@ -47,7 +46,6 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 	case kid:
 		map._id_cred_x_map_kid_present = true;
 		map._id_cred_x_map_kid._id_cred_x_map_kid = *((int32_t *)id);
-		//map._id_cred_x_map_kid._id_cred_x_map_kid.len = id_len;
 		break;
 	case x5chain:
 		map._id_cred_x_map_x5chain_present = true;
@@ -64,12 +62,10 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 		break;
 	}
 
-	success = cbor_encode_id_cred_x_map(id_cred_x, *id_cred_x_len, &map,
-					    &payload_len_out);
+	TRY_EXPECT(cbor_encode_id_cred_x_map(id_cred_x, *id_cred_x_len, &map,
+					     &payload_len_out),
+		   true);
 
-	if (!success) {
-		return cbor_encoding_error;
-	}
 	*id_cred_x_len = payload_len_out;
 
 	return edhoc_no_error;
@@ -81,36 +77,28 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 				 uint32_t *sign_or_mac_len, uint8_t *ad,
 				 uint32_t *ad_len)
 {
-	enum edhoc_error r;
-	bool success;
 	size_t decode_len = 0;
 	struct plaintext p;
 
-	success = cbor_decode_plaintext(ptxt, ptxt_len, &p, &decode_len);
-	if (!success) {
-		return cbor_decoding_error;
-	}
+	TRY_EXPECT(cbor_decode_plaintext(ptxt, ptxt_len, &p, &decode_len),
+		   true);
 
 	/*ID_CRED_x*/
 	if (p._plaintext_ID_CRED_x_choice == _plaintext_ID_CRED_x__map) {
 		if (p._plaintext_ID_CRED_x__map._map_x5chain_present) {
 			PRINT_MSG(
 				"ID_CRED of the other party has label x5chain\n");
-			r = id_cred_x_encode(
+			TRY(id_cred_x_encode(
 				x5chain, 0,
 				p._plaintext_ID_CRED_x__map._map_x5chain
 					._map_x5chain.value,
 				p._plaintext_ID_CRED_x__map._map_x5chain
 					._map_x5chain.len,
-				id_cred_x, id_cred_x_len);
-
-			if (r != edhoc_no_error) {
-				return r;
-			}
+				id_cred_x, id_cred_x_len));
 		}
 		if (p._plaintext_ID_CRED_x__map._map_x5t_present) {
 			PRINT_MSG("ID_CRED of the other party has label x5t\n");
-			r = id_cred_x_encode(
+			TRY(id_cred_x_encode(
 				x5t,
 				p._plaintext_ID_CRED_x__map._map_x5t
 					._map_x5t_int,
@@ -118,11 +106,7 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 					._map_x5t_bstr.value,
 				p._plaintext_ID_CRED_x__map._map_x5t
 					._map_x5t_bstr.len,
-				id_cred_x, id_cred_x_len);
-
-			if (r != edhoc_no_error) {
-				return r;
-			}
+				id_cred_x, id_cred_x_len));
 		}
 	} else {
 		/*Note that if ID_CRED_x contains a single 'kid' parameter,
@@ -130,37 +114,26 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
             is conveyed in the plaintext encoded as a bstr or int*/
 		if (p._plaintext_ID_CRED_x_choice ==
 		    _plaintext_ID_CRED_x_bstr) {
-			r = id_cred_x_encode(kid, 0,
+			TRY(id_cred_x_encode(kid, 0,
 					     p._plaintext_ID_CRED_x_bstr.value,
 					     p._plaintext_ID_CRED_x_bstr.len,
-					     id_cred_x, id_cred_x_len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
+					     id_cred_x, id_cred_x_len));
+
 		} else {
 			int _kid = p._plaintext_ID_CRED_x_int;
-			r = id_cred_x_encode(kid, 0, &_kid, 1, id_cred_x,
-					     id_cred_x_len);
-			if (r != edhoc_no_error) {
-				return r;
-			}
+			TRY(id_cred_x_encode(kid, 0, &_kid, 1, id_cred_x,
+					     id_cred_x_len));
 		}
 	}
-	r = _memcpy_s(sign_or_mac, *sign_or_mac_len,
+	TRY(_memcpy_s(sign_or_mac, *sign_or_mac_len,
 		      p._plaintext_SGN_or_MAC_x.value,
-		      p._plaintext_SGN_or_MAC_x.len);
+		      p._plaintext_SGN_or_MAC_x.len));
 	*sign_or_mac_len = p._plaintext_SGN_or_MAC_x.len;
-	if (r != edhoc_no_error) {
-		return r;
-	}
 
 	if (p._plaintext_AD_x_present == true) {
-		r = _memcpy_s(ad, *ad_len, p._plaintext_AD_x.value,
-			      p._plaintext_AD_x.len);
+		TRY(_memcpy_s(ad, *ad_len, p._plaintext_AD_x.value,
+			      p._plaintext_AD_x.len));
 		*ad_len = p._plaintext_AD_x.len;
-		if (r != edhoc_no_error) {
-			return r;
-		}
 	} else {
 		*ad_len = 0;
 	}

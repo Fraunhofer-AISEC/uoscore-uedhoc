@@ -22,7 +22,6 @@ enum edhoc_error create_hkdf_info(const uint8_t *th, uint8_t th_len,
 				  uint32_t context_len, uint64_t okm_len,
 				  uint8_t *out, uint8_t *out_len)
 {
-	bool ok;
 	struct info info;
 
 	info._info_transcript_hash.value = th;
@@ -37,11 +36,9 @@ enum edhoc_error create_hkdf_info(const uint8_t *th, uint8_t th_len,
 	info._info_length = okm_len;
 
 	size_t payload_len_out;
-	ok = cbor_encode_info(out, *out_len, &info, &payload_len_out);
+	TRY_EXPECT(cbor_encode_info(out, *out_len, &info, &payload_len_out),
+		   true);
 
-	if (!ok) {
-		return cbor_encoding_error;
-	}
 	*out_len = payload_len_out;
 
 	return edhoc_no_error;

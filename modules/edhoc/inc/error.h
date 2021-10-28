@@ -11,6 +11,7 @@
 
 #ifndef ERROR_H
 #define ERROR_H
+#include "print_util.h"
 
 /**
  * Error type used throughout the whole edhoc implementation.
@@ -48,7 +49,7 @@ enum edhoc_error {
 	cbor_encoding_error = 21,
 	cbor_decoding_error = 22,
 	suites_i_list_to_long = 23,
-
+	unexpected_result_from_ext_lib = 24,
 };
 
 /*This macro checks if a function returns an error and if so it propages 
@@ -60,6 +61,20 @@ enum edhoc_error {
 			PRINTF("Runtime error: %s error code %d at %s:%d\n",   \
 			       #x, retval, __FILE__, __LINE__);                \
 			return retval;                                         \
+		}                                                              \
+	} while (0)
+
+/*This macro checks if a function returns an expected result that may be non 
+	zero and if so it returns unexpected_result_from_ext_lib. This macro 
+	should be used to check the return value of functions belonging to 
+	external libraries that return somthing else but not zero on success*/
+#define TRY_EXPECT(x, expected_result)                                         \
+	do {                                                                   \
+		int retval = (x);                                              \
+		if (retval != expected_result) {                               \
+			PRINTF("Runtime error: %s error code %d at %s:%d\n",   \
+			       #x, retval, __FILE__, __LINE__);                \
+			return unexpected_result_from_ext_lib;                 \
 		}                                                              \
 	} while (0)
 
