@@ -19,9 +19,9 @@ enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
 		suite->suite_label = SUITE_0;
 		suite->edhoc_aead = AES_CCM_16_64_128;
 		suite->edhoc_hash = SHA_256;
-		suite->edhoc_ecdh_curve = X25519;
-		suite->edhoc_sign_alg = EdDSA;
-		suite->edhoc_sign_curve = Ed25519_SIGN;
+		suite->edhoc_mac_len_static_dh = MAC8;
+		suite->edhoc_ecdh = X25519;
+		suite->edhoc_sign = EdDSA;
 		suite->app_aead = AES_CCM_16_64_128;
 		suite->app_hash = SHA_256;
 		break;
@@ -29,9 +29,9 @@ enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
 		suite->suite_label = SUITE_1;
 		suite->edhoc_aead = AES_CCM_16_128_128;
 		suite->edhoc_hash = SHA_256;
-		suite->edhoc_ecdh_curve = X25519;
-		suite->edhoc_sign_alg = EdDSA;
-		suite->edhoc_sign_curve = Ed25519_SIGN;
+		suite->edhoc_mac_len_static_dh = MAC16;
+		suite->edhoc_ecdh = X25519;
+		suite->edhoc_sign = EdDSA;
 		suite->app_aead = AES_CCM_16_64_128;
 		suite->app_hash = SHA_256;
 		break;
@@ -39,9 +39,9 @@ enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
 		suite->suite_label = SUITE_2;
 		suite->edhoc_aead = AES_CCM_16_64_128;
 		suite->edhoc_hash = SHA_256;
-		suite->edhoc_ecdh_curve = 1;
-		suite->edhoc_sign_alg = ES256;
-		suite->edhoc_sign_curve = 1;
+		suite->edhoc_mac_len_static_dh = MAC8;
+		suite->edhoc_ecdh = P256;
+		suite->edhoc_sign = ES256;
 		suite->app_aead = AES_CCM_16_64_128;
 		suite->app_hash = SHA_256;
 		break;
@@ -49,9 +49,9 @@ enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
 		suite->suite_label = SUITE_3;
 		suite->edhoc_aead = AES_CCM_16_128_128;
 		suite->edhoc_hash = SHA_256;
-		suite->edhoc_ecdh_curve = 1;
-		suite->edhoc_sign_alg = ES256;
-		suite->edhoc_sign_curve = 1;
+		suite->edhoc_mac_len_static_dh = MAC16;
+		suite->edhoc_ecdh = P256;
+		suite->edhoc_sign = ES256;
 		suite->app_aead = AES_CCM_16_64_128;
 		suite->app_hash = SHA_256;
 		break;
@@ -72,7 +72,7 @@ uint32_t get_hash_len(enum hash_alg alg)
 	return 0;
 }
 
-uint32_t get_mac_len(enum aead_alg alg)
+uint32_t get_aead_mac_len(enum aead_alg alg)
 {
 	switch (alg) {
 	case AES_CCM_16_128_128:
@@ -107,11 +107,11 @@ uint32_t get_aead_iv_len(enum aead_alg alg)
 	return 0;
 }
 
-uint32_t get_signature_len(enum sign_alg_curve alg)
+uint32_t get_signature_len(enum sign_alg alg)
 {
 	switch (alg) {
-	case Ed25519_SIGN:
-	case P_256_SIGN:
+	case ES256:
+	case EdDSA:
 		return 64;
 		break;
 	}

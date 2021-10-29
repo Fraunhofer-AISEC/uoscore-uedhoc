@@ -31,8 +31,8 @@ enum aead_alg {
 
 enum hash_alg { SHA_256 = -16 };
 
-enum ecdh_curve {
-	P_256_ECDH = 1,
+enum ecdh_alg {
+	P256 = 1,
 	X25519 = 4,
 };
 
@@ -41,18 +41,18 @@ enum sign_alg {
 	EdDSA = -8,
 };
 
-enum sign_alg_curve {
-	P_256_SIGN = 1,
-	Ed25519_SIGN = 6,
+enum mac_len {
+	MAC8 = 8,
+	MAC16 = 16,
 };
 
 struct suite {
 	enum suite_label suite_label;
 	enum aead_alg edhoc_aead;
 	enum hash_alg edhoc_hash;
-	enum ecdh_curve edhoc_ecdh_curve;
-	enum sign_alg edhoc_sign_alg;
-	enum sign_alg_curve edhoc_sign_curve;
+	enum mac_len edhoc_mac_len_static_dh;
+	enum ecdh_alg edhoc_ecdh;
+	enum sign_alg edhoc_sign;
 	enum aead_alg app_aead;
 	enum hash_alg app_hash;
 };
@@ -74,9 +74,8 @@ uint32_t get_hash_len(enum hash_alg alg);
  * 
  * 
  */
-uint32_t get_mac_len(enum aead_alg alg);
-
+uint32_t get_aead_mac_len(enum aead_alg alg);
 uint32_t get_aead_key_len(enum aead_alg alg);
 uint32_t get_aead_iv_len(enum aead_alg alg);
-uint32_t get_signature_len(enum sign_alg_curve alg);
+uint32_t get_signature_len(enum sign_alg alg);
 #endif

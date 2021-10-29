@@ -196,8 +196,8 @@ edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*calculate the DH shared secret*/
 	uint8_t g_xy[ECDH_SECRET_DEFAULT_SIZE];
-	TRY(shared_secret_derive(suite.edhoc_ecdh_curve, c->x.ptr, c->x.len,
-				 g_y, g_y_len, g_xy));
+	TRY(shared_secret_derive(suite.edhoc_ecdh, c->x.ptr, c->x.len, g_y,
+				 g_y_len, g_xy));
 	PRINT_ARRAY("G_XY (ECDH shared secret) ", g_xy, sizeof(g_xy));
 
 	/*calculate th2*/
@@ -259,7 +259,7 @@ edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
 	/*calculate Signature_or_MAC_3*/
-	uint32_t sign_or_mac_3_len = get_signature_len(suite.edhoc_sign_curve);
+	uint32_t sign_or_mac_3_len = get_signature_len(suite.edhoc_sign);
 	uint8_t sign_or_mac_3[sign_or_mac_3_len];
 
 	TRY(signature_or_mac(GENERATE, static_dh_i, &suite, c->sk_i.ptr,

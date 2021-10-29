@@ -55,30 +55,37 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 		memcpy(tag, out + out_len, tag_len);
 	}
 #endif
-	return edhoc_no_error;
-}
-
-enum edhoc_error __attribute__((weak))
-sign(enum sign_alg_curve curve, const uint8_t *sk, const uint8_t sk_len,
-     const uint8_t *pk, const uint8_t pk_len, const uint8_t *msg,
-     const uint16_t msg_len, uint8_t *out, uint32_t *out_len)
-{
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
-	if (curve == Ed25519_SIGN) {
-		edsign_sign(out, pk, sk, msg, msg_len);
-	}
-	if (curve == P_256_SIGN) {
-	}
+#ifdef EDHOC_WITH_MBEDTLS
+	/*TODO add mbedtls code here*/
 #endif
 	return edhoc_no_error;
 }
 
 enum edhoc_error __attribute__((weak))
-verify(enum sign_alg_curve curve, const uint8_t *pk, const uint8_t pk_len,
+sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
+     const uint8_t *pk, const uint8_t pk_len, const uint8_t *msg,
+     const uint16_t msg_len, uint8_t *out, uint32_t *out_len)
+{
+	if (alg == EdDSA) {
+#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+		edsign_sign(out, pk, sk, msg, msg_len);
+#endif
+	}
+	if (alg == ES256) {
+#ifdef EDHOC_WITH_MBEDTLS
+		/*TODO add mbedtls code here*/
+#endif
+	}
+
+	return edhoc_no_error;
+}
+
+enum edhoc_error __attribute__((weak))
+verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
        const uint8_t *msg, const uint16_t msg_len, const uint8_t *sgn,
        const uint16_t sgn_len, bool *result)
 {
-	if (curve == Ed25519_SIGN) {
+	if (alg == EdDSA) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		int verified = edsign_verify(sgn, pk, msg, msg_len);
 		if (verified) {
@@ -86,6 +93,11 @@ verify(enum sign_alg_curve curve, const uint8_t *pk, const uint8_t pk_len,
 		} else {
 			*result = false;
 		}
+#endif
+	}
+	if (alg == ES256) {
+#ifdef EDHOC_WITH_MBEDTLS
+		/*TODO add mbedtls code here*/
 #endif
 	}
 	return edhoc_no_error;
@@ -160,29 +172,32 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 }
 
 enum edhoc_error __attribute__((weak))
-shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
+shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 		     const uint32_t sk_len, const uint8_t *pk,
 		     const uint32_t pk_len, uint8_t *shared_secret)
 {
-	if (curve == X25519) {
+	if (alg == X25519) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		uint8_t e[F25519_SIZE];
 		f25519_copy(e, sk);
 		c25519_prepare(e);
 		c25519_smult(shared_secret, pk, e);
 #endif
-	} else if (curve == P_256_ECDH) {
+	}
+	if (alg == P256) {
+#ifdef EDHOC_WITH_MBEDTLS
+		/*TODO add mbedtls code here*/
+#endif
 	}
 
 	return edhoc_no_error;
 }
 
 enum edhoc_error __attribute__((weak))
-ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
-		     uint8_t *pk)
+ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 {
 	uint8_t extended_seed[32];
-	if (curve == X25519) {
+	if (alg == X25519) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		struct tc_sha256_state_struct s;
 		TRY_EXPECT(tc_sha256_init(&s), 1);
@@ -201,7 +216,6 @@ ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
 enum edhoc_error __attribute__((weak))
 hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 {
-	/*all currently prosed suites use sha256*/
 	if (alg == SHA_256) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 		struct tc_sha256_state_struct s;

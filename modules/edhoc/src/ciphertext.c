@@ -116,7 +116,7 @@ enum edhoc_error ciphertext_decrypt_split(
 
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
-	uint32_t tag_len = get_mac_len(suite->edhoc_aead);
+	uint32_t tag_len = get_aead_mac_len(suite->edhoc_aead);
 	uint32_t plaintext_len = ciphertext_len;
 	if (ctxt != CIPHERTEXT2) {
 		plaintext_len -= tag_len;
@@ -269,7 +269,7 @@ enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
 	/*Ciphertext 3 calculate*/
-	uint8_t mac_len = get_mac_len(suite->edhoc_aead);
+	uint8_t mac_len = get_aead_mac_len(suite->edhoc_aead);
 	uint8_t tag[mac_len];
 	*ciphertext_len = plaintext_len;
 

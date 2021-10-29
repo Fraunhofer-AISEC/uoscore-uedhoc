@@ -140,7 +140,7 @@ struct edhoc_initiator_context {
  * @param   pk pointer to a buffer where the public key will be strored
  */
 enum edhoc_error __attribute__((weak))
-ephemeral_dh_key_gen(enum ecdh_curve curve, uint32_t seed, uint8_t *sk,
+ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk,
 		     uint8_t *pk);
 
 /**

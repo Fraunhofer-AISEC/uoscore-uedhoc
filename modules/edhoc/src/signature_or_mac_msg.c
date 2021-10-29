@@ -76,7 +76,7 @@ enum edhoc_error mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
 	PRINT_ARRAY("MAC context", context_mac, context_mac_len);
 
 	if (static_dh) {
-		*mac_len = get_mac_len(suite->edhoc_aead);
+		*mac_len = suite->edhoc_mac_len_static_dh;
 
 	} else {
 		*mac_len = get_hash_len(suite->edhoc_hash);
@@ -144,9 +144,9 @@ signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 				&signature_struct_len));
 
 			*signature_or_mac_len =
-				get_signature_len(suite->edhoc_sign_curve);
-			TRY(sign(suite->edhoc_sign_curve, sk, sk_len, pk,
-				 pk_len, signature_struct, signature_struct_len,
+				get_signature_len(suite->edhoc_sign);
+			TRY(sign(suite->edhoc_sign, sk, sk_len, pk, pk_len,
+				 signature_struct, signature_struct_len,
 				 signature_or_mac, signature_or_mac_len));
 			PRINT_ARRAY("signature_or_mac (is signature)",
 				    signature_or_mac, *signature_or_mac_len);
@@ -177,7 +177,7 @@ signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 				signature_struct, &signature_struct_len));
 
 			bool result;
-			TRY(verify(suite->edhoc_sign_curve, pk, pk_len,
+			TRY(verify(suite->edhoc_sign, pk, pk_len,
 				   signature_struct, signature_struct_len,
 				   signature_or_mac, *signature_or_mac_len,
 				   &result));

@@ -25,9 +25,8 @@ enum edhoc_error prk_derive(bool static_dh_auth, struct suite suite,
 	if (static_dh_auth) {
 		uint8_t dh_secret[ECDH_SECRET_DEFAULT_SIZE];
 
-		TRY(shared_secret_derive(suite.edhoc_ecdh_curve, stat_sk,
-					 stat_sk_len, stat_pk, stat_pk_len,
-					 dh_secret));
+		TRY(shared_secret_derive(suite.edhoc_ecdh, stat_sk, stat_sk_len,
+					 stat_pk, stat_pk_len, dh_secret));
 		PRINT_ARRAY("dh_secret", dh_secret, sizeof(dh_secret));
 		TRY(hkdf_extract(suite.edhoc_hash, prk_in, prk_in_len,
 				 dh_secret, sizeof(dh_secret), prk_out));

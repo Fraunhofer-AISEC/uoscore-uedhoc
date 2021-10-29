@@ -55,7 +55,7 @@ enum edhoc_error aead(enum aes_operation op, const uint8_t *in,
  * @param   shared_secret the result
  * @retval  an edhoc_error code
  */
-enum edhoc_error shared_secret_derive(enum ecdh_curve curve, const uint8_t *sk,
+enum edhoc_error shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 				      const uint32_t sk_len, const uint8_t *pk,
 				      const uint32_t pk_len,
 				      uint8_t *shared_secret);
@@ -114,7 +114,7 @@ enum edhoc_error hash(enum hash_alg alg, const uint8_t *in,
  * @param   out_len length of out
  * @retval  an edhoc_error code
  */
-enum edhoc_error sign(enum sign_alg_curve curve, const uint8_t *sk,
+enum edhoc_error sign(enum sign_alg alg, const uint8_t *sk,
 		      const uint8_t sk_len, const uint8_t *pk,
 		      const uint8_t pk_len, const uint8_t *msg,
 		      const uint16_t msg_len, uint8_t *out, uint32_t *out_len);
@@ -131,7 +131,7 @@ enum edhoc_error sign(enum sign_alg_curve curve, const uint8_t *sk,
  * @param   result true if the signature verification is successfully
  * @retval  an edhoc_error code
  */
-enum edhoc_error verify(enum sign_alg_curve curve, const uint8_t *pk,
+enum edhoc_error verify(enum sign_alg alg, const uint8_t *pk,
 			const uint8_t pk_len, const uint8_t *msg,
 			const uint16_t msg_len, const uint8_t *sgn,
 			const uint16_t sgn_len, bool *result);

@@ -69,7 +69,7 @@ static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
 	TRY(_memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len));
 	*pk_len = c._cert_pk.len;
 
-	return verify(Ed25519_SIGN, root_pk, root_pk_len, cert,
+	return verify(EdDSA, root_pk, root_pk_len, cert,
 		      cert_len - 2 - c._cert_signature.len,
 		      c._cert_signature.value, c._cert_signature.len, verified);
 }
