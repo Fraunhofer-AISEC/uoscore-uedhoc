@@ -175,14 +175,14 @@ int main()
 	uint64_t ad_3_len = sizeof(ad_1);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 13;
+	const uint8_t TEST_VEC_NUM = 14;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_i;
 	struct edhoc_responder_context c_r;
 	struct other_party_cred_bufs other_party_bufs;
 	struct edhoc_responder_context_bufs responder_context_bufs;
 	char filename[] = { "../../common/edhoc-vectors-json_v11.txt" };
-	char test_vec_buf[1024 * 120];
+	char test_vec_buf[1024 * 160];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 
 	TRY(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len));

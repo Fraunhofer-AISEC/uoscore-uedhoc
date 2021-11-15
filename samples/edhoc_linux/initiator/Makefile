@@ -56,18 +56,18 @@ C_SOURCES += $(wildcard ../../common/*.c)
 C_SOURCES += $(wildcard ../../common/cbor/*.c) 
 C_SOURCES += $(wildcard ../../../modules/edhoc/src/*.c)
 C_SOURCES += $(wildcard ../../../modules/edhoc/cbor/*.c)
-C_SOURCES += ../../../modules/edhoc/crypto_wrapper.c
-C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
-C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
 C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycrypt/lib/source/*.c))
+#C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
+#C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
+#C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycrypt/lib/source/*.c))
+C_SOURCES += $(wildcard ../../../externals/mbedtls/library/*.c)
 
 #$(info    C_SOURCES is $(C_SOURCES))
 # C defines
 C_DEFS =  \
--DEDHOC_WITH_TINYCRYPT_AND_C25519 \
+-DEDHOC_WITH_MBEDTLS \
 -DEDHOC_DEBUG_PRINT
-
+#-DEDHOC_WITH_TINYCRYPT_AND_C25519 \
 
 # C includes
 C_INCLUDES =  \
@@ -79,7 +79,11 @@ C_INCLUDES =  \
 -I../../../externals/compact25519/src/\
 -I../../../externals/tinycrypt/lib/include\
 -I../../../externals/cddl-gen/include \
--I../../../externals/jsmn
+-I../../../externals/jsmn \
+-I../../../externals/mbedtls/library \
+-I../../../externals/mbedtls/include \
+-I../../../externals/mbedtls/include/mbedtls \
+-I../../../externals/mbedtls/include/psa \
 #########################################
 # Use gcc compiler with flags
 #########################################

@@ -20,3 +20,6 @@
 [submodule "externals/jsmn"]
 	path = externals/jsmn
 	url = git@github.com:zserge/jsmn.git
+[submodule "externals/mbedtls"]
+	path = externals/mbedtls
+	url = git@github.com:ARMmbed/mbedtls.git

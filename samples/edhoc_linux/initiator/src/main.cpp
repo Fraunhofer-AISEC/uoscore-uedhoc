@@ -146,14 +146,14 @@ int main()
 	uint64_t ad_4_len = sizeof(ad_2);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 13;
+	const uint8_t TEST_VEC_NUM = 14;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_r;
 	struct edhoc_initiator_context c_i;
 	struct other_party_cred_bufs other_party_bufs;
 	struct edhoc_initiator_context_bufs initiator_context_bufs;
 	char filename[] = { "../../common/edhoc-vectors-json_v11.txt" };
-	char test_vec_buf[1024 * 120];
+	char test_vec_buf[1024 * 160];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 
 	TRY(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len));

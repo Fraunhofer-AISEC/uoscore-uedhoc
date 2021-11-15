@@ -15,7 +15,16 @@
 #include "../inc/print_util.h"
 #include "../inc/suites.h"
 
-//#define EDHOC_WITH_TINYCRYPT_AND_C25519
+#ifdef EDHOC_WITH_MBEDTLS
+/*
+IMPORTANT!!!!
+make sure MBEDTLS_PSA_CRYPTO_CONFIG is defined in include/mbedtls/mbedtls_config.h
+
+
+modify setting in include/psa/crypto_config.h 
+*/
+#include <psa/crypto.h>
+#endif
 
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
 #include <c25519.h>
@@ -186,7 +195,27 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 	}
 	if (alg == P256) {
 #ifdef EDHOC_WITH_MBEDTLS
-		/*TODO add mbedtls code here*/
+		psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+		psa_algorithm_t alg = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
+		psa_ecc_family_t ecc_family = PSA_ECC_FAMILY_SECP_R1;
+		size_t key_bits = 256;
+		psa_key_id_t key = PSA_KEY_HANDLE_INIT;
+
+		psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+		psa_set_key_algorithm(&attributes, alg);
+		psa_set_key_type(&attributes,
+				 PSA_KEY_TYPE_ECC_KEY_PAIR(ecc_family));
+		psa_set_key_bits(&attributes, key_bits);
+
+		TRY(psa_import_key(&attributes, sk, sk_len, &key));
+
+		uint32_t lenhgt;
+		psa_raw_key_agreement(PSA_ALG_ECDH, key, pk, pk_len,
+				      shared_secret, 32, &lenhgt);
+
+		if (lenhgt != 32) {
+			return dh_failed;
+		}
 #endif
 	}
 
@@ -196,9 +225,9 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 enum edhoc_error __attribute__((weak))
 ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 {
-	uint8_t extended_seed[32];
 	if (alg == X25519) {
 #ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+		uint8_t extended_seed[32];
 		struct tc_sha256_state_struct s;
 		TRY_EXPECT(tc_sha256_init(&s), 1);
 		TRY_EXPECT(tc_sha256_update(&s, (uint8_t *)&seed, sizeof(seed)),
@@ -222,6 +251,14 @@ hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 		TRY_EXPECT(tc_sha256_init(&s), 1);
 		TRY_EXPECT(tc_sha256_update(&s, in, in_len), 1);
 		TRY_EXPECT(tc_sha256_final(out, &s), 1);
+#endif
+#ifdef EDHOC_WITH_MBEDTLS
+		uint32_t length;
+		TRY(psa_hash_compute(PSA_ALG_SHA_256, in, in_len, out, 32,
+				     &length));
+		if (length != 32) {
+			return sha_failed;
+		}
 #endif
 	}
 
