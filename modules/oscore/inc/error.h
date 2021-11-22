@@ -38,6 +38,7 @@ enum oscore_error {
 	len_extra_byte_error = 16,
 	cbor_encoding_error = 17,
 	not_valid_input_packet = 18,
+	replayed_packed_received = 19,
 };
 
 #endif

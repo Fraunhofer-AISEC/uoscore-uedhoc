@@ -91,7 +91,7 @@ struct compressed_oscore_option {
 	uint8_t h; /*flag bit for KID_context*/
 	uint8_t k; /*flag bit for KID*/
 	uint8_t n; /*bytes number of PIV*/
-	struct byte_array piv;
+	struct byte_array piv; /*same as sender sequence number*/
 	struct byte_array kid_context;
 	struct byte_array kid;
 };

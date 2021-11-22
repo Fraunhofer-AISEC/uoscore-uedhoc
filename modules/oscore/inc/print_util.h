@@ -12,6 +12,7 @@
 #ifndef OSCORE_PRINT_UTIL_H
 #define OSCORE_PRINT_UTIL_H
 
+#include <stdio.h>
 #include <stdint.h>
 /**
  *@brief prints an array for debug pourposes 

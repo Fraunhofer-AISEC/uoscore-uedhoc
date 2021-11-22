@@ -70,11 +70,11 @@ inline enum oscore_error create_hkdf_info(struct byte_array *id,
 	info_struct._info_alg_aead_choice = _info_alg_aead_int;
 	info_struct._info_alg_aead_int = aead_alg;
 
-	info_struct._info_type.value = type_enc;
+	info_struct._info_type.value = (uint8_t *)type_enc;
 	info_struct._info_type.len = strlen(type_enc);
 	info_struct._info_L = len;
 
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	success_encoding = cbor_encode_info(out->ptr, out->len, &info_struct,
 					    &payload_len_out);
 

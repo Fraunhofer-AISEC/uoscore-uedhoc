@@ -14,8 +14,8 @@ echo Generating CBOR encoding and decoding functions...
 #rm *.h
 #rm *.c
 
-python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c aad_array.cddl code -e -t aad_array --oc aad_array.c --oh aad_array.h
+python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c aad_array.cddl code -e -t aad_array --oc aad_array.c --oh aad_array.h
 
-python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c info.cddl code -e -t info --oc info.c --oh info.h
+python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c info.cddl code -e -t info --oc info.c --oh info.h
 
-python3 ../../../externals/cddl-gen/scripts/cddl_gen.py -c enc_structure.cddl code -e -t enc_structure --oc enc_structure.c --oh enc_structure.h
+python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c enc_structure.cddl code -e -t enc_structure --oc enc_structure.c --oh enc_structure.h

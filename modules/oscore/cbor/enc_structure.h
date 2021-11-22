@@ -1,6 +1,7 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
+ * Generated with a default_max_qty of 3
  */
 
 #ifndef ENC_STRUCTURE_H__
@@ -13,15 +14,15 @@
 #include "cbor_encode.h"
 #include "types_enc_structure.h"
 
-#if DEFAULT_MAXQ != 3
-#error "The type file was generated with a different default_maxq than this file"
+#if DEFAULT_MAX_QTY != 3
+#error "The type file was generated with a different default_max_qty than this file"
 #endif
 
 
 bool cbor_encode_enc_structure(
-		uint8_t *payload, size_t payload_len,
+		uint8_t *payload, uint32_t payload_len,
 		const struct enc_structure *input,
-		size_t *payload_len_out);
+		uint32_t *payload_len_out);
 
 
 #endif /* ENC_STRUCTURE_H__ */

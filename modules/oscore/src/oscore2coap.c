@@ -486,6 +486,82 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 	return oscore_no_error;
 }
 
+static bool is_request(struct o_coap_packet *packet)
+{
+	if ((CODE_CLASS_MASK & packet->header.code) == REQUEST_CLASS) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+static inline enum oscore_error replay_check(uint64_t sender_sequence_number,
+					     uint64_t *replay_window,
+					     uint8_t replay_window_len)
+{
+	bool first_run = true;
+
+	if (first_run) {
+		first_run = false;
+		return oscore_no_error;
+	} else {
+		/*if the sender sequence number is bigger than the 
+		right most element -> all good */
+		if (sender_sequence_number >
+		    replay_window[replay_window_len - 1]) {
+			return oscore_no_error;
+		}
+
+		/*if the sender sequence number is smaller than the 
+		left most element -> a replay is detected*/
+		if (sender_sequence_number < replay_window[0]) {
+			return replayed_packed_received;
+		}
+
+		/*if the sender sequence number is in the replay window
+		-> a replay is detected*/
+		for (uint8_t i = 0; i < replay_window_len; i++) {
+			if (sender_sequence_number == replay_window[i]) {
+				return replayed_packed_received;
+			}
+		}
+	}
+
+	return oscore_no_error;
+}
+
+static void insert_sender_seq_number(uint64_t sender_seq_number,
+				     uint64_t *replay_window, uint8_t position)
+{
+	/*shift all old values to the left*/
+	for (uint8_t j = 0; j < position; j++) {
+		replay_window[j] = replay_window[j + 1];
+	}
+	/*insert the new sender sequence number at a given position*/
+	replay_window[position] = sender_seq_number;
+}
+
+static void update_replay_window(uint64_t sender_seq_number,
+				 uint64_t *replay_window,
+				 uint8_t replay_window_len)
+{
+	for (uint8_t i = 0; i < replay_window_len -1; i++) {
+		if ((replay_window[i] < sender_seq_number) &&
+		    (sender_seq_number < replay_window[i + 1])) {
+			insert_sender_seq_number(sender_seq_number,
+						 replay_window, i);
+			PRINT_ARRAY("Replay window:", (uint8_t *)replay_window,
+				    replay_window_len *
+					    sizeof(replay_window[0]));
+			return;
+		}
+	}
+	insert_sender_seq_number(sender_seq_number, replay_window,
+				 replay_window_len - 1);
+	PRINT_ARRAY("Replay window:", (uint8_t *)replay_window,
+		    replay_window_len * sizeof(replay_window[0]));
+}
+
 enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 			      uint8_t *buf_out, uint16_t *buf_out_len,
 			      bool *oscore_pkg_flag, struct context *c)
@@ -517,8 +593,7 @@ enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 	if (*oscore_pkg_flag) {
 		/*In requests the OSCORE packet contains at least a KID = sender ID 
         and eventually sender sequence number*/
-		if ((CODE_CLASS_MASK & oscore_packet.header.code) ==
-		    REQUEST_CLASS) {
+		if (is_request(&oscore_packet)) {
 			/*Check that the recipient context c->rc has a  Recipient ID that
 			 matches the received with the oscore option KID (Sender ID).
 			 If this is not true return an error which indicates the caller
@@ -528,6 +603,14 @@ enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 			if (!array_equals(&c->rc.recipient_id,
 					  &oscore_option.kid)) {
 				return oscore_kid_recipent_id_mismatch;
+			}
+
+			/*check is the packet is replayed*/
+			r = replay_check(*oscore_option.piv.ptr,
+					 c->rc.replay_window,
+					 c->rc.replay_window_len);
+			if (r != oscore_no_error) {
+				return r;
 			}
 
 			/*If this is a request message we need to calculate the nonce, aad 
@@ -551,8 +634,16 @@ enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 
 		/* Decrypt payload */
 		r = payload_decrypt(c, &plaintext, &oscore_packet);
-		if (r != oscore_no_error)
+		if (r == oscore_no_error) {
+			/*update the replay window after the decryption*/
+			if (is_request(&oscore_packet)) {
+				update_replay_window(*oscore_option.piv.ptr,
+						     c->rc.replay_window,
+						     c->rc.replay_window_len);
+			}
+		} else {
 			return r;
+		}
 
 		/* Generate corresponding CoAP packet */
 		struct o_coap_packet o_coap_packet;

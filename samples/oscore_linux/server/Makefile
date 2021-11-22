@@ -55,16 +55,18 @@ DO_NOT_COMPILE_SOURCES = \
 ../../../externals/tinycrypt/lib/source/ecc_dsa.c 
 
 C_SOURCES = $(wildcard src/*.c)
-C_SOURCES += $(wildcard ../../common/*.c)
+C_SOURCES += ../../common/sock.c
 C_SOURCES += $(wildcard ../../../modules/oscore/src/*.c)
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycbor/src/*.c))
+C_SOURCES += $(wildcard ../../../modules/oscore/cbor/*.c)
+#C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycbor/src/*.c))
+C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
 C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycrypt/lib/source/*.c))
 
 
 # C defines
 C_DEFS =  \
--DOSCORE_WITH_TINYCRYPT 
-#-DOSCORE_DEBUG_PRINT 
+-DOSCORE_WITH_TINYCRYPT \
+-DOSCORE_DEBUG_PRINT 
 
 # C++ defines
 CXX_DEFS =  
@@ -76,8 +78,10 @@ C_INCLUDES =  \
 -I../common/ \
 -I../../../externals/cantcoap/ \
 -I../../../modules/oscore/ \
--I../../../externals/tinycbor/src/ \
+-I../../../externals/cddl-gen/include \
 -I../../../externals/tinycrypt/lib/include
+#-I../../../externals/tinycbor/src/ \
+
 
 #-Iexternals/libcoap/examples/lwip/
 #########################################
@@ -103,6 +107,9 @@ CXXFLAGS += -Wall -g
 # generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" 
+
+# required for gddl-gen library
+CFLAGS += -DCDDL_CBOR_CANONICAL 
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed

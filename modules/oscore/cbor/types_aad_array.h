@@ -1,6 +1,7 @@
 /*
- * Generated with cddl_gen.py (https://github.com/oyvindronningstad/cddl_gen)
- * Generated with a default_maxq of 3
+ * Generated using cddl_gen version 0.2.99
+ * https://github.com/NordicSemiconductor/cddl-gen
+ * Generated with a default_max_qty of 3
  */
 
 #ifndef TYPES_AAD_ARRAY_H__
@@ -12,7 +13,7 @@
 #include <string.h>
 #include "cbor_encode.h"
 
-#define DEFAULT_MAXQ 3
+#define DEFAULT_MAX_QTY 3
 
 struct aad_array {
  	uint32_t _aad_array_oscore_version;

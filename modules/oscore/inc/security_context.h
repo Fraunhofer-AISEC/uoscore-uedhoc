@@ -17,6 +17,8 @@
 #include "supported_algorithm.h"
 #include "coap.h"
 
+#define REPLAY_WINDOW_LEN 32
+
 enum dev_type {
 	SERVER,
 	CLIENT,
@@ -26,9 +28,6 @@ enum derive_type {
 	KEY,
 	IV,
 };
-
-/*not implemented yet*/
-typedef void *replay_window;
 
 /**
  * @brief Common Context
@@ -58,8 +57,8 @@ struct recipient_context {
 	struct byte_array recipient_id;
 	struct byte_array recipient_key;
 	uint8_t recipient_key_buf[RECIPIENT_KEY_LEN_];
-	/*replay window not implement yet*/
-	//replay_window replay_window;
+	uint64_t replay_window[REPLAY_WINDOW_LEN];
+	uint8_t replay_window_len;
 };
 
 /*request-response context contains parameters that need to persists between

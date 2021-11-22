@@ -34,13 +34,13 @@ static enum oscore_error create_enc_structure(struct byte_array *external_aad,
 
 	uint8_t context[] = { "Encrypt0" };
 	enc_structure._enc_structure_context.value = context;
-	enc_structure._enc_structure_context.len = strlen(context);
+	enc_structure._enc_structure_context.len = strlen((char *)context);
 	enc_structure._enc_structure_protected.value = NULL;
 	enc_structure._enc_structure_protected.len = 0;
 	enc_structure._enc_structure_external_aad.value = external_aad->ptr;
 	enc_structure._enc_structure_external_aad.len = external_aad->len;
 
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	success_encoding = cbor_encode_enc_structure(
 		out->ptr, out->len, &enc_structure, &payload_len_out);
 

@@ -195,13 +195,13 @@ enum oscore_error oscore_context_init(struct oscore_init_params *params,
 	if (params->aead_alg != AES_CCM_16_64_128) {
 		return oscore_invalid_algorithm_aead;
 	} else {
-		c->cc.aead_alg = AES_CCM_16_64_128; /*thats the default*/
+		c->cc.aead_alg = AES_CCM_16_64_128; /*that's the default*/
 	}
 
 	if (params->hkdf != SHA_256) {
 		return oscore_invalid_algorithm_hkdf;
 	} else {
-		c->cc.kdf = SHA_256; /*thats the default*/
+		c->cc.kdf = SHA_256; /*that's the default*/
 	}
 
 	c->cc.master_secret = params->master_secret;
@@ -213,7 +213,10 @@ enum oscore_error oscore_context_init(struct oscore_init_params *params,
 	if (r != oscore_no_error)
 		return r;
 
-	/*derive Recipient Context*************************************************/
+	/*derive Recipient Context*********************************************/
+	c->rc.replay_window_len = REPLAY_WINDOW_LEN;
+	memset(c->rc.replay_window, 0,
+	       sizeof(c->rc.replay_window[0]) * c->rc.replay_window_len);
 	c->rc.recipient_id = params->recipient_id;
 	c->rc.recipient_key.len = sizeof(c->rc.recipient_key_buf);
 	c->rc.recipient_key.ptr = c->rc.recipient_key_buf;
@@ -221,7 +224,7 @@ enum oscore_error oscore_context_init(struct oscore_init_params *params,
 	if (r != oscore_no_error)
 		return r;
 
-	/*derive Sender Context****************************************************/
+	/*derive Sender Context************************************************/
 	c->sc.sender_id = params->sender_id;
 	c->sc.sender_key.len = sizeof(c->sc.sender_key_buf);
 	c->sc.sender_key.ptr = c->sc.sender_key_buf;
@@ -274,11 +277,13 @@ enum oscore_error oscore_context_init(struct oscore_init_params *params,
 	return oscore_no_error;
 }
 
+//todo: how big is piv? 5 byte= 40 bit -> in that case the sender sequence number needs to loop at the value of 2^40 -1 !!! -> uint8_t is sufficient for the sender sequence number.
 enum oscore_error sender_seq_num2piv(uint64_t ssn, struct byte_array *piv)
 {
 	uint8_t *p = (uint8_t *)&ssn;
 	enum oscore_error r;
 
+	//todo here we can start at 4?
 	for (int8_t i = 7; i >= 0; i--) {
 		if (*(p + i) > 0) {
 			r = _memcpy_s(piv->ptr, MAX_PIV_LEN, p, i + 1);
