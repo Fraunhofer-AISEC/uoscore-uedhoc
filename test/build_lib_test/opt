@@ -1,2 +1,0 @@
-OPT = -O3
-LIB_NAME = libuedhoc.a

@@ -7,7 +7,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-include ../build_lib_test/opt
+include ../lib_test/opt
 
 # $(info    LIB_NAME is $(LIB_NAME))
 # $(info    PREFIX is $(PREFIX))

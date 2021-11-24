@@ -18,7 +18,7 @@ from collections import namedtuple
 
 arc = namedtuple("arc", "board, cpu_arc")
 
-
+makefile_path = 'lib_test'
 build_path = 'build'
 build_lib_test_path = 'build_lib_test'
 results_path = 'packaged'
@@ -79,8 +79,8 @@ def build(name, opt, arc):
           arc.cpu_arc + " with optimization " + opt + "\n")
     print("===================================================================")
 
-    os.mkdir(build_lib_test_path)
-    f = open(build_lib_test_path + "/opt", "x")
+   # os.mkdir(build_lib_test_path)
+    f = open(makefile_path + "/opt", "w")
     f.write("OPT = " + opt + "\n")
     f.write("LIB_NAME = " + name + "\n")
     f.close()
