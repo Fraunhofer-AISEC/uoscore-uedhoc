@@ -35,10 +35,10 @@ jobs:
 
           chmod +x zephyr-sdk-0.13.1-linux-x86_64-setup.run
           ./zephyr-sdk-0.13.1-linux-x86_64-setup.run -- -d ~/zephyr-sdk-0.13.1
-
-       - name: Checkout code
-         uses: actions/checkout@v2
-         run: |
+      
+      - name: Checkout code
+        uses: actions/checkout@v2
+        run: |
            source  ~/zephyrproject/zephyr/zephyr-env.sh
            cd test/
            ./run.py
