@@ -36,13 +36,15 @@ jobs:
           chmod +x zephyr-sdk-0.13.1-linux-x86_64-setup.run
           ./zephyr-sdk-0.13.1-linux-x86_64-setup.run -- -d ~/zephyr-sdk-0.13.1
 
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
+       - name: Checkout code
+         uses: actions/checkout@v2
+         run: |
+           source  ~/zephyrproject/zephyr/zephyr-env.sh
+           cd test/
+           ./run.py
 
-      # - name: Zephyr West
-      #     # You may pin to the exact commit or the version.
-      #     # uses: zmkfirmware/zephyr-west-action@c118b36db5d41c62f6890334ba053574c94bfe03
-      #     uses: zmkfirmware/zephyr-west-action@v0.3.3
+
+
 
 
   # test:
