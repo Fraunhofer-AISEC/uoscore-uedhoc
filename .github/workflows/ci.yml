@@ -46,18 +46,20 @@ jobs:
            source  ~/zephyrproject/zephyr/zephyr-env.sh
            cd test/
            west build -b=native_posix
+           west build -t run
 
-      - name: Test native_posix
-        run: west build -t run
+      # - name: Test native_posix
+      #   run: west build -t run
 
       - name: Build native_posix_64
         run: |
            rm -rf build
            rm -rf build_lib_test
            west build -b=native_posix_64
+           west build -t run
 
-      - name: Test native_posix_64
-        run: west build -t run
+      # - name: Test native_posix_64
+      #   run: west build -t run
 
 
   # test:
