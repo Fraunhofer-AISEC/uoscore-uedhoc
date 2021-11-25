@@ -43,7 +43,7 @@ jobs:
 
 ### build, test and archive
 # native_posix (0x68)
-- name: Build native_posix
+      - name: Build native_posix
         run: |
            source  ~/zephyrproject/zephyr/zephyr-env.sh
            cd test/
