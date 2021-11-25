@@ -95,6 +95,7 @@ int read_test_vectors(char *filename, char *test_vec_buf, uint32_t *len);
  * @param	vec_num	the test vector we are testing
  * @param	test_vec_buf  a buffer holding the test vectors as json string
  * @param	test_vec_buf_len lenhgt of test_vec_buf
+ * @retval      0 if success; -1 otherwise 
  */
 int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 				       struct other_party_cred_bufs *bufs,
@@ -111,6 +112,7 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
  * @param	vec_num	the test vector we are testing
  * @param	test_vec_buf  a buffer holding the test vectors as json string
  * @param	test_vec_buf_len lenhgt of test_vec_buf
+ * @retval      0 if success; -1 otherwise 
  */
 int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 	struct edhoc_initiator_context_bufs *bufs,
@@ -127,6 +129,7 @@ int get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
  * @param	vec_num	the test vector we are testing
  * @param	test_vec_buf  a buffer holding the test vectors as json string
  * @param	test_vec_buf_len lenhgt of test_vec_buf
+  * @retval      0 if success; -1 otherwise 
  */
 int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 	struct edhoc_responder_context_bufs *bufs,
@@ -142,6 +145,7 @@ int get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
  * @param	vec_num	the test vector we are testing
  * @param	test_vec_buf  a buffer holding the test vectors as json string
  * @param	test_vec_buf_len lenhgt of test_vec_buf
+ * @retval      0 if success; -1 otherwise 
  */
 int get_RESULTS_from_test_vec(struct results_bufs *bufs, struct results *m,
 			      uint8_t vec_num, char *test_vec_buf,
@@ -156,6 +160,7 @@ int get_RESULTS_from_test_vec(struct results_bufs *bufs, struct results *m,
  * @param	vec_num	the test vector we are testing
  * @param	test_vec_buf  a buffer holding the test vectors as json string
  * @param	test_vec_buf_len lenhgt of test_vec_buf
+ * @retval      0 if success; -1 otherwise 
  */
 int get_MESSAGES_from_test_vec(struct messages_bufs *bufs, struct messages *m,
 			       uint8_t vec_num, char *test_vec_buf,

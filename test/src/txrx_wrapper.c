@@ -31,9 +31,15 @@ static int _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
 	return 0;
 }
 
+static uint8_t msg_cnt;
+
+void rx_init(void)
+{
+	msg_cnt = 1;
+}
+
 enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 {
-	static uint8_t msg_cnt = 1;
 	if (rx_initiator_switch) {
 		PRINTF("TXRX wrapper test vectors\n");
 		/*The initiator must get msg2 and msg4*/
@@ -68,6 +74,6 @@ enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 }
 
 enum edhoc_error tx(uint8_t *data, uint32_t data_len)
-{ //to do add here a test
+{ //todo add here a test
 	return edhoc_no_error;
 }
