@@ -29,7 +29,7 @@
 enum edhoc_error encode_byte_string(const uint8_t *in, uint32_t in_len,
 				    uint8_t *out, uint64_t *out_len)
 {
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	cbor_string_type_t tmp;
 	tmp.value = in;
 	tmp.len = in_len;
@@ -44,7 +44,7 @@ enum edhoc_error decode_byte_string(const uint8_t *in, const uint32_t in_len,
 				    uint8_t *out, uint32_t *out_len)
 {
 	cbor_string_type_t str;
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 
 	TRY_EXPECT(cbor_decode_bstr_type_b_str(in, in_len, &str, &decode_len),
 		   true);

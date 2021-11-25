@@ -29,7 +29,7 @@ enum edhoc_error cose_enc_structure_encode(
 	enc_structure._enc_structure_external_aad.value = external_aad;
 	enc_structure._enc_structure_external_aad.len = external_aad_len;
 
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	TRY_EXPECT(cbor_encode_enc_structure(out, *out_len, &enc_structure,
 					     &payload_len_out),
 		   true);
@@ -55,7 +55,7 @@ cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 	sig_structure._sig_structure_payload.value = payload;
 	sig_structure._sig_structure_payload.len = payload_len;
 
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	TRY_EXPECT(cbor_encode_sig_structure(out, *out_len, &sig_structure,
 					     &payload_len_out),
 		   true);

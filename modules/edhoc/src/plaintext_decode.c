@@ -35,7 +35,7 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 					 uint32_t *id_cred_x_len)
 {
 	struct id_cred_x_map map;
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 
 	map._id_cred_x_map_kid_present = 0;
 	map._id_cred_x_map_x5chain_present = 0;
@@ -77,7 +77,7 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 				 uint32_t *sign_or_mac_len, uint8_t *ad,
 				 uint32_t *ad_len)
 {
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 	struct plaintext p;
 
 	TRY_EXPECT(cbor_decode_plaintext(ptxt, ptxt_len, &p, &decode_len),

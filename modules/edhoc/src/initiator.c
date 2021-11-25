@@ -46,7 +46,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	   uint32_t msg2_len, uint8_t *g_y, uint64_t g_y_len, struct c_x *c_r,
 	   uint8_t *ciphertext2, uint64_t *ciphertext2_len)
 {
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 	struct m2 m;
 
 	TRY_EXPECT(cbor_decode_m2(msg2, msg2_len, &m, &decode_len), true);
@@ -124,7 +124,7 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 		m1._message_1_ead_1_present = 0;
 	}
 
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	TRY_EXPECT(cbor_encode_message_1(msg1, *msg1_len, &m1,
 					 &payload_len_out),
 		   true);

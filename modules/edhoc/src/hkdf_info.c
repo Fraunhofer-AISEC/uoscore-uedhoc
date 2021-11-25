@@ -35,7 +35,7 @@ enum edhoc_error create_hkdf_info(const uint8_t *th, uint8_t th_len,
 
 	info._info_length = okm_len;
 
-	size_t payload_len_out;
+	uint32_t payload_len_out;
 	TRY_EXPECT(cbor_encode_info(out, *out_len, &info, &payload_len_out),
 		   true);
 

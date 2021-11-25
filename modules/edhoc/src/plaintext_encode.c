@@ -25,8 +25,8 @@ enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 			     uint8_t *_kid, uint32_t *kid_len)
 {
 	struct id_cred_x_map map;
-	size_t payload_len_out;
-	size_t decode_len = 0;
+	uint32_t payload_len_out;
+	uint32_t decode_len = 0;
 	TRY_EXPECT(cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
 					     &decode_len),
 		   true);

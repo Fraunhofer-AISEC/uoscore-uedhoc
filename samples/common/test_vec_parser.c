@@ -139,7 +139,7 @@ int get_suites_decode(char *test_vec_buf, jsmntok_t *t, uint32_t t_len,
 	byte_array_init(tmp_buf, sizeof(tmp_buf), &tmp);
 	TRY(get_element(test_vec_buf, t, t_len, suite_name, vec_num, &tmp));
 
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 	struct suites_ s;
 
 	TRY_EXPECT(cbor_decode_suites(tmp.ptr, tmp.len, &s, &decode_len), true);
@@ -183,7 +183,7 @@ int get_C_X_decode(uint8_t vec_num, char *test_vec_buf, int r, jsmntok_t *t,
 	byte_array_init(c_x_tmp_buf, sizeof(c_x_tmp_buf), &c_x_tmp);
 	TRY(get_element(test_vec_buf, t, r, cx_name, vec_num, &c_x_tmp));
 
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 	enum edhoc_error err;
 	struct cx_C_X_ cx;
 

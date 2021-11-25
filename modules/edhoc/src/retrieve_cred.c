@@ -34,7 +34,7 @@ static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
 				    uint16_t cred_num, uint8_t *pk,
 				    uint16_t *pk_len, bool *verified)
 {
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 	struct cert c;
 
 	TRY_EXPECT(cbor_decode_cert(cert, cert_len, &c, &decode_len), true);
@@ -82,7 +82,7 @@ enum edhoc_error retrieve_cred(bool static_dh_auth,
 			       uint16_t *pk_len, uint8_t *g, uint16_t *g_len)
 {
 	bool verified;
-	size_t decode_len = 0;
+	uint32_t decode_len = 0;
 	struct id_cred_x_map map;
 
 	//TODO implement here retrieving of the public of the other party from CRED_x of the other party!!!
