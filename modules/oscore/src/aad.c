@@ -19,9 +19,7 @@ enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 		    enum AEAD_algorithm aead_alg, struct byte_array *kid,
 		    struct byte_array *piv, struct byte_array *out)
 {
-	enum err r;
 
-	bool success_encoding;
 	struct aad_array aad_array;
 
 	aad_array._aad_array_oscore_version = 1;
@@ -41,21 +39,17 @@ enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 		.len = encoded_opt_i_len,
 		.ptr = encoded_opt_i_bytes,
 	};
-	r = encode_options(options, opt_num, CLASS_I, &opts_i.ptr[0],
-			   encoded_opt_i_len);
-	if (r != ok)
-		return r;
+	TRY(encode_options(options, opt_num, CLASS_I, &opts_i.ptr[0],
+			   encoded_opt_i_len));
 
 	aad_array._aad_array_options.len = opts_i.len;
 	aad_array._aad_array_options.value = opts_i.ptr;
 
 	uint32_t payload_len_out;
-	success_encoding = cbor_encode_aad_array(out->ptr, out->len, &aad_array,
-						 &payload_len_out);
+	TRY_EXPECT(cbor_encode_aad_array(out->ptr, out->len, &aad_array,
+					 &payload_len_out),
+		   true);
 
-	if (!success_encoding) {
-		return cbor_encoding_error;
-	}
 	out->len = payload_len_out;
 	PRINT_ARRAY("AAD", out->ptr, out->len);
 	return ok;

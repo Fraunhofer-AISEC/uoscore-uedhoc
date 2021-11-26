@@ -128,11 +128,9 @@ enum err encode_options(struct o_coap_option *options,
 		out[index] = delta_length_field;
 		index += 1 + delta_len + length_len;
 		// value
-		enum err r =
-			_memcpy_s(&out[index], (out_buf_len - index),
-				  &option.value[0], length);
-		if (r != ok)
-			return r;
+		TRY(_memcpy_s(&out[index], (out_buf_len - index),
+				  &option.value[0], length));
+
 		index += length;
 	}
 	return ok;

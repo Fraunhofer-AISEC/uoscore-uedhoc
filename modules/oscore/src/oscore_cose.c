@@ -27,7 +27,7 @@
  * @return err
  */
 static enum err create_enc_structure(struct byte_array *external_aad,
-					      struct byte_array *out)
+				     struct byte_array *out)
 {
 	bool success_encoding;
 	struct enc_structure enc_structure;
@@ -52,22 +52,18 @@ static enum err create_enc_structure(struct byte_array *external_aad,
 }
 
 enum err cose_decrypt(struct byte_array *in_ciphertext,
-			       struct byte_array *out_plaintext,
-			       struct byte_array *nonce,
-			       struct byte_array *recipient_aad,
-			       struct byte_array *key)
+		      struct byte_array *out_plaintext,
+		      struct byte_array *nonce,
+		      struct byte_array *recipient_aad, struct byte_array *key)
 {
 	/* get enc_structure */
-	enum err r;
 	uint32_t aad_len = recipient_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
 	struct byte_array aad = {
 		.len = aad_len,
 		.ptr = aad_bytes,
 	};
-	r = create_enc_structure(recipient_aad, &aad);
-	if (r != ok)
-		return r;
+	TRY(create_enc_structure(recipient_aad, &aad));
 	PRINT_ARRAY("AAD encoded", aad.ptr, aad.len);
 
 	struct byte_array tag = {
@@ -76,34 +72,27 @@ enum err cose_decrypt(struct byte_array *in_ciphertext,
 
 	PRINT_ARRAY("Ciphertext", in_ciphertext->ptr, in_ciphertext->len);
 
-	r = aes_ccm_16_64_128(DECRYPT, in_ciphertext, out_plaintext, key, nonce,
-			      &aad, &tag);
-
-	if (r != ok)
-		return r;
+	TRY(aes_ccm_16_64_128(DECRYPT, in_ciphertext, out_plaintext, key, nonce,
+			      &aad, &tag));
 
 	PRINT_ARRAY("Decrypted plaintext", out_plaintext->ptr,
 		    out_plaintext->len);
-	return r;
+	return ok;
 }
 
-enum err
-cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
-	     uint32_t out_ciphertext_len, struct byte_array *nonce,
-	     struct byte_array *sender_aad, struct byte_array *key)
+enum err cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
+		      uint32_t out_ciphertext_len, struct byte_array *nonce,
+		      struct byte_array *sender_aad, struct byte_array *key)
 {
 	/* get enc_structure  */
-	enum err r;
-
 	uint32_t aad_len = sender_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
 	struct byte_array aad = {
 		.len = aad_len,
 		.ptr = aad_bytes,
 	};
-	r = create_enc_structure(sender_aad, &aad);
-	if (r != ok)
-		return r;
+	TRY(create_enc_structure(sender_aad, &aad));
+
 	struct byte_array tag = {
 		.len = 8,
 		.ptr = out_ciphertext + in_plaintext->len,
@@ -113,10 +102,8 @@ cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 		.len = out_ciphertext_len,
 		.ptr = out_ciphertext,
 	};
-	r = aes_ccm_16_64_128(ENCRYPT, in_plaintext, &ctxt, key, nonce, &aad,
-			      &tag);
-	if (r != ok)
-		return r;
+	TRY(aes_ccm_16_64_128(ENCRYPT, in_plaintext, &ctxt, key, nonce, &aad,
+			      &tag));
 
 	PRINT_ARRAY("Ciphertext", out_ciphertext, out_ciphertext_len);
 	return ok;

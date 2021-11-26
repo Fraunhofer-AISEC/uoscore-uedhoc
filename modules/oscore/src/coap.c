@@ -20,8 +20,8 @@
 #include "../inc/print_util.h"
 
 enum err options_into_byte_string(struct o_coap_option *options,
-					   uint8_t options_cnt,
-					   struct byte_array *out_byte_string)
+				  uint8_t options_cnt,
+				  struct byte_array *out_byte_string)
 {
 	uint8_t delta_extra_byte = 0;
 	uint8_t len_extra_byte = 0;
@@ -101,10 +101,9 @@ enum err options_into_byte_string(struct o_coap_option *options,
 		/* Copy the byte string of current option into output*/
 		uint64_t dest_size = out_byte_string_capacity -
 				     (temp_ptr - out_byte_string->ptr);
-		enum err r = _memcpy_s(
-			temp_ptr, dest_size, options[i].value, options[i].len);
-		if (r != ok)
-			return r;
+		TRY(_memcpy_s(temp_ptr, dest_size, options[i].value,
+			      options[i].len));
+
 		temp_ptr += options[i].len;
 	}
 	return ok;
@@ -118,10 +117,9 @@ enum err options_into_byte_string(struct o_coap_option *options,
  * @param out_options_count: count number of output options
  * @return  err
  */
-static inline enum err buf2options(uint8_t *in_data,
-					    uint16_t in_data_len,
-					    struct o_coap_option *out_options,
-					    uint8_t *out_options_count)
+static inline enum err buf2options(uint8_t *in_data, uint16_t in_data_len,
+				   struct o_coap_option *out_options,
+				   uint8_t *out_options_count)
 {
 	uint8_t *temp_options_ptr = in_data;
 	uint8_t temp_options_count = 0;
@@ -211,7 +209,6 @@ static inline enum err buf2options(uint8_t *in_data,
 
 enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
 {
-	enum err r;
 	uint8_t *tmp_p = in->ptr;
 	uint16_t payload_len = in->len;
 
@@ -271,11 +268,10 @@ enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
 
 			/* Parser all options */
 			if (options_len > 0) {
-				r = buf2options(temp_option_ptr, options_len,
+				TRY(buf2options(temp_option_ptr, options_len,
 						out->options,
-						&(out->options_cnt));
-				if (r != ok)
-					return r;
+						&(out->options_cnt)));
+
 			} else {
 				out->options_cnt = 0;
 			}
@@ -295,10 +291,9 @@ enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
 }
 
 enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
-			   uint16_t *out_byte_string_len)
+		  uint16_t *out_byte_string_len)
 {
 	uint8_t *temp_out_ptr = out_byte_string;
-	enum err r;
 
 	/* First byte in header (version + type + token length) */
 	*temp_out_ptr = (in->header.ver << HEADER_VERSION_OFFSET) |
@@ -315,10 +310,8 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 	if (in->header.TKL > 0) {
 		uint64_t dest_size =
 			*out_byte_string_len - (temp_out_ptr - out_byte_string);
-		r = _memcpy_s(temp_out_ptr, dest_size, in->token,
-			      in->header.TKL);
-		if (r != ok)
-			return r;
+		TRY(_memcpy_s(temp_out_ptr, dest_size, in->token,
+			      in->header.TKL));
 
 		temp_out_ptr += in->header.TKL;
 	}
@@ -336,18 +329,16 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 	};
 
 	/* Convert all OSCORE U-options structure into byte string*/
-	r = options_into_byte_string(in->options, in->options_cnt,
-				     &option_byte_string);
-	if (r != ok)
-		return r;
+	TRY(options_into_byte_string(in->options, in->options_cnt,
+				     &option_byte_string));
+
 	/* Copy options byte string into output*/
 
 	uint64_t dest_size =
 		*out_byte_string_len - (temp_out_ptr - out_byte_string);
-	r = _memcpy_s(temp_out_ptr, dest_size, temp_opt_bytes,
-		      option_byte_string.len);
-	if (r != ok)
-		return r;
+	TRY(_memcpy_s(temp_out_ptr, dest_size, temp_opt_bytes,
+		      option_byte_string.len));
+
 
 	temp_out_ptr += option_byte_string.len;
 
@@ -357,10 +348,9 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 
 		dest_size = *out_byte_string_len -
 			    (temp_out_ptr + 1 - out_byte_string);
-		r = _memcpy_s(++temp_out_ptr, dest_size, in->payload,
-			      in->payload_len);
-		if (r != ok)
-			return r;
+		TRY(_memcpy_s(++temp_out_ptr, dest_size, in->payload,
+			      in->payload_len));
+
 	}
 	*out_byte_string_len = 4 + in->header.TKL + option_byte_string.len;
 	if (in->payload_len) {

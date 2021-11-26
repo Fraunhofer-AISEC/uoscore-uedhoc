@@ -17,37 +17,28 @@
 #include "../inc/print_util.h"
 #include "../inc/security_context.h"
 
-enum err create_nonce(struct byte_array *id_piv,
-			       struct byte_array *piv,
-			       struct byte_array *common_iv,
-			       struct byte_array *nonce)
+enum err create_nonce(struct byte_array *id_piv, struct byte_array *piv,
+		      struct byte_array *common_iv, struct byte_array *nonce)
 {
 	/* "1. left-padding the PIV in network byte order with zeroes to exactly 5 bytes"*/
-	enum err r;
 	uint8_t padded_piv[MAX_PIV_LEN] = { 0 };
-	r = _memcpy_s(&padded_piv[sizeof(padded_piv) - piv->len], piv->len,
-		      piv->ptr, piv->len);
-	if (r != ok)
-		return r;
+	TRY(_memcpy_s(&padded_piv[sizeof(padded_piv) - piv->len], piv->len,
+		      piv->ptr, piv->len));
+
 	/* "2. left-padding the ID_PIV in network byte order with zeroes to exactly nonce length minus 6 bytes," */
 
 	uint8_t padded_id_piv[NONCE_LEN - MAX_PIV_LEN - 1] = { 0 };
 	const uint8_t padded_id_piv_len = sizeof(padded_id_piv);
-	r = _memcpy_s(&padded_id_piv[sizeof(padded_id_piv) - id_piv->len],
-		      id_piv->len, id_piv->ptr, id_piv->len);
-	if (r != ok)
-		return r;
+	TRY(_memcpy_s(&padded_id_piv[sizeof(padded_id_piv) - id_piv->len],
+		      id_piv->len, id_piv->ptr, id_piv->len));
 
 	/* "3. concatenating the size of the ID_PIV (a single byte S) with the padded ID_PIV and the padded PIV,"*/
 	nonce->ptr[0] = (uint8_t)id_piv->len;
-	r = _memcpy_s(&nonce->ptr[1], padded_id_piv_len, padded_id_piv,
-		      padded_id_piv_len);
-	if (r != ok)
-		return r;
-	r = _memcpy_s(&nonce->ptr[1 + sizeof(padded_id_piv)],
-		      sizeof(padded_piv), padded_piv, sizeof(padded_piv));
-	if (r != ok)
-		return r;
+	TRY(_memcpy_s(&nonce->ptr[1], padded_id_piv_len, padded_id_piv,
+		      padded_id_piv_len));
+
+	TRY(_memcpy_s(&nonce->ptr[1 + sizeof(padded_id_piv)],
+		      sizeof(padded_piv), padded_piv, sizeof(padded_piv)));
 
 	/* "4. and then XORing with the Common IV."*/
 	for (int i = 0; i < common_iv->len; i++) {

@@ -134,9 +134,9 @@ oscore_option_parser(struct o_coap_packet *in,
  * @param oscore_packet: complete OSCORE packet which contains the ciphertext to be decrypted
  * @return void
  */
-static inline enum err
-payload_decrypt(struct context *c, struct byte_array *out_plaintext,
-		struct o_coap_packet *oscore_packet)
+static inline enum err payload_decrypt(struct context *c,
+				       struct byte_array *out_plaintext,
+				       struct o_coap_packet *oscore_packet)
 {
 	struct byte_array oscore_ciphertext = {
 		.len = oscore_packet->payload_len,
@@ -278,10 +278,9 @@ void options_from_oscore_reorder(struct o_coap_packet *in_oscore_packet,
  * @param out_options_count: count number of output options
  * @return  err
  */
-enum err
-oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
-			     struct o_coap_option *out_options,
-			     uint8_t *out_options_count)
+enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
+				      struct o_coap_option *out_options,
+				      uint8_t *out_options_count)
 {
 	uint8_t *temp_options_ptr = in_data;
 	uint8_t temp_options_count = 0;
@@ -378,10 +377,11 @@ oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
  * @param out_o_coap_payload: output pointer original unprotected CoAP payload
  * @return  err
  */
-enum err oscore_decrypted_payload_parser(
-	struct byte_array *in_payload, uint8_t *out_code,
-	struct o_coap_option *out_E_options, uint8_t *E_options_cnt,
-	struct byte_array *out_o_coap_payload)
+enum err oscore_decrypted_payload_parser(struct byte_array *in_payload,
+					 uint8_t *out_code,
+					 struct o_coap_option *out_E_options,
+					 uint8_t *E_options_cnt,
+					 struct byte_array *out_o_coap_payload)
 {
 	uint8_t *temp_payload_ptr = in_payload->ptr;
 	uint16_t temp_payload_len = in_payload->len;
@@ -408,12 +408,10 @@ enum err oscore_decrypted_payload_parser(
 		/* Parser all options */
 		if (options_len > 0) {
 			uint8_t r = 0;
-			r = oscore_packet_options_parser(temp_option_ptr,
-							 options_len,
-							 out_E_options,
-							 E_options_cnt);
-			if (r != ok)
-				return r;
+			TRY(oscore_packet_options_parser(
+				temp_option_ptr, options_len, out_E_options,
+				E_options_cnt));
+
 		} else
 			*E_options_cnt = 0;
 	}
@@ -444,7 +442,6 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 		    struct o_coap_packet *in_oscore_packet,
 		    struct o_coap_packet *out_o_coap_packet)
 {
-	enum err r;
 	uint8_t code = 0;
 	struct byte_array unprotected_o_coap_payload = {
 		.len = 0,
@@ -454,11 +451,10 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 	uint8_t E_options_cnt = 0;
 
 	/* Parse decrypted payload: code + options + unprotected CoAP payload*/
-	r = oscore_decrypted_payload_parser(decrypted_payload, &code, E_options,
+	TRY(oscore_decrypted_payload_parser(decrypted_payload, &code, E_options,
 					    &E_options_cnt,
-					    &unprotected_o_coap_payload);
-	if (r != ok)
-		return r;
+					    &unprotected_o_coap_payload));
+
 	/* Copy each items from OSCORE packet to CoAP packet */
 	/* Header */
 	out_o_coap_packet->header.ver = in_oscore_packet->header.ver;
@@ -496,8 +492,8 @@ static bool is_request(struct o_coap_packet *packet)
 }
 
 static inline enum err replay_check(uint64_t sender_sequence_number,
-					     uint64_t *replay_window,
-					     uint8_t replay_window_len)
+				    uint64_t *replay_window,
+				    uint8_t replay_window_len)
 {
 	bool first_run = true;
 
@@ -545,7 +541,7 @@ static void update_replay_window(uint64_t sender_seq_number,
 				 uint64_t *replay_window,
 				 uint8_t replay_window_len)
 {
-	for (uint8_t i = 0; i < replay_window_len -1; i++) {
+	for (uint8_t i = 0; i < replay_window_len - 1; i++) {
 		if ((replay_window[i] < sender_seq_number) &&
 		    (sender_seq_number < replay_window[i + 1])) {
 			insert_sender_seq_number(sender_seq_number,
@@ -562,9 +558,9 @@ static void update_replay_window(uint64_t sender_seq_number,
 		    replay_window_len * sizeof(replay_window[0]));
 }
 
-enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
-			      uint8_t *buf_out, uint16_t *buf_out_len,
-			      bool *oscore_pkg_flag, struct context *c)
+enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
+		     uint16_t *buf_out_len, bool *oscore_pkg_flag,
+		     struct context *c)
 {
 	uint8_t r = ok;
 	struct o_coap_packet oscore_packet;
@@ -579,15 +575,11 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 	buf.len = buf_in_len;
 
 	/*Parse the incoming message (buf_in) into a CoAP struct*/
-	r = buf2coap(&buf, &oscore_packet);
-	if (r != ok)
-		return r;
+	TRY(buf2coap(&buf, &oscore_packet));
 
 	/* Check if the packet is OSCORE packet and if so parse the OSCORE option */
-	r = oscore_option_parser(&oscore_packet, &oscore_option,
-				 oscore_pkg_flag);
-	if (r != ok)
-		return r;
+	TRY(oscore_option_parser(&oscore_packet, &oscore_option,
+				 oscore_pkg_flag));
 
 	/* If the incoming packet is OSCORE packet -- analyze and and decrypt it. */
 	if (*oscore_pkg_flag) {
@@ -606,22 +598,17 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 			}
 
 			/*check is the packet is replayed*/
-			r = replay_check(*oscore_option.piv.ptr,
+			TRY(replay_check(*oscore_option.piv.ptr,
 					 c->rc.replay_window,
-					 c->rc.replay_window_len);
-			if (r != ok) {
-				return r;
-			}
+					 c->rc.replay_window_len));
 
 			/*If this is a request message we need to calculate the nonce, aad 
             and eventually update the Common IV, Sender and Recipient Keys*/
-			r = context_update(
+			TRY(context_update(
 				SERVER,
 				(struct o_coap_option *)&oscore_packet.options,
 				oscore_packet.options_cnt, &oscore_option.piv,
-				&oscore_option.kid_context, c);
-			if (r != ok)
-				return r;
+				&oscore_option.kid_context, c));
 		}
 
 		/* Setup buffer for the plaintext. The plaintext is shorter than the ciphertext because of the authentication tag*/
@@ -647,10 +634,9 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 
 		/* Generate corresponding CoAP packet */
 		struct o_coap_packet o_coap_packet;
-		r = o_coap_pkg_generate(&plaintext, &oscore_packet,
-					&o_coap_packet);
-		if (r != ok)
-			return r;
+		TRY(o_coap_pkg_generate(&plaintext, &oscore_packet,
+					&o_coap_packet));
+
 
 		/*Convert to byte string*/
 		r = coap2buf(&o_coap_packet, buf_out, buf_out_len);
