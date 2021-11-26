@@ -7,7 +7,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-include ../lib_test/opt
+LIB_NAME = uoscore-uedhoc.a
+
+include ../lib_test/makefile_config.mk
 
 # $(info    LIB_NAME is $(LIB_NAME))
 # $(info    PREFIX is $(PREFIX))
@@ -16,58 +18,78 @@ include ../lib_test/opt
 # $(info    CC is $(CC))
 # $(info    CFLAGS is $(CFLAGS))
 # $(info    OPT is $(OPT))
-
+$(info    CRYPTO_ENGINE is $(CRYPTO_ENGINE))
 ################################################################################
 # Build directory
 DIR = $(PREFIX)
 
 ################################################################################
-# Source files
-DO_NOT_COMPILE_SOURCES = \
-../../externals/tinycrypt/lib/source/ctr_prng.c \
-../../externals/tinycrypt/lib/source/ecc_dh.c \
-../../externals/tinycrypt/lib/source/cbc_mode.c \
-../../externals/tinycrypt/lib/source/hmac_prng.c \
-../../externals/tinycrypt/lib/source/ctr_mode.c \
-../../externals/tinycrypt/lib/source/ecc_platform_specific.c \
-../../externals/tinycrypt/lib/source/cmac_mode.c \
-../../externals/tinycrypt/lib/source/ecc.c \
-../../externals/tinycrypt/lib/source/ecc_dsa.c 
+# C Source files
+
+# common source files for OSCORE and EDHOC
+
+# EDHOC specific source files
+C_SOURCES += $(wildcard ../../modules/edhoc/src/*.c)
+C_SOURCES += $(wildcard ../../modules/edhoc/cbor/*.c)
+
+# OSCORE specific source files
+#C_SOURCES = $(wildcard ../../modules/oscore/src/*.c)
+#C_SOURCES += $(wildcard ../../modules/oscore/cbor/*.c)
+
+# Crypto engine
+ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519)
+C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
+C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
+endif
+
+ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
+C_SOURCES += $(wildcard ../../externals/tinycrypt/lib/source/*.c)
+endif
+
+ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
+
+endif
+
+# CBOR engine
+ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
+C_SOURCES += $(wildcard ../../externals/cddl-gen/src/*.c)
+endif
 
 
-
-ifeq	($(LIB_NAME), libuedhoc.a) 
-	C_SOURCES = $(wildcard ../../modules/edhoc/src/*.c)
-	C_SOURCES += $(wildcard ../../modules/edhoc/cbor/*.c)
-	C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
-	C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
-endif 
-
-ifeq	($(LIB_NAME), libuoscore.a) 
-	C_SOURCES = $(wildcard ../../modules/oscore/src/*.c)
-	C_SOURCES += $(wildcard ../../modules/oscore/cbor/*.c)
-endif 
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/cddl-gen/src/*.c))
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../externals/tinycrypt/lib/source/*.c))
 
 #$(info    \n C_SOURCES is $(C_SOURCES))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 
 ################################################################################
 # C includes
-C_INCLUDES = -I../../externals/tinycrypt/lib/include
+
+# common include files for OSCORE and EDHOC
+
+
+# EDHOC specific include files
+
+
+# OSCORE specific inlude files
+
+
+# Crypto engine
+ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519) 
+C_INCLUDES += -I../../externals/compact25519/src/c25519/ 
+C_INCLUDES += -I../../externals/compact25519/src/ 
+endif
+
+ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
+C_INCLUDES += -I../../externals/tinycrypt/lib/include
+endif
+
+ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
+
+endif
+
+# CBOR engine
+ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
 C_INCLUDES += -I../../externals/cddl-gen/include
-
-
-ifeq	($(LIB_NAME), libuedhoc.a) 
-	C_INCLUDES += -I../../externals/tinycbor/src/ 
-	C_INCLUDES += -I../../externals/compact25519/src/c25519/ 
-	C_INCLUDES += -I../../externals/compact25519/src/ 
-endif 
-
-ifeq	($(LIB_NAME), libuoscore.a) 
-	C_INCLUDES += -I../../externals/cddl-gen/include  
-endif 
+endif
 
 ################################################################################
 # CFLAGS
@@ -75,8 +97,11 @@ endif
 FILTERED_CFLAGS = -Os
 CFLAGS1 = $(filter-out $(FILTERED_CFLAGS), $(CFLAGS))
 
-#add optimization
+#add options form configuration file 
 CFLAGS1 += $(OPT)
+CFLAGS1 += $(DEBUG_PRINT)
+CFLAGS1 += $(CBOR_ENGINE)
+CFLAGS1 += $(CRYPTO_ENGINE)
 
 #add include paths
 CFLAGS1 += $(C_INCLUDES)
@@ -90,17 +115,6 @@ CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
 # required for gddl-gen library
 CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 
-ifeq	($(LIB_NAME), libuedhoc.a) 
-	#use tyncrypt + ed25519
-	CFLAGS1 += -DEDHOC_WITH_TINYCRYPT_AND_C25519
-	#CFLAGS1 += -DEDHOC_DEBUG_PRINT
-endif 
-
-ifeq	($(LIB_NAME), libuoscore.a) 
-	#use tyncrypt 
-	CFLAGS1 += -DOSCORE_WITH_TINYCRYPT
-	#CFLAGS1 += -DOSCORE_DEBUG_PRINT
-endif 
 
 #$(info    CFLAGS1 is $(CFLAGS1))
 ################################################################################

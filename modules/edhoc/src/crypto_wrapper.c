@@ -26,7 +26,7 @@ modify setting in include/psa/crypto_config.h
 #include <psa/crypto.h>
 #endif
 
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 #include <c25519.h>
 #include <edsign.h>
 #include <string.h>
@@ -45,7 +45,7 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
      const uint16_t nonce_len, const uint8_t *aad, const uint16_t aad_len,
      uint8_t *out, const uint16_t out_len, uint8_t *tag, const uint16_t tag_len)
 {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 	struct tc_ccm_mode_struct c;
 	struct tc_aes_key_sched_struct sched;
 	TRY_EXPECT(tc_aes128_set_encrypt_key(&sched, key), 1);
@@ -76,7 +76,7 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
      const uint16_t msg_len, uint8_t *out, uint32_t *out_len)
 {
 	if (alg == EdDSA) {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		edsign_sign(out, pk, sk, msg, msg_len);
 #endif
 	}
@@ -95,7 +95,7 @@ verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
        const uint16_t sgn_len, bool *result)
 {
 	if (alg == EdDSA) {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		int verified = edsign_verify(sgn, pk, msg, msg_len);
 		if (verified) {
 			*result = true;
@@ -124,7 +124,7 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
     OSCORE sets the salt default value to empty byte string, which is
     converted to a string of zeroes (see Section 2.2 of [RFC5869])".*/
 
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		struct tc_hmac_state_struct h;
 		memset(&h, 0x00, sizeof(h));
 		if (salt == NULL || salt_len == 0) {
@@ -156,7 +156,7 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 
 		uint8_t t[32] = { 0 };
 
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		struct tc_hmac_state_struct h;
 		for (uint8_t i = 1; i <= iterations; i++) {
 			memset(&h, 0x00, sizeof(h));
@@ -186,7 +186,7 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 		     const uint32_t pk_len, uint8_t *shared_secret)
 {
 	if (alg == X25519) {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		uint8_t e[F25519_SIZE];
 		f25519_copy(e, sk);
 		c25519_prepare(e);
@@ -226,7 +226,7 @@ enum edhoc_error __attribute__((weak))
 ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 {
 	if (alg == X25519) {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		uint8_t extended_seed[32];
 		struct tc_sha256_state_struct s;
 		TRY_EXPECT(tc_sha256_init(&s), 1);
@@ -246,7 +246,7 @@ enum edhoc_error __attribute__((weak))
 hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 {
 	if (alg == SHA_256) {
-#ifdef EDHOC_WITH_TINYCRYPT_AND_C25519
+#if defined(TINYCRYPT) || defined(COMPACT25519)
 		struct tc_sha256_state_struct s;
 		TRY_EXPECT(tc_sha256_init(&s), 1);
 		TRY_EXPECT(tc_sha256_update(&s, in, in_len), 1);

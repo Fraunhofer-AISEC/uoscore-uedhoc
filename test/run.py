@@ -151,7 +151,7 @@ def run_tests(name, arc):
         clean()
         build(name, o, arc)
         test(arc)
-    save(name, arc)
+    #save(name, arc)
 
 
 def main():
