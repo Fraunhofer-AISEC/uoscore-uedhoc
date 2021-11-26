@@ -110,7 +110,7 @@ enum err tx(uint8_t *data, uint32_t data_len)
 	txPDU->setCode(CoapPDU::COAP_CHANGED);
 	txPDU->setPayload(data, data_len);
 	send_coap_reply(txPDU);
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err rx(uint8_t *data, uint32_t *data_len)
@@ -156,7 +156,7 @@ enum err rx(uint8_t *data, uint32_t *data_len)
 	}
 
 	delete rxPDU;
-	return edhoc_no_error;
+	return ok;
 }
 
 int main()

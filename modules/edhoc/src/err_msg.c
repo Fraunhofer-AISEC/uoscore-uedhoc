@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/messages.h"
 #include "../inc/print_util.h"
 #include "../inc/txrx_wrapper.h"
@@ -86,7 +86,7 @@ static inline enum err err_msg_crate(struct error_msg *msg_struct,
 	// msg->len = payload_len_out;
 
 	// PRINT_ARRAY("Error message (CBOR Sequence)", msg->ptr, msg->len);
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
@@ -118,9 +118,9 @@ enum err tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 	// }
 
 	// r = err_msg_crate(&err_struct, &err_msg);
-	// if (r != edhoc_no_error) {
+	// if (r != ok) {
 	// 	return r;
 	// }
 	// return tx(err_msg.ptr, err_msg.len);
-	return edhoc_no_error;
+	return ok;
 }

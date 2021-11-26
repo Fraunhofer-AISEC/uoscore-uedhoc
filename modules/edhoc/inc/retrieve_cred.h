@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "error.h"
+#include "oscore_edhoc_error.h"
 
 enum id_cred_x_label {
 	/*ID_CRED_x contains a key ID used to identify a pre established RPK*/

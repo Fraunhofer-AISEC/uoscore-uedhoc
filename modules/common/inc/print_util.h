@@ -19,7 +19,7 @@
  */
 void print_array(const uint8_t *in_data, uint16_t in_len);
 
-#ifdef EDHOC_DEBUG_PRINT
+#ifdef DEBUG_PRINT
 #define PRINT_ARRAY(msg, a, a_len)                                             \
 	printf(msg);                                                           \
 	print_array(a, a_len);

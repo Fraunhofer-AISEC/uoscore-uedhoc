@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#include "error.h"
+#include "oscore_edhoc_error.h"
 
 /**
  * @brief   derives a pseudo random key (prk) form anther prk and static DH 

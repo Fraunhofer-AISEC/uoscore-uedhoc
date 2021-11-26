@@ -14,7 +14,7 @@
 #include "../inc/signature_or_mac_msg.h"
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/okm.h"
 #include "../inc/print_util.h"
@@ -37,7 +37,7 @@ enum err encode_byte_string(const uint8_t *in, uint32_t in_len,
 					       &payload_len_out),
 		   true);
 	*out_len = payload_len_out;
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
@@ -52,7 +52,7 @@ enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
 	TRY(_memcpy_s(out, *out_len, str.value, str.len));
 	*out_len = str.len;
 
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
@@ -86,7 +86,7 @@ enum err mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
 		     context_mac, context_mac_len, mac, *mac_len));
 
 	PRINT_ARRAY("MAC 2/3", mac, *mac_len);
-	return edhoc_no_error;
+	return ok;
 }
 
 static enum err
@@ -112,7 +112,7 @@ signature_struct_gen(const uint8_t *th, uint8_t th_len, const uint8_t *id_cred,
 				      id_cred, id_cred_len, tmp, sizeof(tmp),
 				      mac, mac_len, out, out_len));
 	PRINT_ARRAY("COSE_Sign1 object to be signed", out, *out_len);
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err
@@ -132,7 +132,7 @@ signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 
 		if (static_dh) {
 			/*signature_or_mac is mac when the caller of this function authenticates with static DH keys*/
-			return edhoc_no_error;
+			return ok;
 		} else {
 			uint8_t signature_struct[300];
 			uint16_t signature_struct_len =
@@ -188,5 +188,5 @@ signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 				"Signiture or MAC verification successfull!\n");
 		}
 	}
-	return edhoc_no_error;
+	return ok;
 }

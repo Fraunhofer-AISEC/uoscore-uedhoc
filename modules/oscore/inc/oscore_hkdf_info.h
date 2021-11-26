@@ -28,7 +28,7 @@
  *          in the out-parameter by `hkdf_info_len`.
  * @return  err
  */
-enum err create_hkdf_info(struct byte_array *id,
+enum err oscore_create_hkdf_info(struct byte_array *id,
 				   struct byte_array *id_context,
 				   enum AEAD_algorithm aead_alg,
 				   enum derive_type type,

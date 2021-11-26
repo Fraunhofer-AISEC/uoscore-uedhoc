@@ -16,7 +16,7 @@
 #include "../inc/aad.h"
 #include "../inc/byte_array.h"
 #include "../inc/coap.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/nonce.h"
 #include "../inc/option.h"
 #include "../inc/oscore_cose.h"
@@ -124,7 +124,7 @@ oscore_option_parser(struct o_coap_packet *in,
 		}
 	}
 
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -366,7 +366,7 @@ oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 	// Assign options count number
 	*out_options_count = temp_options_count;
 
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -412,7 +412,7 @@ enum err oscore_decrypted_payload_parser(
 							 options_len,
 							 out_E_options,
 							 E_options_cnt);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 		} else
 			*E_options_cnt = 0;
@@ -429,7 +429,7 @@ enum err oscore_decrypted_payload_parser(
 		out_o_coap_payload->ptr = temp_payload_ptr;
 	}
 
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -457,7 +457,7 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 	r = oscore_decrypted_payload_parser(decrypted_payload, &code, E_options,
 					    &E_options_cnt,
 					    &unprotected_o_coap_payload);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 	/* Copy each items from OSCORE packet to CoAP packet */
 	/* Header */
@@ -483,7 +483,7 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 	/* reorder all options, and copy it to output coap packet */
 	options_from_oscore_reorder(in_oscore_packet, E_options, E_options_cnt,
 				    out_o_coap_packet);
-	return oscore_no_error;
+	return ok;
 }
 
 static bool is_request(struct o_coap_packet *packet)
@@ -503,13 +503,13 @@ static inline enum err replay_check(uint64_t sender_sequence_number,
 
 	if (first_run) {
 		first_run = false;
-		return oscore_no_error;
+		return ok;
 	} else {
 		/*if the sender sequence number is bigger than the 
 		right most element -> all good */
 		if (sender_sequence_number >
 		    replay_window[replay_window_len - 1]) {
-			return oscore_no_error;
+			return ok;
 		}
 
 		/*if the sender sequence number is smaller than the 
@@ -527,7 +527,7 @@ static inline enum err replay_check(uint64_t sender_sequence_number,
 		}
 	}
 
-	return oscore_no_error;
+	return ok;
 }
 
 static void insert_sender_seq_number(uint64_t sender_seq_number,
@@ -566,7 +566,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 			      uint8_t *buf_out, uint16_t *buf_out_len,
 			      bool *oscore_pkg_flag, struct context *c)
 {
-	uint8_t r = oscore_no_error;
+	uint8_t r = ok;
 	struct o_coap_packet oscore_packet;
 	struct compressed_oscore_option oscore_option;
 	struct byte_array buf;
@@ -580,13 +580,13 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 
 	/*Parse the incoming message (buf_in) into a CoAP struct*/
 	r = buf2coap(&buf, &oscore_packet);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/* Check if the packet is OSCORE packet and if so parse the OSCORE option */
 	r = oscore_option_parser(&oscore_packet, &oscore_option,
 				 oscore_pkg_flag);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/* If the incoming packet is OSCORE packet -- analyze and and decrypt it. */
@@ -609,7 +609,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 			r = replay_check(*oscore_option.piv.ptr,
 					 c->rc.replay_window,
 					 c->rc.replay_window_len);
-			if (r != oscore_no_error) {
+			if (r != ok) {
 				return r;
 			}
 
@@ -620,7 +620,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 				(struct o_coap_option *)&oscore_packet.options,
 				oscore_packet.options_cnt, &oscore_option.piv,
 				&oscore_option.kid_context, c);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 		}
 
@@ -634,7 +634,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 
 		/* Decrypt payload */
 		r = payload_decrypt(c, &plaintext, &oscore_packet);
-		if (r == oscore_no_error) {
+		if (r == ok) {
 			/*update the replay window after the decryption*/
 			if (is_request(&oscore_packet)) {
 				update_replay_window(*oscore_option.piv.ptr,
@@ -649,7 +649,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 		struct o_coap_packet o_coap_packet;
 		r = o_coap_pkg_generate(&plaintext, &oscore_packet,
 					&o_coap_packet);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 
 		/*Convert to byte string*/

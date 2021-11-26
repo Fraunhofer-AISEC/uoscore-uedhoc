@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "error.h"
+#include "oscore_edhoc_error.h"
 
 /**
  * @brief   Decodes id_cred to kid

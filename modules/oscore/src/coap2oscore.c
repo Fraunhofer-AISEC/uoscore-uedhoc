@@ -15,7 +15,7 @@
 #include "../inc/aad.h"
 #include "../inc/byte_array.h"
 #include "../inc/coap.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/nonce.h"
 #include "../inc/option.h"
@@ -40,7 +40,7 @@ e_u_options_extract(struct o_coap_packet *in_o_coap,
 		    uint16_t *e_options_len, struct o_coap_option *U_options,
 		    uint8_t *U_options_cnt)
 {
-	enum err r = oscore_no_error;
+	enum err r = ok;
 
 	/* Initialize to 0 */
 	*e_options_len = 0;
@@ -147,14 +147,14 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 	/* Convert all E-options structure to byte string, and copy it to output*/
 	r = options_into_byte_string(E_options, E_options_cnt,
 				     &E_option_byte_string);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	uint64_t dest_size =
 		plaintext->len - (temp_plaintext_ptr + 1 - plaintext->ptr);
 	r = _memcpy_s(++temp_plaintext_ptr, dest_size, temp_opt_bytes,
 		      E_option_byte_string.len);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 	temp_plaintext_ptr += E_option_byte_string.len;
 
@@ -167,11 +167,11 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 			    (temp_plaintext_ptr + 1 - plaintext->ptr);
 		r = _memcpy_s(++temp_plaintext_ptr, dest_size,
 			      in_o_coap->payload, in_o_coap->payload_len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 	}
 	PRINT_ARRAY("Plain text", plaintext->ptr, plaintext->len);
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -256,7 +256,7 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 				    (temp_ptr + 1 - oscore_option->value);
 			r = _memcpy_s(++temp_ptr, dest_size, piv->ptr,
 				      piv->len);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 
 			temp_ptr += piv->len;
@@ -272,7 +272,7 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 				    (temp_ptr + 1 - oscore_option->value);
 			r = _memcpy_s(++temp_ptr, dest_size, kid_context->ptr,
 				      kid_context->len);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 
 			temp_ptr += kid_context->len;
@@ -287,14 +287,14 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 			dest_size = oscore_option->len -
 				    (temp_ptr - oscore_option->value);
 			r = _memcpy_s(temp_ptr, dest_size, kid->ptr, kid->len);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 		}
 	}
 
 	PRINT_ARRAY("OSCORE option value", oscore_option->value,
 		    oscore_option->len);
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -380,7 +380,7 @@ oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 	/* Protected Payload */
 	out_oscore->payload_len = in_ciphertext_len;
 	out_oscore->payload = in_ciphertext;
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -398,7 +398,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 			      uint8_t *buf_oscore, uint16_t *buf_oscore_len,
 			      struct context *c)
 {
-	enum err r = oscore_no_error;
+	enum err r = ok;
 	struct o_coap_packet o_coap_pkt;
 	struct byte_array buf;
 	uint16_t plaintext_len = 0;
@@ -412,7 +412,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 
 	/*Parse the coap buf into a CoAP struct*/
 	r = buf2coap(&buf, &o_coap_pkt);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/* 1. Divide CoAP options into E-option and U-option */
@@ -425,7 +425,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 	/* Analyze CoAP options, extract E-options and U-options */
 	r = e_u_options_extract(&o_coap_pkt, e_options, &e_options_cnt,
 				&e_options_len, u_options, &u_options_cnt);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/* 2. Create plaintext (code + E-options + o_coap_payload) */
@@ -445,7 +445,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 
 	/* Combine code, E-options and payload of CoAP to plaintext */
 	r = plaintext_setup(&o_coap_pkt, e_options, e_options_cnt, &plaintext);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/* Generate OSCORE option */
@@ -458,12 +458,12 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 	if ((CODE_CLASS_MASK & o_coap_pkt.header.code) == 0) {
 		/*update the piv in the request response context*/
 		r = sender_seq_num2piv(c->sc.sender_seq_num++, &c->rrc.piv);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		r = context_update(CLIENT,
 				   (struct o_coap_option *)&o_coap_pkt.options,
 				   o_coap_pkt.options_cnt, NULL, NULL, c);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 
 		/*calculate the OSCORE option value*/
@@ -476,7 +476,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 		oscore_option.value = oscore_option.buf;
 		r = oscore_option_generate(&c->rrc.piv, &c->rrc.kid,
 					   &c->rrc.kid_context, &oscore_option);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 	} else {
 		oscore_option.option_number = COAP_OPTION_OSCORE;
@@ -489,7 +489,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 
 	r = plaintext_encrypt(c, &o_coap_pkt, &plaintext,
 			      (uint8_t *)&ciphertext, sizeof(ciphertext));
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/*create an OSCORE packet*/
@@ -497,7 +497,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 	r = oscore_pkg_generate(&o_coap_pkt, &oscore_pkt, u_options,
 				u_options_cnt, (uint8_t *)&ciphertext,
 				sizeof(ciphertext), &oscore_option);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/*convert the oscore pkg to byte string*/

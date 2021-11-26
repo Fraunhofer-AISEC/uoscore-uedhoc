@@ -10,7 +10,7 @@
 */
 #include "../inc/suites.h"
 
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 enum err get_suite(enum suite_label label, struct suite *suite)
 {
@@ -59,7 +59,7 @@ enum err get_suite(enum suite_label label, struct suite *suite)
 		return unsupported_cipher_suite;
 		break;
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 uint32_t get_hash_len(enum hash_alg alg)

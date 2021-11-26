@@ -113,7 +113,7 @@ void edhoc_initiator_init(void)
 	r = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, PRK_4x3m, sizeof(PRK_4x3m),
 				th4, sizeof(th4));
-	if (r != edhoc_no_error) {
+	if (r != ok) {
 		PRINTK("error initiator run (Error Code %d\n)", r);
 	}
 

@@ -6,7 +6,9 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(auto_test)
 
 FILE(GLOB app_sources 
-  src/*.c 
+  main.c
+  edhoc_testvector_tests/*.c 
+  oscore_testvector_tests/*.c 
   ../samples/common/test_vec_parser.c
   ../samples/common/cbor/*.c)
 target_sources(app PRIVATE ${app_sources})

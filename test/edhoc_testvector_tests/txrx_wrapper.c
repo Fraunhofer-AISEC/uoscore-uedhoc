@@ -70,10 +70,10 @@ enum err rx(uint8_t *data, uint32_t *data_len)
 			msg_cnt = 1;
 		}
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err tx(uint8_t *data, uint32_t data_len)
 { //todo add here a test
-	return edhoc_no_error;
+	return ok;
 }

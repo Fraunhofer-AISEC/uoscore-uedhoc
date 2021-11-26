@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../cbor/encode_enc_structure.h"
 #include "../cbor/encode_sig_structure.h"
 
@@ -34,7 +34,7 @@ enum err cose_enc_structure_encode(
 					     &payload_len_out),
 		   true);
 	*out_len = payload_len_out;
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err
@@ -61,5 +61,5 @@ cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 		   true);
 
 	*out_len = payload_len_out;
-	return edhoc_no_error;
+	return ok;
 }

@@ -2,8 +2,8 @@
 OPT = -O3
 
 # Uncomment this to print intermediery results at runtime
-#DEBUG_PRINT += -DEDHOC_DEBUG_PRINT
-#DEBUG_PRINT += -DOSCORE_DEBUG_PRINT
+#DEBUG_PRINT += -DDEBUG_PRINT
+
 
 # CBOR engine
 # currently only CDDL is supported

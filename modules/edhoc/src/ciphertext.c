@@ -2,7 +2,7 @@
 
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/okm.h"
 #include "../inc/ciphertext.h"
 #include "../inc/signature_or_mac_msg.h"
@@ -41,7 +41,7 @@ static enum err ciphertext_encrypt_decrypt(
 		TRY(aead(op, in, in_len, key, key_len, nonce, nonce_len, aad,
 			 aad_len, out, out_len, tag, tag_len));
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 /**
@@ -49,10 +49,11 @@ static enum err ciphertext_encrypt_decrypt(
  * 
  * 
  */
-static enum err
-ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
-		   uint8_t prk_len, uint8_t *th, uint8_t th_len, uint8_t *key,
-		   uint32_t key_len, uint8_t *iv, uint32_t iv_len)
+static enum err ciphertext_key_gen(enum ciphertext ctxt,
+				   enum hash_alg edhoc_hash, uint8_t *prk,
+				   uint8_t prk_len, uint8_t *th, uint8_t th_len,
+				   uint8_t *key, uint32_t key_len, uint8_t *iv,
+				   uint32_t iv_len)
 {
 	switch (ctxt) {
 	case CIPHERTEXT2:
@@ -79,7 +80,7 @@ ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
 		PRINT_ARRAY("IV_4", iv, iv_len);
 		break;
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 /**
@@ -88,12 +89,14 @@ ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
  * 
  * 
  */
-enum err ciphertext_decrypt_split(
-	enum ciphertext ctxt, struct suite *suite, uint8_t *prk,
-	uint8_t prk_len, uint8_t *th, uint8_t th_len, uint8_t *ciphertext,
-	uint32_t ciphertext_len, uint8_t *id_cred, uint32_t *id_cred_len,
-	uint8_t *signature_or_mac, uint32_t *signature_or_mac_len, uint8_t *ead,
-	uint32_t *ead_len)
+enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
+				  uint8_t *prk, uint8_t prk_len, uint8_t *th,
+				  uint8_t th_len, uint8_t *ciphertext,
+				  uint32_t ciphertext_len, uint8_t *id_cred,
+				  uint32_t *id_cred_len,
+				  uint8_t *signature_or_mac,
+				  uint32_t *signature_or_mac_len, uint8_t *ead,
+				  uint32_t *ead_len)
 {
 	/*generate key and iv (no iv in for ciphertext 2)*/
 	uint32_t key_len = get_aead_key_len(suite->edhoc_aead);
@@ -148,7 +151,7 @@ enum err ciphertext_decrypt_split(
 		}
 	}
 
-	return edhoc_no_error;
+	return ok;
 }
 
 /**
@@ -160,12 +163,12 @@ enum err ciphertext_decrypt_split(
  */
 //todo refactore this function simalar to ciphertext_decrypt_split
 enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
-				uint8_t *id_cred, uint32_t id_cred_len,
-				uint8_t *signature_or_mac,
-				uint32_t signature_or_mac_len, uint8_t *ead,
-				uint32_t ead_len, uint8_t *prk, uint8_t prk_len,
-				uint8_t *th, uint8_t th_len,
-				uint8_t *ciphertext, uint32_t *ciphertext_len)
+			uint8_t *id_cred, uint32_t id_cred_len,
+			uint8_t *signature_or_mac,
+			uint32_t signature_or_mac_len, uint8_t *ead,
+			uint32_t ead_len, uint8_t *prk, uint8_t prk_len,
+			uint8_t *th, uint8_t th_len, uint8_t *ciphertext,
+			uint32_t *ciphertext_len)
 {
 	/*Encode plaintext*/
 	uint8_t plaintext[PLAINTEXT_DEFAULT_SIZE];
@@ -236,7 +239,7 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 			ciphertext[i] = KEYSTREAM_2[i] ^ plaintext[i];
 		}
 		*ciphertext_len = plaintext_len;
-		return edhoc_no_error;
+		return ok;
 	}
 
 	/*Calculate key, nonce and encrypt*/
@@ -278,5 +281,5 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 		 *ciphertext_len, tag, mac_len));
 	*ciphertext_len += mac_len;
 	PRINT_ARRAY("ciphertext_2/3/4", ciphertext, *ciphertext_len);
-	return edhoc_no_error;
+	return ok;
 }

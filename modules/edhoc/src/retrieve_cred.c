@@ -14,7 +14,7 @@
 
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/print_util.h"
 #include "../inc/memcpy_s.h"
 #include "../cbor/decode_id_cred_x.h"
@@ -109,7 +109,7 @@ enum err retrieve_cred(bool static_dh_auth,
 						      cred_array[i].pk.len));
 					*pk_len = cred_array[i].pk.len;
 				}
-				return edhoc_no_error;
+				return ok;
 			}
 		}
 	}
@@ -149,7 +149,7 @@ enum err retrieve_cred(bool static_dh_auth,
 
 		if (verified) {
 			PRINT_MSG("Certificate verification successful!\n");
-			return edhoc_no_error;
+			return ok;
 		} else {
 			return aead_authentication_failed;
 		}

@@ -17,8 +17,8 @@
 #include "../inc/aad.h"
 #include "../inc/coap.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../../common/inc/error.h"
-#include "../inc/hkdf_info.h"
+#include "../../common/inc/oscore_edhoc_error.h"
+#include "../inc/oscore_hkdf_info.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/nonce.h"
 #include "../inc/print_util.h"
@@ -43,8 +43,8 @@ static enum err derive(struct common_context *cc, struct byte_array *id,
 		.ptr = info_bytes,
 	};
 
-	r = create_hkdf_info(id, &cc->id_context, cc->aead_alg, type, &info);
-	if (r != oscore_no_error)
+	r = oscore_create_hkdf_info(id, &cc->id_context, cc->aead_alg, type, &info);
+	if (r != ok)
 		return r;
 
 	PRINT_ARRAY("info struct", info.ptr, info.len);
@@ -110,14 +110,14 @@ enum err context_update(enum dev_type dev, struct o_coap_option *options,
 			uint16_t opt_num, struct byte_array *new_piv,
 			struct byte_array *new_kid_context, struct context *c)
 {
-	enum err r = oscore_no_error;
+	enum err r = ok;
 
 	if (dev == SERVER) {
 		/**********************************************************************/
 		/*update PIV*/
 		r = _memcpy_s(c->rrc.piv.ptr, MAX_PIV_LEN, new_piv->ptr,
 			      new_piv->len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		c->rrc.piv.len = new_piv->len;
 
@@ -133,7 +133,7 @@ enum err context_update(enum dev_type dev, struct o_coap_option *options,
 			r = _memcpy_s(c->rrc.kid_context.ptr,
 				      MAX_KID_CONTEXT_LEN, new_kid_context->ptr,
 				      new_kid_context->len);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 
 			c->rrc.kid_context.len = new_kid_context->len;
@@ -142,22 +142,22 @@ enum err context_update(enum dev_type dev, struct o_coap_option *options,
 				      c->cc.id_context.len,
 				      new_kid_context->ptr,
 				      new_kid_context->len);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 			c->cc.id_context.len = new_kid_context->len;
 
 			PRINT_MSG("Common Context Updated*****************\n");
 
 			r = derive_common_iv(&c->cc);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 
 			r = derive_sender_key(&c->cc, &c->sc);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 
 			r = derive_recipient_key(&c->cc, &c->rc);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 		}
 	}
@@ -165,7 +165,7 @@ enum err context_update(enum dev_type dev, struct o_coap_option *options,
 	/*calculate nonce*/
 	r = create_nonce(&c->rrc.kid, &c->rrc.piv, &c->cc.common_iv,
 			 &c->rrc.nonce);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/**************************************************************************/
@@ -208,7 +208,7 @@ enum err oscore_context_init(struct oscore_init_params *params,
 	c->cc.common_iv.len = sizeof(c->cc.common_iv_buf);
 	c->cc.common_iv.ptr = c->cc.common_iv_buf;
 	r = derive_common_iv(&c->cc);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/*derive Recipient Context*********************************************/
@@ -219,7 +219,7 @@ enum err oscore_context_init(struct oscore_init_params *params,
 	c->rc.recipient_key.len = sizeof(c->rc.recipient_key_buf);
 	c->rc.recipient_key.ptr = c->rc.recipient_key_buf;
 	r = derive_recipient_key(&c->cc, &c->rc);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	/*derive Sender Context************************************************/
@@ -227,7 +227,7 @@ enum err oscore_context_init(struct oscore_init_params *params,
 	c->sc.sender_key.len = sizeof(c->sc.sender_key_buf);
 	c->sc.sender_key.ptr = c->sc.sender_key_buf;
 	r = derive_sender_key(&c->cc, &c->sc);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	c->sc.sender_seq_num = 0;
@@ -251,13 +251,13 @@ enum err oscore_context_init(struct oscore_init_params *params,
 	if (params->dev_type == CLIENT) {
 		r = _memcpy_s(c->rrc.kid_context.ptr, c->rrc.kid_context.len,
 			      params->id_context.ptr, params->id_context.len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		c->rrc.kid_context.len = params->id_context.len;
 
 		r = _memcpy_s(c->rrc.kid.ptr, c->rrc.kid.len,
 			      params->sender_id.ptr, params->sender_id.len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		c->rrc.kid.len = params->sender_id.len;
 
@@ -267,12 +267,12 @@ enum err oscore_context_init(struct oscore_init_params *params,
 		r = _memcpy_s(c->rrc.kid.ptr, c->rrc.kid.len,
 			      params->recipient_id.ptr,
 			      params->recipient_id.len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		c->rrc.kid.len = params->recipient_id.len;
 	}
 	PRINT_ARRAY("KID", c->rrc.kid.ptr, c->rrc.kid.len);
-	return oscore_no_error;
+	return ok;
 }
 
 //todo: how big is piv? 5 byte= 40 bit -> in that case the sender sequence number needs to loop at the value of 2^40 -1 !!! -> uint8_t is sufficient for the sender sequence number.
@@ -285,15 +285,15 @@ enum err sender_seq_num2piv(uint64_t ssn, struct byte_array *piv)
 	for (int8_t i = 7; i >= 0; i--) {
 		if (*(p + i) > 0) {
 			r = _memcpy_s(piv->ptr, MAX_PIV_LEN, p, i + 1);
-			if (r != oscore_no_error)
+			if (r != ok)
 				return r;
 			piv->len = i + 1;
-			return oscore_no_error;
+			return ok;
 		}
 	}
 
 	/*if the sender seq number is 0 piv has value 0 and length 1*/
 	*piv->ptr = 0;
 	piv->len = 1;
-	return oscore_no_error;
+	return ok;
 }

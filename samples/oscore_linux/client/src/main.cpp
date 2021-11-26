@@ -77,7 +77,7 @@ int main()
 	};
 	r = oscore_context_init(&params, &c_client);
 
-	if (r != oscore_no_error) {
+	if (r != ok) {
 		printf("Error during establishing an OSCORE security context!\n");
 	}
 
@@ -113,7 +113,7 @@ int main()
 			r = coap2oscore(protected_pdu->getPDUPointer(),
 					(uint16_t)protected_pdu->getPDULength(),
 					buf_oscore, &buf_oscore_len, &c_client);
-			if (r != oscore_no_error) {
+			if (r != ok) {
 				printf("Error in coap2oscore (Error code %d)!\n",
 				       r);
 			}
@@ -133,7 +133,7 @@ int main()
 						coap_rx_buf, &coap_rx_buf_len,
 						&oscore_flag, &c_client);
 
-				if (r != oscore_no_error) {
+				if (r != ok) {
 					printf("Error in oscore2coap (Error code %d)!\n",
 					       r);
 				}

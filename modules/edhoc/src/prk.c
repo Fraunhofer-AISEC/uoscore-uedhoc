@@ -12,7 +12,7 @@
 
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/print_util.h"
 #include "../inc/suites.h"
 
@@ -34,5 +34,5 @@ enum err prk_derive(bool static_dh_auth, struct suite suite,
 		/*it is save to do that since prks have the same size*/
 		memcpy(prk_out, prk_in, prk_in_len);
 	}
-	return edhoc_no_error;
+	return ok;
 }

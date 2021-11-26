@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#include "../common/inc/error.h"
+#include "../common/inc/oscore_edhoc_error.h"
 #include "../common/inc/byte_array.h"
 #include "../common/inc/print_util.h"
 #include "inc/edhoc_method_type.h"

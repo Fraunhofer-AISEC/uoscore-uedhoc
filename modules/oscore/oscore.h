@@ -16,13 +16,12 @@
 #include <stdint.h>
 
 #include "../common/inc/byte_array.h"
-#include "../common/inc/error.h"
+#include "../common/inc/oscore_edhoc_error.h"
 #include "../common/inc/print_util.h"
 #include "inc/security_context.h"
 #include "inc/supported_algorithm.h"
 
 #define MAX_PLAINTEXT_LEN 1024
-
 
 /**
  * Each endpoint derives the parameters in the security context from a
@@ -57,7 +56,7 @@ struct oscore_init_params {
  * @return  err
  */
 enum err oscore_context_init(struct oscore_init_params *params,
-				      struct context *c);
+			     struct context *c);
 
 /**
  * @brief  	Checks if the packet in buf_in is a OSCORE packet.
@@ -77,9 +76,9 @@ enum err oscore_context_init(struct oscore_init_params *params,
  * @param 	oscore_pkg indicates if an incoming packet is OSCORE
  * @return	err
  */
-enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
-			      uint8_t *buf_out, uint16_t *buf_out_len,
-			      bool *oscore_pkg_flag, struct context *c);
+enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
+		     uint16_t *buf_out_len, bool *oscore_pkg_flag,
+		     struct context *c);
 
 /**
  *@brief 	Converts a CoAP packet to OSCORE packet
@@ -92,7 +91,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
  *@return	err
  */
 enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
-			      uint8_t *buf_oscore, uint16_t *buf_oscore_len,
-			      struct context *c);
+		     uint8_t *buf_oscore, uint16_t *buf_oscore_len,
+		     struct context *c);
 
 #endif

@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "error.h"
+#include "oscore_edhoc_error.h"
 
 /**
  * @brief   Ecodes associated data for message 3. (COSE "Encrypt0") data 

@@ -11,8 +11,9 @@
 #include <string.h>
 
 #include "../inc/aad.h"
-#include "../inc/hkdf_info.h"
+#include "../inc/oscore_hkdf_info.h"
 #include "../cbor/info.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 /*
 HKDF = composition of HKDF-Extract and HKDF-Expand (RFC5869)
@@ -33,14 +34,14 @@ output = HKDF(salt, IKM, info, L
 * https://www.iana.org/assignments/cose/cose.xhtml
 */
 
-inline enum err create_hkdf_info(struct byte_array *id,
-					  struct byte_array *id_context,
-					  enum AEAD_algorithm aead_alg,
-					  enum derive_type type,
-					  struct byte_array *out)
+inline enum err oscore_create_hkdf_info(struct byte_array *id,
+					struct byte_array *id_context,
+					enum AEAD_algorithm aead_alg,
+					enum derive_type type,
+					struct byte_array *out)
 {
 	bool success_encoding;
-	struct info info_struct;
+	struct oscore_info info_struct;
 
 	char type_enc[10];
 	uint8_t len = 0;
@@ -57,30 +58,30 @@ inline enum err create_hkdf_info(struct byte_array *id,
 		break;
 	}
 
-	info_struct._info_id.value = id->ptr;
-	info_struct._info_id.len = id->len;
+	info_struct._oscore_info_id.value = id->ptr;
+	info_struct._oscore_info_id.len = id->len;
 
 	if (id_context->len == 0) {
-		info_struct._info_id_context_choice = _info_id_context_nil;
+		info_struct._oscore_info_id_context_choice = _oscore_info_id_context_nil;
 	} else {
-		info_struct._info_id_context_choice = _info_id_context_bstr;
-		info_struct._info_id_context_bstr.value = id_context->ptr;
-		info_struct._info_id_context_bstr.len = id_context->len;
+		info_struct._oscore_info_id_context_choice = _oscore_info_id_context_bstr;
+		info_struct._oscore_info_id_context_bstr.value = id_context->ptr;
+		info_struct._oscore_info_id_context_bstr.len = id_context->len;
 	}
-	info_struct._info_alg_aead_choice = _info_alg_aead_int;
-	info_struct._info_alg_aead_int = aead_alg;
+	info_struct._oscore_info_alg_aead_choice = _oscore_info_alg_aead_int;
+	info_struct._oscore_info_alg_aead_int = aead_alg;
 
-	info_struct._info_type.value = (uint8_t *)type_enc;
-	info_struct._info_type.len = strlen(type_enc);
-	info_struct._info_L = len;
+	info_struct._oscore_info_type.value = (uint8_t *)type_enc;
+	info_struct._oscore_info_type.len = strlen(type_enc);
+	info_struct._oscore_info_L = len;
 
 	uint32_t payload_len_out;
-	success_encoding = cbor_encode_info(out->ptr, out->len, &info_struct,
+	success_encoding = cbor_encode_oscore_info(out->ptr, out->len, &info_struct,
 					    &payload_len_out);
 
 	if (!success_encoding) {
 		return cbor_encoding_error;
 	}
 	out->len = payload_len_out;
-	return oscore_no_error;
+	return ok;
 }

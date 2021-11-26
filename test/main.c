@@ -11,7 +11,8 @@
 
 #include <zephyr.h>
 #include <ztest.h>
-#include "edhoc_tests.h"
+#include "edhoc_testvector_tests/edhoc_tests.h"
+#include "oscore_testvector_tests/oscore_tests.h"
 
 static void test_initiator1(void)
 {
@@ -80,6 +81,11 @@ static void test_responder13(void)
 }
 void test_main(void)
 {
+	/*
+ * 
+ *  EDHOC testvector tests
+ * 
+ */
 	ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1),
 			 ztest_unit_test(test_initiator2),
 			 ztest_unit_test(test_initiator3),
@@ -104,4 +110,18 @@ void test_main(void)
 
 	ztest_run_test_suite(initiator_tests);
 	ztest_run_test_suite(responder_tests);
+
+	/*
+ * 
+ *  OSCORE testvector tests
+ * 
+ */
+	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
+			 ztest_unit_test(oscore_server_test2),
+			 ztest_unit_test(oscore_client_test3),
+			 ztest_unit_test(oscore_server_test4),
+			 ztest_unit_test(oscore_client_test5),
+			 ztest_unit_test(oscore_server_test6));
+
+	ztest_run_test_suite(oscore_tests);
 }

@@ -12,7 +12,7 @@
 #define TH_H
 
 #include "byte_array.h"
-#include "error.h"
+#include "oscore_edhoc_error.h"
 #include "suites.h"
 #include "c_x.h"
 

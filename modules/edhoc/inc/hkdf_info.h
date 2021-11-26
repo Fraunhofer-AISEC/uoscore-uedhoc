@@ -13,7 +13,7 @@
 #define HKDF_INFO_H
 
 #include "../../common/inc/byte_array.h"
-#include "error.h"
+#include "oscore_edhoc_error.h"
 #include "suites.h"
 
 /**

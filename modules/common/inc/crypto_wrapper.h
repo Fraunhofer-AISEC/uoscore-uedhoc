@@ -12,7 +12,7 @@
 #define CRYPTO_WRAPPER_H
 
 #include "byte_array.h"
-#include "error.h"
+#include "oscore_edhoc_error.h"
 #include "suites.h"
 
 
@@ -159,7 +159,7 @@ enum err verify(enum sign_alg alg, const uint8_t *pk,
  * @param   tag outputs the authentication tag in case of encryption. 
  *          In case of decryption the it is an input parameter.
  * @retval  oscore_authentication_error if the authentication fails
- *          else oscore_no_error
+ *          else ok
  */
 enum err
 aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,

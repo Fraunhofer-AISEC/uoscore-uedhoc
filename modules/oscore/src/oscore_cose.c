@@ -48,7 +48,7 @@ static enum err create_enc_structure(struct byte_array *external_aad,
 		return cbor_encoding_error;
 	}
 	out->len = payload_len_out;
-	return oscore_no_error;
+	return ok;
 }
 
 enum err cose_decrypt(struct byte_array *in_ciphertext,
@@ -66,7 +66,7 @@ enum err cose_decrypt(struct byte_array *in_ciphertext,
 		.ptr = aad_bytes,
 	};
 	r = create_enc_structure(recipient_aad, &aad);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 	PRINT_ARRAY("AAD encoded", aad.ptr, aad.len);
 
@@ -79,7 +79,7 @@ enum err cose_decrypt(struct byte_array *in_ciphertext,
 	r = aes_ccm_16_64_128(DECRYPT, in_ciphertext, out_plaintext, key, nonce,
 			      &aad, &tag);
 
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	PRINT_ARRAY("Decrypted plaintext", out_plaintext->ptr,
@@ -102,7 +102,7 @@ cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 		.ptr = aad_bytes,
 	};
 	r = create_enc_structure(sender_aad, &aad);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 	struct byte_array tag = {
 		.len = 8,
@@ -115,9 +115,9 @@ cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 	};
 	r = aes_ccm_16_64_128(ENCRYPT, in_plaintext, &ctxt, key, nonce, &aad,
 			      &tag);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	PRINT_ARRAY("Ciphertext", out_ciphertext, out_ciphertext_len);
-	return oscore_no_error;
+	return ok;
 }

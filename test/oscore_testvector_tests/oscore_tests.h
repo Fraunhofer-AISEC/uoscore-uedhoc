@@ -8,19 +8,14 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 */
-#ifndef MEMCPY_S_H
-#define MEMCPY_S_H
+#ifndef OSCORE_TESTS_H
+#define OSCORE_TESTS_H
 
-#include <stdint.h>
-
-#include "oscore_edhoc_error.h"
-
-/**
- * @brief memcpy_s (see [1]) may not be available in some setups thus our own 
- * implementation 
- * [1]: https://docs.microsoft.com/de-de/cpp/c-runtime-library/reference/memcpy-s-wmemcpy-s?view=msvc-160
- */
-enum err _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
-		     uint64_t count);
+void oscore_client_test1(void);
+void oscore_client_test3(void);
+void oscore_client_test5(void);
+void oscore_server_test2(void);
+void oscore_server_test4(void);
+void oscore_server_test6(void);
 
 #endif

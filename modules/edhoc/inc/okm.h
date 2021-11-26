@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "error.h"
+#include "oscore_edhoc_error.h"
 #include "hkdf_info.h"
 #include "suites.h"
 

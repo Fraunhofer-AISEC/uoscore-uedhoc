@@ -88,7 +88,7 @@ enum err tx(uint8_t *data, uint32_t data_len)
 	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
 
 	delete pdu;
-	return edhoc_no_error;
+	return ok;
 }
 
 /**
@@ -127,7 +127,7 @@ enum err rx(uint8_t *data, uint32_t *data_len)
 	}
 
 	delete recvPDU;
-	return edhoc_no_error;
+	return ok;
 }
 
 int main()

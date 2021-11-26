@@ -15,25 +15,25 @@
 
 #define DEFAULT_MAX_QTY 3
 
-struct info {
- 	cbor_string_type_t _info_id;
+struct oscore_info {
+ 	cbor_string_type_t _oscore_info_id;
 	union {
-		cbor_string_type_t _info_id_context_bstr;
+		cbor_string_type_t _oscore_info_id_context_bstr;
 	};
 	enum {
-		_info_id_context_bstr,
-		_info_id_context_nil,
-	} _info_id_context_choice;
+		_oscore_info_id_context_bstr,
+		_oscore_info_id_context_nil,
+	} _oscore_info_id_context_choice;
 	union {
-		int32_t _info_alg_aead_int;
-		cbor_string_type_t _info_alg_aead_tstr;
+		int32_t _oscore_info_alg_aead_int;
+		cbor_string_type_t _oscore_info_alg_aead_tstr;
 	};
 	enum {
-		_info_alg_aead_int,
-		_info_alg_aead_tstr,
-	} _info_alg_aead_choice;
-	cbor_string_type_t _info_type;
-	uint32_t _info_L;
+		_oscore_info_alg_aead_int,
+		_oscore_info_alg_aead_tstr,
+	} _oscore_info_alg_aead_choice;
+	cbor_string_type_t _oscore_info_type;
+	uint32_t _oscore_info_L;
 };
 
 

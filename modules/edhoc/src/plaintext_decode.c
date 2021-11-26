@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/retrieve_cred.h"
@@ -68,7 +68,7 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 
 	*id_cred_x_len = payload_len_out;
 
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
@@ -138,5 +138,5 @@ enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 		*ad_len = 0;
 	}
 
-	return edhoc_no_error;
+	return ok;
 }

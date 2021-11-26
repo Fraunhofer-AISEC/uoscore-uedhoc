@@ -19,9 +19,9 @@
 #endif
 
 
-bool cbor_encode_info(
+bool cbor_encode_oscore_info(
 		uint8_t *payload, uint32_t payload_len,
-		const struct info *input,
+		const struct oscore_info *input,
 		uint32_t *payload_len_out);
 
 

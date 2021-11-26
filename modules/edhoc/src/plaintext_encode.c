@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/retrieve_cred.h"
@@ -46,7 +46,7 @@ enum err id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 		// 		_kid, *kid_len,
 		// 		map._id_cred_x_map_kid._id_cred_x_map_kid.value,
 		// 		map._id_cred_x_map_kid._id_cred_x_map_kid.len);
-		// 	if (r != edhoc_no_error) {
+		// 	if (r != ok) {
 		// 		return r;
 		// 	}
 		// 	*kid_len =
@@ -63,7 +63,7 @@ enum err id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 		*kid_len = 0;
 	}
 
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
@@ -96,5 +96,5 @@ enum err plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
 
 	*plaintext_len = l + enc_sgn_or_mac_len + ad_len;
 
-	return edhoc_no_error;
+	return ok;
 }

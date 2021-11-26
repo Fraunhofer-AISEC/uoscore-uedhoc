@@ -13,7 +13,7 @@
 #include "../inc/associated_data_encode.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/messages.h"
@@ -70,7 +70,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 			    c_r->mem.c_x_bstr.len);
 	}
 
-	return edhoc_no_error;
+	return ok;
 }
 /**
  * @brief   Encodes message 1
@@ -131,7 +131,7 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	*msg1_len = payload_len_out;
 
 	PRINT_ARRAY("message_1 (CBOR Sequence)", msg1, *msg1_len);
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err
@@ -187,7 +187,7 @@ edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	// if (r == error_message_received) {
 	// 	/*provide the error message to the caller*/
 	// 	r = _memcpy_s(err_msg, *err_msg_len, msg2, msg2_len);
-	// 	if (r != edhoc_no_error) {
+	// 	if (r != ok) {
 	// 		return r;
 	// 	}
 	// 	*err_msg_len = msg2_len;
@@ -306,5 +306,5 @@ edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			th4_len, ciphertext_4, ciphertext_4_len, NULL, 0, NULL,
 			0, ead_4, (uint32_t *)ead_4_len));
 	}
-	return edhoc_no_error;
+	return ok;
 }

@@ -131,9 +131,9 @@ enum err encode_options(struct o_coap_option *options,
 		enum err r =
 			_memcpy_s(&out[index], (out_buf_len - index),
 				  &option.value[0], length);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		index += length;
 	}
-	return oscore_no_error;
+	return ok;
 }

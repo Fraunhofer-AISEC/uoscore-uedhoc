@@ -13,7 +13,7 @@
 #include "../inc/associated_data_encode.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/messages.h"
@@ -106,7 +106,7 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, enum method_type *method,
 		*ad1_len = m._message_1_ead_1.len;
 		PRINT_ARRAY("msg1 ead_1", ad1, *ad1_len);
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 /**
@@ -173,7 +173,7 @@ static inline enum err msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
 	*msg2_len = payload_len_out;
 
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, *msg2_len);
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err
@@ -209,7 +209,7 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 					  &c->suites_r))) {
 		// r = tx_err_msg(RESPONDER, method, c_i, c_i_len, NULL, 0,
 		// 	       c->suites_r.ptr, c->suites_r.len);
-		// if (r != edhoc_no_error) {
+		// if (r != ok) {
 		// 	return r;
 		// }
 		/*After an error message is sent the protocol must be discontinued*/
@@ -284,7 +284,7 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 	// if (r == error_message_received) {
 	// 	/*provide the error message to the caller*/
 	// 	r = _memcpy_s(err_msg, *err_msg_len, msg3, msg3_len);
-	// 	if (r != edhoc_no_error) {
+	// 	if (r != ok) {
 	// 		return r;
 	// 	}
 	// 	*err_msg_len = msg3_len;
@@ -359,5 +359,5 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 		TRY(tx(msg4, msg4_len));
 	}
 
-	return edhoc_no_error;
+	return ok;
 }

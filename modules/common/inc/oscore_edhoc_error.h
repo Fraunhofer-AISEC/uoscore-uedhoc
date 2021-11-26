@@ -20,7 +20,8 @@
  * return value into an out-parameter.
  */
 enum err {
-	edhoc_no_error = 0,
+	ok = 0,
+	
 	error_message_received = 1,
 	error_message_sent = 2,
 
@@ -53,7 +54,6 @@ enum err {
 
 
 	/*OSCORE specific errors*/
-	oscore_no_error = 100,
 	oscore_tiny_crypt_error = 101,
 	oscore_unknown_hkdf = 102,
 	oscore_out_too_long = 103,

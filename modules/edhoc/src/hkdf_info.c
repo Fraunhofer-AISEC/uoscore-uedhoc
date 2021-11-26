@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "../inc/byte_array.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/suites.h"
 #include "../cbor/encode_info.h"
 
@@ -41,5 +41,5 @@ enum err create_hkdf_info(const uint8_t *th, uint8_t th_len,
 
 	*out_len = payload_len_out;
 
-	return edhoc_no_error;
+	return ok;
 }

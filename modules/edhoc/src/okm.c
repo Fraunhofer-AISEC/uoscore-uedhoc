@@ -10,7 +10,7 @@
 */
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/print_util.h"
 
@@ -27,5 +27,5 @@ enum err okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
 	PRINT_ARRAY("info", info, info_len);
 	TRY(hkdf_expand(hash_alg, prk, prk_len, (uint8_t *)&info, info_len, okm,
 			okm_len));
-	return edhoc_no_error;
+	return ok;
 }

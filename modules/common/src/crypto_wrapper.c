@@ -11,7 +11,7 @@
 #include "crypto_wrapper.h"
 
 #include "byte_array.h"
-#include "error.h"
+#include "oscore_edhoc_error.h"
 #include "print_util.h"
 #include "suites.h"
 
@@ -90,7 +90,7 @@ aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
 
 #endif /* TINYCRYPT */
 
-	return oscore_no_error;
+	return ok;
 };
 
 enum err __attribute__((weak))
@@ -150,7 +150,7 @@ hkdf_sha_256(struct byte_array *master_secret, struct byte_array *master_salt,
 		}
 	}
 
-	return oscore_no_error;
+	return ok;
 
 #endif /* TINYCRYPT */
 
@@ -190,7 +190,7 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 #ifdef EDHOC_WITH_MBEDTLS
 	/*TODO add mbedtls code here*/
 #endif
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -209,7 +209,7 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 #endif
 	}
 
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -232,7 +232,7 @@ verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
 		/*TODO add mbedtls code here*/
 #endif
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -261,7 +261,7 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 		TRY_EXPECT(tc_hmac_final(out, TC_SHA256_DIGEST_SIZE, &h), 1);
 #endif
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -300,7 +300,7 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 		}
 #endif
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -342,7 +342,7 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 #endif
 	}
 
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -362,7 +362,7 @@ ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 	} else {
 		return unsupported_ecdh_curve;
 	}
-	return edhoc_no_error;
+	return ok;
 }
 
 enum err __attribute__((weak))
@@ -385,5 +385,5 @@ hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 #endif
 	}
 
-	return edhoc_no_error;
+	return ok;
 }

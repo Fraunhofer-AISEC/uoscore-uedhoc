@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 
@@ -103,11 +103,11 @@ enum err options_into_byte_string(struct o_coap_option *options,
 				     (temp_ptr - out_byte_string->ptr);
 		enum err r = _memcpy_s(
 			temp_ptr, dest_size, options[i].value, options[i].len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 		temp_ptr += options[i].len;
 	}
-	return oscore_no_error;
+	return ok;
 }
 
 /**
@@ -206,7 +206,7 @@ static inline enum err buf2options(uint8_t *in_data,
 	// Assign options count number
 	*out_options_count = temp_options_count;
 
-	return oscore_no_error;
+	return ok;
 }
 
 enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
@@ -274,7 +274,7 @@ enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
 				r = buf2options(temp_option_ptr, options_len,
 						out->options,
 						&(out->options_cnt));
-				if (r != oscore_no_error)
+				if (r != ok)
 					return r;
 			} else {
 				out->options_cnt = 0;
@@ -291,7 +291,7 @@ enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
 		out->payload = tmp_p;
 	}
 
-	return oscore_no_error;
+	return ok;
 }
 
 enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
@@ -317,7 +317,7 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			*out_byte_string_len - (temp_out_ptr - out_byte_string);
 		r = _memcpy_s(temp_out_ptr, dest_size, in->token,
 			      in->header.TKL);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 
 		temp_out_ptr += in->header.TKL;
@@ -338,7 +338,7 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 	/* Convert all OSCORE U-options structure into byte string*/
 	r = options_into_byte_string(in->options, in->options_cnt,
 				     &option_byte_string);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 	/* Copy options byte string into output*/
 
@@ -346,7 +346,7 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 		*out_byte_string_len - (temp_out_ptr - out_byte_string);
 	r = _memcpy_s(temp_out_ptr, dest_size, temp_opt_bytes,
 		      option_byte_string.len);
-	if (r != oscore_no_error)
+	if (r != ok)
 		return r;
 
 	temp_out_ptr += option_byte_string.len;
@@ -359,7 +359,7 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			    (temp_out_ptr + 1 - out_byte_string);
 		r = _memcpy_s(++temp_out_ptr, dest_size, in->payload,
 			      in->payload_len);
-		if (r != oscore_no_error)
+		if (r != ok)
 			return r;
 	}
 	*out_byte_string_len = 4 + in->header.TKL + option_byte_string.len;
@@ -369,5 +369,5 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 
 	PRINT_ARRAY("Byte string of the converted packet", out_byte_string,
 		    *out_byte_string_len);
-	return oscore_no_error;
+	return ok;
 }

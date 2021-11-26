@@ -9,7 +9,7 @@
 
 ; This file shold be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
-info = [
+oscore_info = [
 	id: bstr,
 	id_context: bstr / nil,
 	alg_aead: int / tstr,

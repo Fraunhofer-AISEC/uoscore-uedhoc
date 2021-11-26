@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "error.h"
+#include "oscore_edhoc_error.h"
 #include "print_util.h"
 #include "cose.h"
 

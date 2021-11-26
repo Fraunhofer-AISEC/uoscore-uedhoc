@@ -202,7 +202,7 @@ int get_C_X_decode(uint8_t vec_num, char *test_vec_buf, int r, jsmntok_t *t,
 				c_x_out->mem.c_x_bstr.len,
 				cx._cx_C_X_bstr.value, cx._cx_C_X_bstr.len);
 		c_x_out->mem.c_x_bstr.len = cx._cx_C_X_bstr.len;
-		if (err != edhoc_no_error) {
+		if (err != ok) {
 			printf("the buffer for C_X is to small");
 			return -1;
 		}

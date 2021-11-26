@@ -12,7 +12,7 @@
 
 #include <stdbool.h>
 
-#include "../../common/inc/error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 enum err authentication_type_get(enum method_type m,
 				   volatile bool *static_dh_i,
 				   volatile bool *static_dh_r)
@@ -36,5 +36,5 @@ enum err authentication_type_get(enum method_type m,
 	default:
 		break;
 	}
-	return edhoc_no_error;
+	return ok;
 }

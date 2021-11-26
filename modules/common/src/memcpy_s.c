@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "error.h"
+#include "oscore_edhoc_error.h"
 
 enum err _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
 			   uint64_t count)
