@@ -161,11 +161,11 @@ enum err verify(enum sign_alg alg, const uint8_t *pk,
  * @retval  oscore_authentication_error if the authentication fails
  *          else ok
  */
-enum err
-aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
-		  struct byte_array *out, struct byte_array *key,
-		  struct byte_array *nonce, struct byte_array *aad,
-		  struct byte_array *tag);
+//enum err
+// aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
+// 		  struct byte_array *out, struct byte_array *key,
+// 		  struct byte_array *nonce, struct byte_array *aad,
+// 		  struct byte_array *tag);
 
 /**
  * @brief   HKDF funcion used for the derivation of the Common IV, 

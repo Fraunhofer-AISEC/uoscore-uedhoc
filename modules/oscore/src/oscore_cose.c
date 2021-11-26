@@ -72,8 +72,9 @@ enum err cose_decrypt(struct byte_array *in_ciphertext,
 
 	PRINT_ARRAY("Ciphertext", in_ciphertext->ptr, in_ciphertext->len);
 
-	TRY(aes_ccm_16_64_128(DECRYPT, in_ciphertext, out_plaintext, key, nonce,
-			      &aad, &tag));
+	TRY(aead(DECRYPT, in_ciphertext->ptr, in_ciphertext->len, key->ptr,
+		 key->len, nonce->ptr, nonce->len, aad.ptr, aad.len,
+		 out_plaintext->ptr, out_plaintext->len, tag.ptr, tag.len));
 
 	PRINT_ARRAY("Decrypted plaintext", out_plaintext->ptr,
 		    out_plaintext->len);
@@ -98,13 +99,16 @@ enum err cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 		.ptr = out_ciphertext + in_plaintext->len,
 	};
 
+	//todo remove this struct
 	struct byte_array ctxt = {
 		.len = out_ciphertext_len,
 		.ptr = out_ciphertext,
 	};
-	TRY(aes_ccm_16_64_128(ENCRYPT, in_plaintext, &ctxt, key, nonce, &aad,
-			      &tag));
+	TRY(aead(ENCRYPT, in_plaintext->ptr, in_plaintext->len, key->ptr,
+		 key->len, nonce->ptr, nonce->len, aad.ptr, aad.len, ctxt.ptr,
+		 ctxt.len - tag.len, tag.ptr, tag.len));
 
+	PRINT_ARRAY("tag", tag.ptr, tag.len);
 	PRINT_ARRAY("Ciphertext", out_ciphertext, out_ciphertext_len);
 	return ok;
 }

@@ -407,7 +407,6 @@ enum err oscore_decrypted_payload_parser(struct byte_array *in_payload,
 
 		/* Parser all options */
 		if (options_len > 0) {
-			uint8_t r = 0;
 			TRY(oscore_packet_options_parser(
 				temp_option_ptr, options_len, out_E_options,
 				E_options_cnt));
@@ -636,7 +635,6 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
 		struct o_coap_packet o_coap_packet;
 		TRY(o_coap_pkg_generate(&plaintext, &oscore_packet,
 					&o_coap_packet));
-
 
 		/*Convert to byte string*/
 		r = coap2buf(&o_coap_packet, buf_out, buf_out_len);
