@@ -46,21 +46,21 @@ int test_edhoc(enum role p, uint8_t vec_num)
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 	struct results_bufs res_bufs;
 	struct results res;
-	int err;
-	enum edhoc_error edhoc_error;
+	int r;
+	enum err err;
 
 	rx_init();
 
-	err = read_test_vectors(filename, test_vec_buf, &test_vec_buf_len);
-	zassert_true(err == 0, "reading the testvectors failed");
+	r = read_test_vectors(filename, test_vec_buf, &test_vec_buf_len);
+	zassert_true(r == 0, "reading the testvectors failed");
 
-	err = get_RESULTS_from_test_vec(&res_bufs, &res, vec_num, test_vec_buf,
-					test_vec_buf_len);
-	zassert_true(err == 0, "parsing results form testvectors failed");
+	r = get_RESULTS_from_test_vec(&res_bufs, &res, vec_num, test_vec_buf,
+				      test_vec_buf_len);
+	zassert_true(r == 0, "parsing results form testvectors failed");
 
-	err = get_MESSAGES_from_test_vec(&m_bufs, &m, vec_num, test_vec_buf,
-					 test_vec_buf_len);
-	zassert_true(err == 0, "parsing messages form testvectors failed");
+	r = get_MESSAGES_from_test_vec(&m_bufs, &m, vec_num, test_vec_buf,
+				       test_vec_buf_len);
+	zassert_true(r == 0, "parsing messages form testvectors failed");
 
 	if (p == INITIATOR) {
 		uint16_t cred_num = 1;
@@ -70,26 +70,25 @@ int test_edhoc(enum role p, uint8_t vec_num)
 		struct edhoc_initiator_context_bufs initiator_context_bufs;
 
 		rx_initiator_switch = true;
-		err = get_OTHER_PARTY_CRED_from_test_vec(
+		r = get_OTHER_PARTY_CRED_from_test_vec(
 			RESPONDER, &other_party_bufs, &cred_r, vec_num,
 			test_vec_buf, test_vec_buf_len);
 		zassert_true(
-			err == 0,
+			r == 0,
 			"parsing other party credentials form testvectors failed");
 
-		err = get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
+		r = get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
 			&initiator_context_bufs, &c_i, vec_num, test_vec_buf,
 			test_vec_buf_len);
 		zassert_true(
-			err == 0,
+			r == 0,
 			"parsing initiator context form testvectors failed");
 
-		edhoc_error = edhoc_initiator_run(&c_i, &cred_r, cred_num,
-						  err_msg, &err_msg_len, ad_2,
-						  &ad_2_len, ad_4, &ad_4_len,
-						  PRK_4x3m, sizeof(PRK_4x3m),
-						  th4, sizeof(th4), tx, rx);
-		zassert_true(edhoc_error == 0, "edhoc_initiator_run failed");
+		err = edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg,
+					  &err_msg_len, ad_2, &ad_2_len, ad_4,
+					  &ad_4_len, PRK_4x3m, sizeof(PRK_4x3m),
+					  th4, sizeof(th4), tx, rx);
+		zassert_true(err == 0, "edhoc_initiator_run failed");
 
 	} else {
 		const uint16_t num_cred_i_elements = 1;
@@ -99,39 +98,40 @@ int test_edhoc(enum role p, uint8_t vec_num)
 		struct edhoc_responder_context_bufs responder_context_bufs;
 
 		rx_initiator_switch = false;
-		err = get_OTHER_PARTY_CRED_from_test_vec(
-			       INITIATOR, &other_party_bufs, &cred_i, vec_num,
-			       test_vec_buf, test_vec_buf_len);
+		r = get_OTHER_PARTY_CRED_from_test_vec(
+			INITIATOR, &other_party_bufs, &cred_i, vec_num,
+			test_vec_buf, test_vec_buf_len);
 		zassert_true(
-			err == 0,
+			r == 0,
 			"parsing other party credentials form testvectors failed");
 
-		err = get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
+		r = get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
 			&responder_context_bufs, &c_r, vec_num, test_vec_buf,
 			test_vec_buf_len);
 		zassert_true(
-			err == 0,
+			r == 0,
 			"parsing responder context form testvectors failed");
 
-		edhoc_error = edhoc_responder_run(
-			&c_r, &cred_i, num_cred_i_elements, err_msg,
-			&err_msg_len, (uint8_t *)&ad_1, &ad_1_len,
-			(uint8_t *)&ad_3, &ad_3_len, PRK_4x3m, sizeof(PRK_4x3m),
-			th4, sizeof(th4), tx, rx);
-		zassert_true(edhoc_error == 0, "edhoc_responder_run failed");
+		err = edhoc_responder_run(&c_r, &cred_i, num_cred_i_elements,
+					  err_msg, &err_msg_len,
+					  (uint8_t *)&ad_1, &ad_1_len,
+					  (uint8_t *)&ad_3, &ad_3_len, PRK_4x3m,
+					  sizeof(PRK_4x3m), th4, sizeof(th4),
+					  tx, rx);
+		zassert_true(err == 0, "edhoc_responder_run failed");
 	}
 
-	edhoc_error = edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4,
-			   sizeof(th4), "OSCORE_Master_Secret",
-			   oscore_master_secret, 16);
+	err = edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4,
+			     sizeof(th4), "OSCORE_Master_Secret",
+			     oscore_master_secret, 16);
 
-	zassert_true(edhoc_error == 0, "edhoc_exporter failed");
+	zassert_true(err == 0, "edhoc_exporter failed");
 
-	edhoc_error = edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4,
-			   sizeof(th4), "OSCORE_Master_Salt",
-			   oscore_master_salt, 8);
+	err = edhoc_exporter(SHA_256, PRK_4x3m, sizeof(PRK_4x3m), th4,
+			     sizeof(th4), "OSCORE_Master_Salt",
+			     oscore_master_salt, 8);
 
-	zassert_true(edhoc_error == 0, "edhoc_exporter failed");
+	zassert_true(err == 0, "edhoc_exporter failed");
 
 	/* check th4, PRK_4x3m, OSCORE Master secret and salt are correct */
 	zassert_mem_equal__(&PRK_4x3m, res.prk_4x3m.ptr, sizeof(PRK_4x3m),

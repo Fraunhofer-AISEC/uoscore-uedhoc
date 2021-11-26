@@ -17,13 +17,13 @@
 #include "../inc/print_util.h"
 #include "../inc/security_context.h"
 
-enum oscore_error create_nonce(struct byte_array *id_piv,
+enum err create_nonce(struct byte_array *id_piv,
 			       struct byte_array *piv,
 			       struct byte_array *common_iv,
 			       struct byte_array *nonce)
 {
 	/* "1. left-padding the PIV in network byte order with zeroes to exactly 5 bytes"*/
-	enum oscore_error r;
+	enum err r;
 	uint8_t padded_piv[MAX_PIV_LEN] = { 0 };
 	r = _memcpy_s(&padded_piv[sizeof(padded_piv) - piv->len], piv->len,
 		      piv->ptr, piv->len);

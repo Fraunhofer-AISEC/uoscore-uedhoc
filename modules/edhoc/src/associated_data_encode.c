@@ -11,11 +11,11 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "../inc/error.h"
-#include "../inc/print_util.h"
-#include "../inc/cose.h"
+#include "error.h"
+#include "print_util.h"
+#include "cose.h"
 
-enum edhoc_error associated_data_encode(uint8_t *thX, const uint16_t thX_len,
+enum err associated_data_encode(uint8_t *thX, const uint16_t thX_len,
 					uint8_t *out, uint16_t *out_len)
 {
 	uint8_t context_str[] = { "Encrypt0" };

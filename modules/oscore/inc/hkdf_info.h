@@ -12,7 +12,7 @@
 #ifndef HKDF_INFO_H
 #define HKDF_INFO_H
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "error.h"
 #include "security_context.h"
 #include "supported_algorithm.h"
@@ -26,9 +26,9 @@
  * @param   type type of operation this HKDF Info is going to be used for
  * @param   out out-array. Must have a length of exactly the value returned 
  *          in the out-parameter by `hkdf_info_len`.
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error create_hkdf_info(struct byte_array *id,
+enum err create_hkdf_info(struct byte_array *id,
 				   struct byte_array *id_context,
 				   enum AEAD_algorithm aead_alg,
 				   enum derive_type type,

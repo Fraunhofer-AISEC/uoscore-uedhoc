@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/messages.h"
 #include "../inc/print_util.h"
 #include "../inc/txrx_wrapper.h"
@@ -23,7 +23,7 @@
  * @param   msg_struct contains all messsage fields
  * @param   msg the encoded error message
  */
-static inline enum edhoc_error err_msg_crate(struct error_msg *msg_struct,
+static inline enum err err_msg_crate(struct error_msg *msg_struct,
 					     struct byte_array *msg)
 {
 	// 	bool success;
@@ -89,12 +89,12 @@ static inline enum edhoc_error err_msg_crate(struct error_msg *msg_struct,
 	return edhoc_no_error;
 }
 
-enum edhoc_error tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
+enum err tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 			    uint8_t c_x_len, uint8_t *err_msg_str,
 			    uint8_t err_msg_str_len, uint8_t *suites,
 			    uint8_t suites_len)
 {
-	// enum edhoc_error r;
+	// enum err r;
 	// uint8_t err_msg_buf[ERR_MSG_DEFAULT_SIZE];
 	// struct byte_array err_msg = {
 	// 	.len = sizeof(err_msg_buf),

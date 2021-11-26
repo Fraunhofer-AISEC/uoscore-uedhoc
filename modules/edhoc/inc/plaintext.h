@@ -22,7 +22,7 @@
  * @param   _kid output pointer
  * @param   kid_len length of the kid
  */
-enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
+enum err id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 			     uint8_t *_kid, uint32_t *kid_len);
 
 /**
@@ -36,7 +36,7 @@ enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
  * @param   ad axillary data
  * @param   ad_len length of ad
  */
-enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
+enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 				 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
 				 uint8_t *sign_or_mac,
 				 uint32_t *sign_or_mac_len, uint8_t *ad,
@@ -53,7 +53,7 @@ enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
  * @param   paintext pointer to the paintext
  * @param   paintext_len length of paintext
  */
-enum edhoc_error plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
+enum err plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
 				  const uint8_t *sgn_or_mac,
 				  uint8_t sgn_or_mac_len, const uint8_t *ad,
 				  uint16_t ad_len, uint8_t *plaintext,

@@ -49,7 +49,7 @@ static void prepare_CoAP_response(CoapPDU *recvPDU, CoapPDU *sendPDU)
 int main()
 {
 	setbuf(stdout, NULL); //disable printf buffereing
-	oscore_error r;
+	err r;
 	int err, n;
 	char buffer[MAXLINE];
 	socklen_t client_addr_len;

@@ -9,7 +9,7 @@
    except according to those terms.
 */
 
-#include "../inc/byte_array.h"
+#include "byte_array.h"
 
 struct byte_array EMPTY_ARRAY = {
 	.len = 0,
@@ -21,7 +21,14 @@ struct byte_array NULL_ARRAY = {
 	.ptr = NULL,
 };
 
-bool array_equals(struct byte_array *left, struct byte_array *right)
+void byte_array_init(uint8_t *buf, uint32_t buf_len,
+		     struct byte_array *byte_array)
+{
+	byte_array->len = buf_len;
+	byte_array->ptr = buf;
+}
+
+bool array_equals(const struct byte_array *left, const struct byte_array *right)
 {
 	if (left->len != right->len) {
 		return false;

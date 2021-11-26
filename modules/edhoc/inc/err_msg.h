@@ -28,7 +28,7 @@ enum role { INITIATOR, RESPONDER };
  * @param   suites list of suported suites. To be used only after message 1
  * @param   suites_len length of suites
  */
-enum edhoc_error tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
+enum err tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 		      uint8_t c_x_len, uint8_t *err_msg_str,
 		      uint8_t err_msg_str_len, uint8_t *suites,
 		      uint8_t suites_len);

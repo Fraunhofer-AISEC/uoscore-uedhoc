@@ -11,12 +11,12 @@
 #include <string.h>
 
 #include "../edhoc.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/print_util.h"
 #include "../inc/suites.h"
 
-enum edhoc_error prk_derive(bool static_dh_auth, struct suite suite,
+enum err prk_derive(bool static_dh_auth, struct suite suite,
 			    const uint8_t *prk_in, const uint8_t prk_in_len,
 			    const uint8_t *stat_pk, const uint16_t stat_pk_len,
 			    const uint8_t *stat_sk, const uint16_t stat_sk_len,

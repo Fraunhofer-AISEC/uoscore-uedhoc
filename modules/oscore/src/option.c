@@ -76,7 +76,7 @@ uint32_t encoded_option_len(struct o_coap_option *options, uint16_t opt_num,
 	return len;
 }
 
-enum oscore_error encode_options(struct o_coap_option *options,
+enum err encode_options(struct o_coap_option *options,
 				 uint16_t opt_num, enum option_class class,
 				 uint8_t *out, uint8_t out_buf_len)
 {
@@ -128,7 +128,7 @@ enum oscore_error encode_options(struct o_coap_option *options,
 		out[index] = delta_length_field;
 		index += 1 + delta_len + length_len;
 		// value
-		enum oscore_error r =
+		enum err r =
 			_memcpy_s(&out[index], (out_buf_len - index),
 				  &option.value[0], length);
 		if (r != oscore_no_error)

@@ -10,7 +10,7 @@
 #include "test_vec_parser.h"
 #include "cbor/decode_c_x.h"
 #include "cbor/decode_suites_i.h"
-#include "../../modules/edhoc/inc/memcpy_s.h"
+#include "../../modules/common/inc/memcpy_s.h"
 
 /**
  * @brief	Checks if json object is a given string
@@ -184,7 +184,7 @@ int get_C_X_decode(uint8_t vec_num, char *test_vec_buf, int r, jsmntok_t *t,
 	TRY(get_element(test_vec_buf, t, r, cx_name, vec_num, &c_x_tmp));
 
 	uint32_t decode_len = 0;
-	enum edhoc_error err;
+	enum err err;
 	struct cx_C_X_ cx;
 
 	TRY_EXPECT(cbor_decode_cx_C_X(c_x_tmp.ptr, c_x_tmp.len, &cx,

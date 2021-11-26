@@ -1,5 +1,5 @@
 #include "../inc/c_x.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/memcpy_s.h"
 
 void c_x_init(struct c_x *c, uint8_t *buf, uint32_t buf_len)
@@ -7,7 +7,7 @@ void c_x_init(struct c_x *c, uint8_t *buf, uint32_t buf_len)
 	byte_array_init(buf, buf_len, &c->mem.c_x_bstr);
 }
 
-enum edhoc_error c_x_set(enum c_x_type t, const uint8_t *c_x_raw_buf,
+enum err c_x_set(enum c_x_type t, const uint8_t *c_x_raw_buf,
 			 uint32_t c_x_raw_buf_len, int c_x_int, struct c_x *out)
 {
 	if (t == INT) {

@@ -13,8 +13,8 @@
 
 #include "../inc/signature_or_mac_msg.h"
 #include "../edhoc.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/okm.h"
 #include "../inc/print_util.h"
@@ -26,7 +26,7 @@
 #include "../cbor/encode_bstr_type.h"
 #include "../cbor/decode_bstr_type.h"
 
-enum edhoc_error encode_byte_string(const uint8_t *in, uint32_t in_len,
+enum err encode_byte_string(const uint8_t *in, uint32_t in_len,
 				    uint8_t *out, uint64_t *out_len)
 {
 	uint32_t payload_len_out;
@@ -40,7 +40,7 @@ enum edhoc_error encode_byte_string(const uint8_t *in, uint32_t in_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error decode_byte_string(const uint8_t *in, const uint32_t in_len,
+enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
 				    uint8_t *out, uint32_t *out_len)
 {
 	cbor_string_type_t str;
@@ -55,7 +55,7 @@ enum edhoc_error decode_byte_string(const uint8_t *in, const uint32_t in_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
+enum err mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
 		     uint8_t th_len, const uint8_t *id_cred,
 		     uint32_t id_cred_len, const uint8_t *cred,
 		     uint32_t cred_len, const uint8_t *ead, uint32_t ead_len,
@@ -89,7 +89,7 @@ enum edhoc_error mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
 	return edhoc_no_error;
 }
 
-static enum edhoc_error
+static enum err
 signature_struct_gen(const uint8_t *th, uint8_t th_len, const uint8_t *id_cred,
 		     uint32_t id_cred_len, const uint8_t *cred,
 		     uint32_t cred_len, const uint8_t *ead, uint32_t ead_len,
@@ -115,7 +115,7 @@ signature_struct_gen(const uint8_t *th, uint8_t th_len, const uint8_t *id_cred,
 	return edhoc_no_error;
 }
 
-enum edhoc_error
+enum err
 signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 		 const uint8_t *sk, uint8_t sk_len, const uint8_t *pk,
 		 uint8_t pk_len, const uint8_t *prk, uint8_t prk_len,

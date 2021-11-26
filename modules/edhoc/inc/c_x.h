@@ -1,6 +1,6 @@
 #ifndef C_X_H
 #define C_X_H
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 
 enum c_x_type { INT, BSTR };
 
@@ -20,7 +20,7 @@ struct c_x {
  * 
  * 
  */
-enum edhoc_error c_x_set(enum c_x_type t, const uint8_t *c_x_raw_buf,
+enum err c_x_set(enum c_x_type t, const uint8_t *c_x_raw_buf,
 			 uint32_t c_x_raw_buf_len, int c_x_int,
 			 struct c_x *out);
 /**

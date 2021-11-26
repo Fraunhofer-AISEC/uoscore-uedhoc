@@ -25,7 +25,7 @@
  * @param   c_r Pointer to the conception identifier of the responder
  * @param   th2 ouput buffer
  */
-enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
+enum err th2_calculate(enum hash_alg alg, uint8_t *msg1,
 			       uint32_t msg1_len, uint8_t *g_y,
 			       uint32_t g_y_len, struct c_x *c_r, uint8_t *th2);
 
@@ -38,7 +38,7 @@ enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
  * @param   ciphertext_2_len  length of ciphertext_2_len
  * @param   th3 ouput buffer
  */
-enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
+enum err th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 			       uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
 			       uint8_t *th3);
 
@@ -51,7 +51,7 @@ enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
  * @param   ciphertext_3_len  length of ciphertext_3_len
  * @param   th4 ouput buffer
  */
-enum edhoc_error th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
+enum err th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
 			       uint8_t *ciphertext_3, uint16_t ciphertext_3_len,
 			       uint8_t *th4);
 

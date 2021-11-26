@@ -58,7 +58,7 @@ enum dev_type { SERVER, CLIENT };
  */
 void edhoc_initiator_init(void)
 {
-	edhoc_error r;
+	err r;
 	uint8_t PRK_4x3m[PRK_DEFAULT_SIZE];
 	uint8_t th4[SHA_DEFAULT_SIZE];
 	uint8_t err_msg[ERR_MSG_DEFAULT_SIZE];

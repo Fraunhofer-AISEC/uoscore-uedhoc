@@ -13,8 +13,8 @@
 #include <string.h>
 
 #include "../edhoc.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/print_util.h"
 #include "../inc/memcpy_s.h"
 #include "../cbor/decode_id_cred_x.h"
@@ -29,7 +29,7 @@
  * @param   pk_len the length pk
  * @param   verified true if verification successfull
  */
-static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
+static enum err cert_verify(const uint8_t *cert, uint16_t cert_len,
 				    const struct other_party_cred *cred_array,
 				    uint16_t cred_num, uint8_t *pk,
 				    uint16_t *pk_len, bool *verified)
@@ -74,7 +74,7 @@ static enum edhoc_error cert_verify(const uint8_t *cert, uint16_t cert_len,
 		      c._cert_signature.value, c._cert_signature.len, verified);
 }
 
-enum edhoc_error retrieve_cred(bool static_dh_auth,
+enum err retrieve_cred(bool static_dh_auth,
 			       struct other_party_cred *cred_array,
 			       uint16_t cred_num, uint8_t *id_cred,
 			       uint8_t id_cred_len, uint8_t *cred,

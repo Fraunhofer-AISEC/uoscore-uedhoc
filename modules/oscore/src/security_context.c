@@ -16,8 +16,8 @@
 
 #include "../inc/aad.h"
 #include "../inc/coap.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/nonce.h"
@@ -31,13 +31,12 @@
  * @param id    empty array for Common IV, sender / recipient ID for keys
  * @param type  IV for Common IV, KEY for Sender / Recipient Keys
  * @param out   out-array. Must be initialized
- * @return      oscore_error
+ * @return      err
  */
-static enum oscore_error derive(struct common_context *cc,
-				struct byte_array *id, enum derive_type type,
-				struct byte_array *out)
+static enum err derive(struct common_context *cc, struct byte_array *id,
+		       enum derive_type type, struct byte_array *out)
 {
-	enum oscore_error r;
+	enum err r;
 	uint8_t info_bytes[MAX_INFO_LEN];
 	struct byte_array info = {
 		.len = sizeof(info_bytes),
@@ -51,7 +50,7 @@ static enum oscore_error derive(struct common_context *cc,
 	PRINT_ARRAY("info struct", info.ptr, info.len);
 
 	switch (cc->kdf) {
-	case SHA_256:
+	case OSCORE_SHA_256:
 		r = hkdf_sha_256(&cc->master_secret, &cc->master_salt, &info,
 				 out);
 		break;
@@ -65,11 +64,11 @@ static enum oscore_error derive(struct common_context *cc,
 /**
  * @brief    Derives the Common IV 
  * @param    cc    pointer to the common context
- * @return   oscore_error
+ * @return   err
  */
-static enum oscore_error derive_common_iv(struct common_context *cc)
+static enum err derive_common_iv(struct common_context *cc)
 {
-	enum oscore_error r;
+	enum err r;
 	r = derive(cc, &EMPTY_ARRAY, IV, &cc->common_iv);
 	PRINT_ARRAY("Common IV", cc->common_iv.ptr, cc->common_iv.len);
 	return r;
@@ -79,12 +78,12 @@ static enum oscore_error derive_common_iv(struct common_context *cc)
  * @brief    Derives the Sender Key 
  * @param    cc    pointer to the common context
  * @param    sc    pointer to the sender context
- * @return   oscore_error
+ * @return   err
  */
-static enum oscore_error derive_sender_key(struct common_context *cc,
-					   struct sender_context *sc)
+static enum err derive_sender_key(struct common_context *cc,
+				  struct sender_context *sc)
 {
-	enum oscore_error r;
+	enum err r;
 	r = derive(cc, &sc->sender_id, KEY, &sc->sender_key);
 	PRINT_ARRAY("Sender Key", sc->sender_key.ptr, sc->sender_key.len);
 	return r;
@@ -94,12 +93,12 @@ static enum oscore_error derive_sender_key(struct common_context *cc,
  * @brief    Derives the Recipient Key 
  * @param    cc    pointer to the common context
  * @param    sc    pointer to the recipient context
- * @return   oscore_error
+ * @return   err
  */
-static enum oscore_error derive_recipient_key(struct common_context *cc,
-					      struct recipient_context *rc)
+static enum err derive_recipient_key(struct common_context *cc,
+				     struct recipient_context *rc)
 {
-	enum oscore_error r;
+	enum err r;
 	r = derive(cc, &rc->recipient_id, KEY, &rc->recipient_key);
 
 	PRINT_ARRAY("Recipient Key", rc->recipient_key.ptr,
@@ -107,13 +106,11 @@ static enum oscore_error derive_recipient_key(struct common_context *cc,
 	return r;
 };
 
-enum oscore_error context_update(enum dev_type dev,
-				 struct o_coap_option *options,
-				 uint16_t opt_num, struct byte_array *new_piv,
-				 struct byte_array *new_kid_context,
-				 struct context *c)
+enum err context_update(enum dev_type dev, struct o_coap_option *options,
+			uint16_t opt_num, struct byte_array *new_piv,
+			struct byte_array *new_kid_context, struct context *c)
 {
-	enum oscore_error r = oscore_no_error;
+	enum err r = oscore_no_error;
 
 	if (dev == SERVER) {
 		/**********************************************************************/
@@ -177,10 +174,10 @@ enum oscore_error context_update(enum dev_type dev,
 			  &c->rrc.piv, &c->rrc.aad);
 }
 
-enum oscore_error oscore_context_init(struct oscore_init_params *params,
-				      struct context *c)
+enum err oscore_context_init(struct oscore_init_params *params,
+			     struct context *c)
 {
-	enum oscore_error r;
+	enum err r;
 
 	if (params->dev_type == CLIENT) {
 		PRINT_MSG(
@@ -192,16 +189,17 @@ enum oscore_error oscore_context_init(struct oscore_init_params *params,
 
 	/*derive common context****************************************************/
 
-	if (params->aead_alg != AES_CCM_16_64_128) {
+	if (params->aead_alg != OSCORE_AES_CCM_16_64_128) {
 		return oscore_invalid_algorithm_aead;
 	} else {
-		c->cc.aead_alg = AES_CCM_16_64_128; /*that's the default*/
+		c->cc.aead_alg =
+			OSCORE_AES_CCM_16_64_128; /*that's the default*/
 	}
 
-	if (params->hkdf != SHA_256) {
+	if (params->hkdf != OSCORE_SHA_256) {
 		return oscore_invalid_algorithm_hkdf;
 	} else {
-		c->cc.kdf = SHA_256; /*that's the default*/
+		c->cc.kdf = OSCORE_SHA_256; /*that's the default*/
 	}
 
 	c->cc.master_secret = params->master_secret;
@@ -278,10 +276,10 @@ enum oscore_error oscore_context_init(struct oscore_init_params *params,
 }
 
 //todo: how big is piv? 5 byte= 40 bit -> in that case the sender sequence number needs to loop at the value of 2^40 -1 !!! -> uint8_t is sufficient for the sender sequence number.
-enum oscore_error sender_seq_num2piv(uint64_t ssn, struct byte_array *piv)
+enum err sender_seq_num2piv(uint64_t ssn, struct byte_array *piv)
 {
 	uint8_t *p = (uint8_t *)&ssn;
-	enum oscore_error r;
+	enum err r;
 
 	//todo here we can start at 4?
 	for (int8_t i = 7; i >= 0; i--) {

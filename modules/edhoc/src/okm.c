@@ -9,12 +9,12 @@
    except according to those terms.
 */
 #include "../edhoc.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/print_util.h"
 
-enum edhoc_error okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
+enum err okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
 			  uint8_t prk_len, const uint8_t *th, uint8_t th_len,
 			  const char *label, uint8_t *context,
 			  uint32_t context_len, uint8_t *okm, uint64_t okm_len)

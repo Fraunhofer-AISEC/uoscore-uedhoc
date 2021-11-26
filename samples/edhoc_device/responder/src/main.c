@@ -80,7 +80,7 @@ K_MBOX_DEFINE(tx_queue);
  */
 void edhoc_responder_init(void)
 {
-	edhoc_error r;
+	err r;
 
 	/* Edhoc internal parameters */
 	uint8_t PRK_4x3m[PRK_DEFAULT_SIZE];

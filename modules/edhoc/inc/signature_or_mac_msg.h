@@ -25,10 +25,10 @@ enum sgn_or_mac_op { VERIFY, GENERATE };
  * @param   out_len length of out
  * @retval  edhoc error code
  */
-enum edhoc_error encode_byte_string(const uint8_t *in, uint32_t in_len,
+enum err encode_byte_string(const uint8_t *in, uint32_t in_len,
 				    uint8_t *out, uint64_t *out_len);
 
-enum edhoc_error decode_byte_string(const uint8_t *in, const uint32_t in_len,
+enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
 				    uint8_t *out, uint32_t *out_len);
 
 /**
@@ -55,7 +55,7 @@ enum edhoc_error decode_byte_string(const uint8_t *in, const uint32_t in_len,
  * @param   mac MAC_2/MAC_3 when the calling party uses static DH authentication
  * @param   m_len length of mac
  */
-enum edhoc_error signature_or_mac_msg_create(
+enum err signature_or_mac_msg_create(
 	bool static_dh_auth, struct suite suite, const char *label_k,
 	const char *label_iv, const uint8_t *prk, const uint8_t prk_len,
 	const uint8_t *th, const uint8_t th_len, const uint8_t *id_cred,
@@ -63,14 +63,14 @@ enum edhoc_error signature_or_mac_msg_create(
 	const uint8_t *ad, const uint8_t ad_len, uint8_t *m, uint16_t *m_len,
 	uint8_t *mac, uint8_t *mac_len);
 
-enum edhoc_error mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
+enum err mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
 		     uint8_t th_len, const uint8_t *id_cred,
 		     uint32_t id_cred_len, const uint8_t *cred,
 		     uint32_t cred_len, const uint8_t *ead, uint32_t ead_len,
 		     const char *mac_label, bool static_dh, struct suite *suite,
 		     uint8_t *mac, uint32_t *mac_len);
 
-enum edhoc_error
+enum err
 signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 		 const uint8_t *sk, uint8_t sk_len, const uint8_t *pk,
 		 uint8_t pk_len, const uint8_t *prk, uint8_t prk_len,

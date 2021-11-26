@@ -32,7 +32,7 @@ struct context c_client;
 int main()
 {
 	setbuf(stdout, NULL); //disable printf buffereing
-	oscore_error r;
+	err r;
 	int err;
 	char buffer[MAXLINE];
 

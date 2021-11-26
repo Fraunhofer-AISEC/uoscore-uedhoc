@@ -11,13 +11,13 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/okm.h"
 #include "../inc/suites.h"
 
-enum edhoc_error edhoc_exporter(enum hash_alg app_hash_alg,
+enum err edhoc_exporter(enum hash_alg app_hash_alg,
 				const uint8_t *prk_4x3m, uint16_t prk_4x3m_len,
 				const uint8_t *th4, uint16_t th4_len,
 				const char *label, uint8_t *out,

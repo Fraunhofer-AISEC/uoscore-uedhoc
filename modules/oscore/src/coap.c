@@ -15,11 +15,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 
-enum oscore_error options_into_byte_string(struct o_coap_option *options,
+enum err options_into_byte_string(struct o_coap_option *options,
 					   uint8_t options_cnt,
 					   struct byte_array *out_byte_string)
 {
@@ -101,7 +101,7 @@ enum oscore_error options_into_byte_string(struct o_coap_option *options,
 		/* Copy the byte string of current option into output*/
 		uint64_t dest_size = out_byte_string_capacity -
 				     (temp_ptr - out_byte_string->ptr);
-		enum oscore_error r = _memcpy_s(
+		enum err r = _memcpy_s(
 			temp_ptr, dest_size, options[i].value, options[i].len);
 		if (r != oscore_no_error)
 			return r;
@@ -116,9 +116,9 @@ enum oscore_error options_into_byte_string(struct o_coap_option *options,
  * @param in_data_len: length of input byte string
  * @param out_options: pointer to output options structure array
  * @param out_options_count: count number of output options
- * @return  oscore_error
+ * @return  err
  */
-static inline enum oscore_error buf2options(uint8_t *in_data,
+static inline enum err buf2options(uint8_t *in_data,
 					    uint16_t in_data_len,
 					    struct o_coap_option *out_options,
 					    uint8_t *out_options_count)
@@ -209,9 +209,9 @@ static inline enum oscore_error buf2options(uint8_t *in_data,
 	return oscore_no_error;
 }
 
-enum oscore_error buf2coap(struct byte_array *in, struct o_coap_packet *out)
+enum err buf2coap(struct byte_array *in, struct o_coap_packet *out)
 {
-	enum oscore_error r;
+	enum err r;
 	uint8_t *tmp_p = in->ptr;
 	uint16_t payload_len = in->len;
 
@@ -294,11 +294,11 @@ enum oscore_error buf2coap(struct byte_array *in, struct o_coap_packet *out)
 	return oscore_no_error;
 }
 
-enum oscore_error coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
+enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			   uint16_t *out_byte_string_len)
 {
 	uint8_t *temp_out_ptr = out_byte_string;
-	enum oscore_error r;
+	enum err r;
 
 	/* First byte in header (version + type + token length) */
 	*temp_out_ptr = (in->header.ver << HEADER_VERSION_OFFSET) |

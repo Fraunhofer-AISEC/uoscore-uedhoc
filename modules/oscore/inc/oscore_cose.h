@@ -12,7 +12,7 @@
 #ifndef OSCORE_COSE_H
 #define OSCORE_COSE_H
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "error.h"
 
 /**
@@ -22,9 +22,9 @@
  * @param nonce the nonce
  * @param aad the aad
  * @param recipient_key the recipient key
- * @return oscore_error
+ * @return err
  */
-enum oscore_error cose_decrypt(struct byte_array *in_ciphertext,
+enum err cose_decrypt(struct byte_array *in_ciphertext,
 			       struct byte_array *out_plaintext,
 			       struct byte_array *nonce, struct byte_array *aad,
 			       struct byte_array *recipient_key);
@@ -36,9 +36,9 @@ enum oscore_error cose_decrypt(struct byte_array *in_ciphertext,
  * @param nonce the nonce
  * @param aad the aad
  * @param sender_key the sender key
- * @return oscore_error
+ * @return err
  */
-enum oscore_error
+enum err
 cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 	     uint32_t out_ciphertext_len, struct byte_array *nonce,
 	     struct byte_array *sender_aad, struct byte_array *key);

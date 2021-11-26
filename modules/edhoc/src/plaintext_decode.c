@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/retrieve_cred.h"
@@ -29,7 +29,7 @@
  * @param	id_len length of id
  * @param	
  */
-static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
+static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 					 const void *id, uint64_t id_len,
 					 uint8_t *id_cred_x,
 					 uint32_t *id_cred_x_len)
@@ -71,7 +71,7 @@ static enum edhoc_error id_cred_x_encode(enum id_cred_x_label label, int algo,
 	return edhoc_no_error;
 }
 
-enum edhoc_error plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
+enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 				 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
 				 uint8_t *sign_or_mac,
 				 uint32_t *sign_or_mac_len, uint8_t *ad,

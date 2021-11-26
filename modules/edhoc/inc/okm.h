@@ -29,7 +29,7 @@
  * @param   okm ouput pointer
  * @param   okm_len length of okm
  */
-enum edhoc_error okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
+enum err okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
 			  uint8_t prk_len, const uint8_t *th, uint8_t th_len,
 			  const char *label, uint8_t *context,
 			  uint32_t context_len, uint8_t *okm, uint64_t okm_len);

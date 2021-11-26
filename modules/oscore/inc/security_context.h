@@ -12,7 +12,7 @@
 #ifndef SECURITY_CONTEXT_H
 #define SECURITY_CONTEXT_H
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "error.h"
 #include "supported_algorithm.h"
 #include "coap.h"
@@ -94,7 +94,7 @@ struct context {
  * @param   ssn the sender sequence number
  * @param   piv Partial IV
  */
-enum oscore_error sender_seq_num2piv(uint64_t ssn, struct byte_array *piv);
+enum err sender_seq_num2piv(uint64_t ssn, struct byte_array *piv);
 
 /**
  * @brief   Updates runtime parameter of the context
@@ -105,7 +105,7 @@ enum oscore_error sender_seq_num2piv(uint64_t ssn, struct byte_array *piv);
  * @param   new_kid_context 
  * @param   c oscore context
  */
-enum oscore_error context_update(enum dev_type dev,
+enum err context_update(enum dev_type dev,
 				 struct o_coap_option *options,
 				 uint16_t opt_num, struct byte_array *new_piv,
 				 struct byte_array *new_kid_context,

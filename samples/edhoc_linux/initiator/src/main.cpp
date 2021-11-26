@@ -70,7 +70,7 @@ static int start_coap_client(void)
  * @param	data pointer to the data that needs to be send
  * @param	data_len lenhgt of the data in bytes
  */
-enum edhoc_error tx(uint8_t *data, uint32_t data_len)
+enum err tx(uint8_t *data, uint32_t data_len)
 {
 	/*construct a CoAP packet*/
 	static uint16_t mid = 0;
@@ -97,7 +97,7 @@ enum edhoc_error tx(uint8_t *data, uint32_t data_len)
  * @param	data pointer to the data that needs to be received
  * @param	data_len lenhgt of the data in bytes
  */
-enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
+enum err rx(uint8_t *data, uint32_t *data_len)
 {
 	int n;
 	char buffer[MAXLINE];

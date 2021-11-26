@@ -16,10 +16,10 @@
 /**
  * Error type used throughout the whole edhoc implementation.
  *
- * Every function that might error returns an edhoc_error and writes its
+ * Every function that might error returns an err and writes its
  * return value into an out-parameter.
  */
-enum edhoc_error {
+enum err {
 	edhoc_no_error = 0,
 	error_message_received = 1,
 	error_message_sent = 2,
@@ -50,6 +50,31 @@ enum edhoc_error {
 	cbor_decoding_error = 22,
 	suites_i_list_to_long = 23,
 	unexpected_result_from_ext_lib = 24,
+
+
+	/*OSCORE specific errors*/
+	oscore_no_error = 100,
+	oscore_tiny_crypt_error = 101,
+	oscore_unknown_hkdf = 102,
+	oscore_out_too_long = 103,
+	oscore_invalid_algorithm_aead = 104,
+	oscore_invalid_algorithm_hkdf = 105,
+	oscore_kid_recipent_id_mismatch = 106,
+	oscore_authentication_error = 107,
+	oscore_valuelen_to_long_error = 108,
+	oscore_inpkt_invalid_tkl = 109,
+	oscore_inpkt_invalid_option_delta = 110,
+	oscore_inpkt_invalid_optionlen = 111,
+	oscore_inpkt_invalid_piv = 112,
+	//oscore_info_to_long = 13,
+	//dest_buffer_to_small = 14,
+	delta_extra_byte_error = 115,
+	len_extra_byte_error = 116,
+	//cbor_encoding_error = 117,
+	not_valid_input_packet = 118,
+	replayed_packed_received = 119,
+
+
 };
 
 /*This macro checks if a function returns an error and if so it propages 

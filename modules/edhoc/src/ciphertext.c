@@ -1,10 +1,10 @@
 
 
 #include "../edhoc.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/okm.h"
 #include "../inc/ciphertext.h"
-#include "../inc/crypto_wrapper.h"
 #include "../inc/signature_or_mac_msg.h"
 #include "../inc/plaintext.h"
 #include "../inc/memcpy_s.h"
@@ -28,7 +28,7 @@ static inline void xor_arrays(const uint8_t *in1, const uint8_t *in2,
  * 
  * 
  */
-static enum edhoc_error ciphertext_encrypt_decrypt(
+static enum err ciphertext_encrypt_decrypt(
 	enum ciphertext ctxt, enum aes_operation op, const uint8_t *in,
 	const uint16_t in_len, const uint8_t *key, const uint16_t key_len,
 	uint8_t *nonce, const uint16_t nonce_len, const uint8_t *aad,
@@ -49,7 +49,7 @@ static enum edhoc_error ciphertext_encrypt_decrypt(
  * 
  * 
  */
-static enum edhoc_error
+static enum err
 ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
 		   uint8_t prk_len, uint8_t *th, uint8_t th_len, uint8_t *key,
 		   uint32_t key_len, uint8_t *iv, uint32_t iv_len)
@@ -88,7 +88,7 @@ ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
  * 
  * 
  */
-enum edhoc_error ciphertext_decrypt_split(
+enum err ciphertext_decrypt_split(
 	enum ciphertext ctxt, struct suite *suite, uint8_t *prk,
 	uint8_t prk_len, uint8_t *th, uint8_t th_len, uint8_t *ciphertext,
 	uint32_t ciphertext_len, uint8_t *id_cred, uint32_t *id_cred_len,
@@ -159,7 +159,7 @@ enum edhoc_error ciphertext_decrypt_split(
  * 
  */
 //todo refactore this function simalar to ciphertext_decrypt_split
-enum edhoc_error ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
+enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 				uint8_t *id_cred, uint32_t id_cred_len,
 				uint8_t *signature_or_mac,
 				uint32_t signature_or_mac_len, uint8_t *ead,

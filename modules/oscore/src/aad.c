@@ -14,12 +14,12 @@
 #include "../inc/print_util.h"
 #include "../cbor/aad_array.h"
 
-enum oscore_error create_aad(struct o_coap_option *options, uint16_t opt_num,
+enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 			     enum AEAD_algorithm aead_alg,
 			     struct byte_array *kid, struct byte_array *piv,
 			     struct byte_array *out)
 {
-	enum oscore_error r;
+	enum err r;
 
 	bool success_encoding;
 	struct aad_array aad_array;

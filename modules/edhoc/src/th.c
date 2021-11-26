@@ -11,8 +11,8 @@
 #include "../inc/th.h"
 
 #include "../edhoc.h"
-#include "../inc/crypto_wrapper.h"
-#include "../inc/error.h"
+#include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/c_x.h"
@@ -32,7 +32,7 @@
  * @param   th2_input ouput buffer for the data structure
  * @param   th2_input_len length of th2_input
  */
-static inline enum edhoc_error
+static inline enum err
 th2_input_encode(uint8_t *hash_msg1, uint32_t hash_msg1_len, uint8_t *g_y,
 		 uint32_t g_y_len, struct c_x *c_r, uint8_t *th2_input,
 		 uint16_t *th2_input_len)
@@ -80,7 +80,7 @@ th2_input_encode(uint8_t *hash_msg1, uint32_t hash_msg1_len, uint8_t *g_y,
  * @param   th3_input ouput buffer for the data structure
  * @param   th3_input_len length of th3_input
  */
-static inline enum edhoc_error th3_input_encode(uint8_t *th2, uint8_t th2_len,
+static inline enum err th3_input_encode(uint8_t *th2, uint8_t th2_len,
 						uint8_t *ciphertext_2,
 						uint16_t ciphertext_2_len,
 						uint8_t *th3_input,
@@ -116,7 +116,7 @@ static inline enum edhoc_error th3_input_encode(uint8_t *th2, uint8_t th2_len,
  * @param   th4_input ouput buffer for the data structure
  * @param   th4_input_len length of th4_input
  */
-static inline enum edhoc_error th4_input_encode(uint8_t *th3, uint8_t th3_len,
+static inline enum err th4_input_encode(uint8_t *th3, uint8_t th3_len,
 						uint8_t *ciphertext_3,
 						uint16_t ciphertext_3_len,
 						uint8_t *th4_input,
@@ -144,7 +144,7 @@ static inline enum edhoc_error th4_input_encode(uint8_t *th3, uint8_t th3_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
+enum err th2_calculate(enum hash_alg alg, uint8_t *msg1,
 			       uint32_t msg1_len, uint8_t *g_y,
 			       uint32_t g_y_len, struct c_x *c_r, uint8_t *th2)
 {
@@ -161,7 +161,7 @@ enum edhoc_error th2_calculate(enum hash_alg alg, uint8_t *msg1,
 	return edhoc_no_error;
 }
 
-enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
+enum err th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 			       uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
 			       uint8_t *th3)
 {
@@ -175,7 +175,7 @@ enum edhoc_error th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
+enum err th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
 			       uint8_t *ciphertext_3, uint16_t ciphertext_3_len,
 			       uint8_t *th4)
 {

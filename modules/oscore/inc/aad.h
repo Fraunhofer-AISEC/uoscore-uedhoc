@@ -12,7 +12,7 @@
 #ifndef AAD_H
 #define AAD_H
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "error.h"
 #include "option.h"
 #include "supported_algorithm.h"
@@ -28,9 +28,9 @@
  *          sequence number.
  * @param   out out-array. Must have the exact length as 
  *          provided by `aad_length`.
- * @return oscore_error
+ * @return err
  */
-enum oscore_error create_aad(struct o_coap_option *options, uint16_t opt_num,
+enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 		       enum AEAD_algorithm aead_alg, struct byte_array *kid,
 		       struct byte_array *piv, struct byte_array *out);
 

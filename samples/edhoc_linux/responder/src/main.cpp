@@ -105,7 +105,7 @@ static int send_coap_reply(CoapPDU *pdu)
 	return 0;
 }
 
-enum edhoc_error tx(uint8_t *data, uint32_t data_len)
+enum err tx(uint8_t *data, uint32_t data_len)
 {
 	txPDU->setCode(CoapPDU::COAP_CHANGED);
 	txPDU->setPayload(data, data_len);
@@ -113,7 +113,7 @@ enum edhoc_error tx(uint8_t *data, uint32_t data_len)
 	return edhoc_no_error;
 }
 
-enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
+enum err rx(uint8_t *data, uint32_t *data_len)
 {
 	int n;
 

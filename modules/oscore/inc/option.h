@@ -15,7 +15,7 @@
 #include <stdint.h>
 //#include <net/coap.h>
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "coap.h"
 #include "error.h"
 
@@ -75,9 +75,9 @@ bool (*class_to_condition(enum option_class class))(uint16_t code);
  * @param   out Out-array. Must be at least `num_options(...)` long or NULL.
  * @param   offset_out Pointer to write byte-length of options into. 
  *          Can be NULL.
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error decode_options(struct byte_array options,
+enum err decode_options(struct byte_array options,
 				 struct o_coap_option *out,
 				 uint16_t *offset_out);
 
@@ -102,9 +102,9 @@ uint32_t encoded_option_len(struct o_coap_option *options, uint16_t opt_num,
  * @param   out out-pointer. Must be at least `encoded_option_len(...)` 
  *          bytes long.
  * @param   out_buf_len the length of of the out buffer
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error encode_options(struct o_coap_option *options,
+enum err encode_options(struct o_coap_option *options,
 				 uint16_t opt_num, enum option_class class,
 				 uint8_t *out, uint8_t out_buf_len);
 

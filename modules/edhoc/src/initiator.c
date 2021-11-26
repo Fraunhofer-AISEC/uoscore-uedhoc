@@ -11,9 +11,9 @@
 
 #include "../edhoc.h"
 #include "../inc/associated_data_encode.h"
-#include "../inc/crypto_wrapper.h"
+#include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/messages.h"
@@ -41,7 +41,7 @@
  * @param   msg2_struct pointer to a structure for the parsed message
  * @param   err_msg pointer to an error message structure
  */
-static inline enum edhoc_error
+static inline enum err
 msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
 	   uint32_t msg2_len, uint8_t *g_y, uint64_t g_y_len, struct c_x *c_r,
 	   uint8_t *ciphertext2, uint64_t *ciphertext2_len)
@@ -78,7 +78,7 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
  * @param   msg1 pointer to a buffer for holding the encoded message
  * @param   msg1_len length of the encoded message
  */
-static inline enum edhoc_error
+static inline enum err
 msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	    uint32_t *msg1_len)
 {
@@ -134,15 +134,15 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	return edhoc_no_error;
 }
 
-enum edhoc_error
+enum err
 edhoc_initiator_run(const struct edhoc_initiator_context *c,
 		    struct other_party_cred *cred_r_array, uint16_t num_cred_r,
 		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_2,
 		    uint64_t *ead_2_len, uint8_t *ead_4, uint64_t *ead_4_len,
 		    uint8_t *prk_4x3m, uint8_t prk_4x3m_len, uint8_t *th4,
 		    uint8_t th4_len,
-		    enum edhoc_error (*tx)(uint8_t *data, uint32_t data_len),
-		    enum edhoc_error (*rx)(uint8_t *data, uint32_t *data_len))
+		    enum err (*tx)(uint8_t *data, uint32_t data_len),
+		    enum err (*rx)(uint8_t *data, uint32_t *data_len))
 {
 	struct suite suite;
 	bool static_dh_i = false, static_dh_r = false;

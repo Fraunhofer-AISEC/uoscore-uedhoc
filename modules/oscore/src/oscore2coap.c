@@ -16,7 +16,7 @@
 #include "../inc/aad.h"
 #include "../inc/byte_array.h"
 #include "../inc/coap.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/nonce.h"
 #include "../inc/option.h"
 #include "../inc/oscore_cose.h"
@@ -29,7 +29,7 @@
  * @param out: pointer output compressed OSCORE_option
  * @return error types or is or not OSCORE packet
  */
-static inline enum oscore_error
+static inline enum err
 oscore_option_parser(struct o_coap_packet *in,
 		     struct compressed_oscore_option *out, bool *oscore_pkt)
 {
@@ -134,7 +134,7 @@ oscore_option_parser(struct o_coap_packet *in,
  * @param oscore_packet: complete OSCORE packet which contains the ciphertext to be decrypted
  * @return void
  */
-static inline enum oscore_error
+static inline enum err
 payload_decrypt(struct context *c, struct byte_array *out_plaintext,
 		struct o_coap_packet *oscore_packet)
 {
@@ -276,9 +276,9 @@ void options_from_oscore_reorder(struct o_coap_packet *in_oscore_packet,
  * @param in_data_len: length of input byte string
  * @param out_options: pointer to output options structure array
  * @param out_options_count: count number of output options
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error
+enum err
 oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 			     struct o_coap_option *out_options,
 			     uint8_t *out_options_count)
@@ -376,9 +376,9 @@ oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
  * @param out_E_options: output pointer to an array of E-options
  * @param E_options_cnt: count number of E-options
  * @param out_o_coap_payload: output pointer original unprotected CoAP payload
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error oscore_decrypted_payload_parser(
+enum err oscore_decrypted_payload_parser(
 	struct byte_array *in_payload, uint8_t *out_code,
 	struct o_coap_option *out_E_options, uint8_t *E_options_cnt,
 	struct byte_array *out_o_coap_payload)
@@ -439,12 +439,12 @@ enum oscore_error oscore_decrypted_payload_parser(
  * @param out_o_coap_packet: pointer to output CoAP packet
  * @return
  */
-static inline enum oscore_error
+static inline enum err
 o_coap_pkg_generate(struct byte_array *decrypted_payload,
 		    struct o_coap_packet *in_oscore_packet,
 		    struct o_coap_packet *out_o_coap_packet)
 {
-	enum oscore_error r;
+	enum err r;
 	uint8_t code = 0;
 	struct byte_array unprotected_o_coap_payload = {
 		.len = 0,
@@ -495,7 +495,7 @@ static bool is_request(struct o_coap_packet *packet)
 	}
 }
 
-static inline enum oscore_error replay_check(uint64_t sender_sequence_number,
+static inline enum err replay_check(uint64_t sender_sequence_number,
 					     uint64_t *replay_window,
 					     uint8_t replay_window_len)
 {
@@ -562,7 +562,7 @@ static void update_replay_window(uint64_t sender_seq_number,
 		    replay_window_len * sizeof(replay_window[0]));
 }
 
-enum oscore_error oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
+enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len,
 			      uint8_t *buf_out, uint16_t *buf_out_len,
 			      bool *oscore_pkg_flag, struct context *c)
 {

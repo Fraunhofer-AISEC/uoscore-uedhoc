@@ -12,8 +12,8 @@
 
 #include <stdbool.h>
 
-#include "../inc/error.h"
-enum edhoc_error authentication_type_get(enum method_type m,
+#include "../../common/inc/error.h"
+enum err authentication_type_get(enum method_type m,
 				   volatile bool *static_dh_i,
 				   volatile bool *static_dh_r)
 {

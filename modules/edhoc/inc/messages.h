@@ -12,7 +12,7 @@
 #ifndef EDHOC_MESSAGES_H
 #define EDHOC_MESSAGES_H
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 
 struct msg_1 {
 	uint8_t method_corr;

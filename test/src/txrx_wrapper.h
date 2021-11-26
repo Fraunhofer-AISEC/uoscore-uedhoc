@@ -14,7 +14,7 @@
 #include <edhoc.h>
 
 extern bool rx_initiator_switch;
-enum edhoc_error rx(uint8_t *data, uint32_t *data_len);
-enum edhoc_error tx(uint8_t *data, uint32_t data_len);
+enum err rx(uint8_t *data, uint32_t *data_len);
+enum err tx(uint8_t *data, uint32_t data_len);
 void rx_init(void);
 #endif

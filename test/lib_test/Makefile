@@ -27,14 +27,15 @@ DIR = $(PREFIX)
 # C Source files
 
 # common source files for OSCORE and EDHOC
+C_SOURCES += $(wildcard ../../modules/common/src/*.c)
 
 # EDHOC specific source files
 C_SOURCES += $(wildcard ../../modules/edhoc/src/*.c)
 C_SOURCES += $(wildcard ../../modules/edhoc/cbor/*.c)
 
 # OSCORE specific source files
-#C_SOURCES = $(wildcard ../../modules/oscore/src/*.c)
-#C_SOURCES += $(wildcard ../../modules/oscore/cbor/*.c)
+C_SOURCES += $(wildcard ../../modules/oscore/src/*.c)
+C_SOURCES += $(wildcard ../../modules/oscore/cbor/*.c)
 
 # Crypto engine
 ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519)
@@ -64,13 +65,15 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 # C includes
 
 # common include files for OSCORE and EDHOC
-
+C_INCLUDES += -I../../modules/common/inc
 
 # EDHOC specific include files
-
+C_INCLUDES += -I../../modules/edhoc/inc
+C_INCLUDES += -I../../modules/edhoc
 
 # OSCORE specific inlude files
-
+C_INCLUDES += -I../../modules/oscore/inc
+C_INCLUDES += -I../../modules/oscore
 
 # Crypto engine
 ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519) 

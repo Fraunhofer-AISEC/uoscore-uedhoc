@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/retrieve_cred.h"
@@ -21,7 +21,7 @@
 #include "../cbor/decode_id_cred_x.h"
 #include "../cbor/encode_int_type.h"
 
-enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
+enum err id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 			     uint8_t *_kid, uint32_t *kid_len)
 {
 	struct id_cred_x_map map;
@@ -66,7 +66,7 @@ enum edhoc_error id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
+enum err plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
 				  const uint8_t *sgn_or_mac,
 				  uint8_t sgn_or_mac_len, const uint8_t *ad,
 				  uint16_t ad_len, uint8_t *plaintext,

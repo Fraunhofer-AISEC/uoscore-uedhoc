@@ -8,19 +8,18 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 */
-#ifndef MEMCPY_S_H
-#define MEMCPY_S_H
-
 #include <stdint.h>
+#include <string.h>
 
 #include "error.h"
 
-/**
- * @brief memcpy_s (see [1]) may not be available in some setups thus our own 
- * implementation 
- * [1]: https://docs.microsoft.com/de-de/cpp/c-runtime-library/reference/memcpy-s-wmemcpy-s?view=msvc-160
- */
-enum edhoc_error _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
-		     uint64_t count);
-
-#endif
+enum err _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
+			   uint64_t count)
+{
+	if (destSize < count) {
+		return dest_buffer_to_small;
+	} else {
+		memcpy(dest, src, count);
+	}
+	return 0;
+}

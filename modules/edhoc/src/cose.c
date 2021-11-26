@@ -11,11 +11,11 @@
 
 #include <stdint.h>
 
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../cbor/encode_enc_structure.h"
 #include "../cbor/encode_sig_structure.h"
 
-enum edhoc_error cose_enc_structure_encode(
+enum err cose_enc_structure_encode(
 	const uint8_t *context, uint16_t context_len, const uint8_t *protected,
 	uint16_t protected_len, const uint8_t *external_aad,
 	uint16_t external_aad_len, uint8_t *out, uint16_t *out_len)
@@ -37,7 +37,7 @@ enum edhoc_error cose_enc_structure_encode(
 	return edhoc_no_error;
 }
 
-enum edhoc_error
+enum err
 cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
 			  const uint8_t *protected, uint16_t protected_len,
 			  const uint8_t *external_aad,

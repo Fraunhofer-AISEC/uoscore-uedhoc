@@ -11,9 +11,9 @@
 
 #include "../edhoc.h"
 #include "../inc/associated_data_encode.h"
-#include "../inc/crypto_wrapper.h"
+#include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/messages.h"
@@ -46,9 +46,9 @@
  * @param   c_i_len length of c_i
  * @param   ad1 axillary data 1
  * @param   ad1_len length of ad1
- * @retval an edhoc_error code
+ * @retval an err code
  */
-static inline enum edhoc_error
+static inline enum err
 msg1_parse(uint8_t *msg1, uint32_t msg1_len, enum method_type *method,
 	   uint8_t *suites_i, uint64_t *suites_i_len, uint8_t *g_x,
 	   uint64_t *g_x_len, struct c_x *c_i, uint8_t *ad1, uint64_t *ad1_len)
@@ -139,9 +139,9 @@ static inline bool selected_suite_is_supported(uint8_t selected,
  * @param   ciphertext_2_len length of ciphertext_2
  * @param   msg2 the encoded message
  * @param   msg2_len length of msg2
- * @retval  an edhoc_error error code
+ * @retval  an err error code
  */
-static inline enum edhoc_error msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
+static inline enum err msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
 					   struct c_x *c_r,
 					   const uint8_t *ciphertext_2,
 					   uint32_t ciphertext_2_len,
@@ -176,15 +176,15 @@ static inline enum edhoc_error msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error
+enum err
 edhoc_responder_run(struct edhoc_responder_context *c,
 		    struct other_party_cred *cred_i_array, uint16_t num_cred_i,
 		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_1,
 		    uint64_t *ead_1_len, uint8_t *ead_3, uint64_t *ead_3_len,
 		    uint8_t *prk_4x3m, uint16_t prk_4x3m_len, uint8_t *th4,
 		    uint16_t th4_len,
-		    enum edhoc_error (*tx)(uint8_t *data, uint32_t data_len),
-		    enum edhoc_error (*rx)(uint8_t *data, uint32_t *data_len))
+		    enum err (*tx)(uint8_t *data, uint32_t data_len),
+		    enum err (*rx)(uint8_t *data, uint32_t *data_len))
 {
 	/**************** receive and process message 1 ***********************/
 	uint8_t msg1[MSG_1_DEFAULT_SIZE];

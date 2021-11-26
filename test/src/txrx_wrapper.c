@@ -38,7 +38,7 @@ void rx_init(void)
 	msg_cnt = 1;
 }
 
-enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
+enum err rx(uint8_t *data, uint32_t *data_len)
 {
 	if (rx_initiator_switch) {
 		PRINTF("TXRX wrapper test vectors\n");
@@ -73,7 +73,7 @@ enum edhoc_error rx(uint8_t *data, uint32_t *data_len)
 	return edhoc_no_error;
 }
 
-enum edhoc_error tx(uint8_t *data, uint32_t data_len)
+enum err tx(uint8_t *data, uint32_t data_len)
 { //todo add here a test
 	return edhoc_no_error;
 }

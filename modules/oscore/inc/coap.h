@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#include "byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "error.h"
 
 #define MAX_PIV_LEN 5
@@ -106,18 +106,18 @@ struct piv_kid_context {
  * @brief   Covert a byte array to a OSCORE/CoAP struct
  * @param   in: pointer input message packet, in byte string format
  * @param   out: pointer to output OSCORE packet
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error buf2coap(struct byte_array *in, struct o_coap_packet *out);
+enum err buf2coap(struct byte_array *in, struct o_coap_packet *out);
 
 /**
  * @brief   Converts a CoAP/OSCORE packet to a byte string
  * @param   in: input CoAP/OSCORE packet
  * @param   out_byte_string: byte string containing the OSCORE packet
  * @param   out_byte_string_len: length of the byte string
- * @return  oscore_error
+ * @return  err
  */
-enum oscore_error coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
+enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			   uint16_t *out_byte_string_len);
 
 /**
@@ -125,10 +125,10 @@ enum oscore_error coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
  * @param   options: input pointer to an array of options
  * @param   options_cnt: count number of input options
  * @param   out_byte_string: output pointer to options byte string
- * @return  oscore_error
+ * @return  err
  *
  */
-enum oscore_error options_into_byte_string(struct o_coap_option *options,
+enum err options_into_byte_string(struct o_coap_option *options,
 					   uint8_t options_cnt,
 					   struct byte_array *out_byte_string);
 #endif

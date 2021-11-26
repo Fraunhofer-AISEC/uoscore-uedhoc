@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 
-#include "../inc/crypto_wrapper.h"
+#include "../../common/inc/crypto_wrapper.h"
 #include "../inc/print_util.h"
 #include "../inc/security_context.h"
 #include "../cbor/enc_structure.h"
@@ -24,9 +24,9 @@
  * @brief Encode the input AAD to defined COSE structure
  * @param external_aad: input aad to form COSE structure
  * @param out: output encoded COSE byte string
- * @return oscore_error
+ * @return err
  */
-static enum oscore_error create_enc_structure(struct byte_array *external_aad,
+static enum err create_enc_structure(struct byte_array *external_aad,
 					      struct byte_array *out)
 {
 	bool success_encoding;
@@ -51,14 +51,14 @@ static enum oscore_error create_enc_structure(struct byte_array *external_aad,
 	return oscore_no_error;
 }
 
-enum oscore_error cose_decrypt(struct byte_array *in_ciphertext,
+enum err cose_decrypt(struct byte_array *in_ciphertext,
 			       struct byte_array *out_plaintext,
 			       struct byte_array *nonce,
 			       struct byte_array *recipient_aad,
 			       struct byte_array *key)
 {
 	/* get enc_structure */
-	enum oscore_error r;
+	enum err r;
 	uint32_t aad_len = recipient_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];
 	struct byte_array aad = {
@@ -87,13 +87,13 @@ enum oscore_error cose_decrypt(struct byte_array *in_ciphertext,
 	return r;
 }
 
-enum oscore_error
+enum err
 cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 	     uint32_t out_ciphertext_len, struct byte_array *nonce,
 	     struct byte_array *sender_aad, struct byte_array *key)
 {
 	/* get enc_structure  */
-	enum oscore_error r;
+	enum err r;
 
 	uint32_t aad_len = sender_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
 	uint8_t aad_bytes[aad_len];

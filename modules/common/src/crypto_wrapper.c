@@ -8,12 +8,12 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 */
-#include "../inc/crypto_wrapper.h"
+#include "crypto_wrapper.h"
 
-#include "../inc/byte_array.h"
-#include "../inc/error.h"
-#include "../inc/print_util.h"
-#include "../inc/suites.h"
+#include "byte_array.h"
+#include "error.h"
+#include "print_util.h"
+#include "suites.h"
 
 #ifdef EDHOC_WITH_MBEDTLS
 /*
@@ -37,9 +37,132 @@ modify setting in include/psa/crypto_config.h
 #include <tinycrypt/hmac.h>
 #include <tinycrypt/ecc_dsa.h>
 #include <tinycrypt/ecc_dh.h>
+
+//todo remove try_tc
+#define try_tc(e)                                                              \
+	do {                                                                   \
+		int res = (e);                                                 \
+		if (res != TC_CRYPTO_SUCCESS) {                                \
+			return oscore_tiny_crypt_error;                        \
+		}                                                              \
+	} while (0)
+
+#define SALT_SIZE 32
+
 #endif
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
+aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
+		  struct byte_array *out, struct byte_array *key,
+		  struct byte_array *nonce, struct byte_array *aad,
+		  struct byte_array *tag)
+{
+#ifdef TINYCRYPT
+	int result = TC_CRYPTO_SUCCESS;
+
+	struct tc_ccm_mode_struct c;
+	struct tc_aes_key_sched_struct sched;
+	tc_aes128_set_encrypt_key(&sched, key->ptr);
+
+	result = tc_ccm_config(&c, &sched, nonce->ptr, nonce->len, 8);
+	if (result == 0) {
+		return oscore_tiny_crypt_error;
+	}
+
+	if (op == DECRYPT) {
+		result = tc_ccm_decryption_verification(out->ptr, out->len,
+							aad->ptr, aad->len,
+							in->ptr, in->len, &c);
+
+		if (result == 0) {
+			return oscore_authentication_error;
+		}
+
+	} else {
+		result = tc_ccm_generation_encryption(out->ptr, out->len,
+						      aad->ptr, aad->len,
+						      in->ptr, in->len, &c);
+
+		if (result == 0) {
+			return oscore_tiny_crypt_error;
+		}
+	}
+
+#endif /* TINYCRYPT */
+
+	return oscore_no_error;
+};
+
+enum err __attribute__((weak))
+hkdf_sha_256(struct byte_array *master_secret, struct byte_array *master_salt,
+	     struct byte_array *info, struct byte_array *out)
+{
+#ifdef TINYCRYPT
+
+	uint8_t default_salt[SALT_SIZE] = { 0 };
+	struct byte_array salt;
+
+	// "Note that [RFC5869] specifies that if the salt is not provided, it is
+	// set to a string of zeros.  For implementation purposes, not providing
+	// the salt is the same as setting the salt to the empty byte string.
+	// OSCORE sets the salt default value to empty byte string, which is
+	// converted to a string of zeroes (see Section 2.2 of [RFC5869])".
+	if (master_salt->ptr == NULL || master_salt->len == 0) {
+		salt.ptr = default_salt;
+		salt.len = sizeof(default_salt);
+	} else {
+		salt = *master_salt;
+	}
+
+	struct tc_hmac_state_struct h;
+
+	// extract
+	uint8_t prk[32];
+	memset(&h, 0x00, sizeof(h));
+	try_tc(tc_hmac_set_key(&h, salt.ptr, salt.len));
+	try_tc(tc_hmac_init(&h));
+	try_tc(tc_hmac_update(&h, master_secret->ptr, master_secret->len));
+	try_tc(tc_hmac_final(prk, TC_SHA256_DIGEST_SIZE, &h));
+
+	// expand
+	// "N = ceil(L/HashLen)"
+	size_t iterations = (out->len + 31) / 32;
+	// "L length of output keying material in octets (<= 255*HashLen)"
+	if (iterations > 255) {
+		return oscore_out_too_long;
+	}
+
+	uint8_t t[32] = { 0 };
+	for (uint8_t i = 1; i <= iterations; i++) {
+		memset(&h, 0x00, sizeof(h));
+		try_tc(tc_hmac_set_key(&h, prk, 32));
+		try_tc(tc_hmac_init(&h));
+		if (i > 1) {
+			try_tc(tc_hmac_update(&h, t, 32));
+		}
+		try_tc(tc_hmac_update(&h, info->ptr, info->len));
+		try_tc(tc_hmac_update(&h, &i, 1));
+		try_tc(tc_hmac_final(t, TC_SHA256_DIGEST_SIZE, &h));
+		if (out->len < i * 32) {
+			memcpy(&out->ptr[(i - 1) * 32], t, out->len % 32);
+		} else {
+			memcpy(&out->ptr[(i - 1) * 32], t, 32);
+		}
+	}
+
+	return oscore_no_error;
+
+#endif /* TINYCRYPT */
+
+}
+
+
+
+
+
+
+
+enum err __attribute__((weak))
 aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
      const uint8_t *key, const uint16_t key_len, uint8_t *nonce,
      const uint16_t nonce_len, const uint8_t *aad, const uint16_t aad_len,
@@ -70,7 +193,7 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
      const uint8_t *pk, const uint8_t pk_len, const uint8_t *msg,
      const uint16_t msg_len, uint8_t *out, uint32_t *out_len)
@@ -89,7 +212,7 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
        const uint8_t *msg, const uint16_t msg_len, const uint8_t *sgn,
        const uint16_t sgn_len, bool *result)
@@ -112,7 +235,7 @@ verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 	     uint8_t *ikm, uint8_t ikm_len, uint8_t *out)
 {
@@ -141,7 +264,7 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 	    const uint8_t *info, const uint8_t info_len, uint8_t *out,
 	    uint64_t out_len)
@@ -180,7 +303,7 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 		     const uint32_t sk_len, const uint8_t *pk,
 		     const uint32_t pk_len, uint8_t *shared_secret)
@@ -222,7 +345,7 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 {
 	if (alg == X25519) {
@@ -242,7 +365,7 @@ ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 	return edhoc_no_error;
 }
 
-enum edhoc_error __attribute__((weak))
+enum err __attribute__((weak))
 hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 {
 	if (alg == SHA_256) {

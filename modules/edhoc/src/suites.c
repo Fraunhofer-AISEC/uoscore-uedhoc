@@ -10,9 +10,9 @@
 */
 #include "../inc/suites.h"
 
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 
-enum edhoc_error get_suite(enum suite_label label, struct suite *suite)
+enum err get_suite(enum suite_label label, struct suite *suite)
 {
 	switch (label) {
 	case SUITE_0:

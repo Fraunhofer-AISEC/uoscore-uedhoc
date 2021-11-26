@@ -13,11 +13,11 @@
 #include <string.h>
 
 #include "../inc/byte_array.h"
-#include "../inc/error.h"
+#include "../../common/inc/error.h"
 #include "../inc/suites.h"
 #include "../cbor/encode_info.h"
 
-enum edhoc_error create_hkdf_info(const uint8_t *th, uint8_t th_len,
+enum err create_hkdf_info(const uint8_t *th, uint8_t th_len,
 				  const char *label, uint8_t *context,
 				  uint32_t context_len, uint64_t okm_len,
 				  uint8_t *out, uint8_t *out_len)
