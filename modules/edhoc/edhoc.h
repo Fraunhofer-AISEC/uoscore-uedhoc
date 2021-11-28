@@ -82,6 +82,9 @@
 #define SHA_DEFAULT_SIZE 32
 #define AEAD_KEY_DEFAULT_SIZE 16
 #define AEAD_IV_DEFAULT_SIZE 13
+#define P_256_PRIV_KEY_DEFAULT_SIZE 32
+#define P_256_PUB_KEY_DEFAULT_SIZE 65
+
 
 struct other_party_cred {
 	struct byte_array id_cred; /*ID_CRED_x of the other party*/

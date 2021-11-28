@@ -21,7 +21,7 @@
  */
 enum err {
 	ok = 0,
-	
+
 	error_message_received = 1,
 	error_message_sent = 2,
 
@@ -34,24 +34,24 @@ enum err {
 	unsupported_ecdh_curve = 9,
 	unsupported_aead_algorithm = 10,
 	unsupported_hash_algorithm = 11,
+	unsupported_signature_algorithm = 12,
 
-	responder_authentication_failed = 12, /*todo remove this eventually*/
-	signature_authentication_failed = 13,
-	mac_authentication_failed = 14,
-	aead_authentication_failed = 15,
-	certificate_authentication_failed = 16,
+	responder_authentication_failed = 13, /*todo remove this eventually*/
+	signature_authentication_failed = 14,
+	mac_authentication_failed = 15,
+	aead_authentication_failed = 16,
+	certificate_authentication_failed = 17,
 
-	credential_not_found = 17,
-	no_such_ca = 18,
+	credential_not_found = 18,
+	no_such_ca = 19,
 
-	message_buff_to_small = 19,
-	dest_buffer_to_small = 20,
+	message_buff_to_small = 20,
+	dest_buffer_to_small = 21,
 
-	cbor_encoding_error = 21,
-	cbor_decoding_error = 22,
-	suites_i_list_to_long = 23,
-	unexpected_result_from_ext_lib = 24,
-
+	cbor_encoding_error = 22,
+	cbor_decoding_error = 23,
+	suites_i_list_to_long = 24,
+	unexpected_result_from_ext_lib = 25,
 
 	/*OSCORE specific errors*/
 	oscore_tiny_crypt_error = 101,
@@ -73,7 +73,6 @@ enum err {
 	//cbor_encoding_error = 117,
 	not_valid_input_packet = 118,
 	replayed_packed_received = 119,
-
 
 };
 

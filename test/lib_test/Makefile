@@ -18,7 +18,7 @@ include ../lib_test/makefile_config.mk
 # $(info    CC is $(CC))
 # $(info    CFLAGS is $(CFLAGS))
 # $(info    OPT is $(OPT))
-$(info    CRYPTO_ENGINE is $(CRYPTO_ENGINE))
+# $(info    CRYPTO_ENGINE is $(CRYPTO_ENGINE))
 ################################################################################
 # Build directory
 DIR = $(PREFIX)
@@ -48,7 +48,7 @@ C_SOURCES += $(wildcard ../../externals/tinycrypt/lib/source/*.c)
 endif
 
 ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
-
+C_SOURCES += $(wildcard ../../externals/mbedtls/library/*.c)
 endif
 
 # CBOR engine
@@ -86,7 +86,10 @@ C_INCLUDES += -I../../externals/tinycrypt/lib/include
 endif
 
 ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
-
+C_INCLUDES += -I../../externals/mbedtls/library 
+C_INCLUDES += -I../../externals/mbedtls/include 
+C_INCLUDES += -I../../externals/mbedtls/include/mbedtls 
+C_INCLUDES += -I../../externals/mbedtls/include/psa 
 endif
 
 # CBOR engine

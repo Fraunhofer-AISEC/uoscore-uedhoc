@@ -81,11 +81,8 @@ static void test_responder13(void)
 }
 void test_main(void)
 {
-	/*
- * 
- *  EDHOC testvector tests
- * 
- */
+	/* EDHOC testvector tests  */
+
 	ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1),
 			 ztest_unit_test(test_initiator2),
 			 ztest_unit_test(test_initiator3),
@@ -95,7 +92,7 @@ void test_main(void)
 			 ztest_unit_test(test_initiator12),
 			 ztest_unit_test(test_initiator13));
 
-	//ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1));
+	// ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator13));
 
 	ztest_test_suite(responder_tests, ztest_unit_test(test_responder1),
 			 ztest_unit_test(test_responder2),
@@ -111,11 +108,8 @@ void test_main(void)
 	ztest_run_test_suite(initiator_tests);
 	ztest_run_test_suite(responder_tests);
 
-	/*
- * 
- *  OSCORE testvector tests
- * 
- */
+	/* OSCORE testvector tests */
+
 	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
 			 ztest_unit_test(oscore_server_test2),
 			 ztest_unit_test(oscore_client_test3),

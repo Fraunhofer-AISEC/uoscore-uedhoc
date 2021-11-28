@@ -38,6 +38,7 @@ static enum err ciphertext_encrypt_decrypt(
 	if (ctxt == CIPHERTEXT2) {
 		xor_arrays(in, key, key_len, out);
 	} else {
+		PRINT_ARRAY("in", in, in_len);
 		TRY(aead(op, in, in_len, key, key_len, nonce, nonce_len, aad,
 			 aad_len, out, out_len, tag, tag_len));
 	}

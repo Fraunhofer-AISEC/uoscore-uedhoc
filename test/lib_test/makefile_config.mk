@@ -42,26 +42,27 @@ CBOR_ENGINE += -DCDDL_GEN
 
 
 # EDHOC methods: 
-#   +-------+-------------------+-------------------+-------------------+
-#   | Value | Initiator         | Responder         | Reference         |
-#   +-------+-------------------+-------------------+-------------------+
-#   |     0 | Signature Key     | Signature Key     | [[this document]] |
-#   |     1 | Signature Key     | Static DH Key     | [[this document]] |
-#   |     2 | Static DH Key     | Signature Key     | [[this document]] |
-#   |     3 | Static DH Key     | Static DH Key     | [[this document]] |
-#   +-------+-------------------+-------------------+-------------------+
+# +-------+-------------------+-------------------+-------------------+
+# | Value | Initiator         | Responder         | Reference         |
+# +-------+-------------------+-------------------+-------------------+
+# |     0 | Signature Key     | Signature Key     | [[this document]] |
+# |     1 | Signature Key     | Static DH Key     | [[this document]] |
+# |     2 | Static DH Key     | Signature Key     | [[this document]] |
+# |     3 | Static DH Key     | Static DH Key     | [[this document]] |
+# +-------+-------------------+-------------------+-------------------+
 #
 #
 #
-#----------+-------+---------+--------------------------------------------------
-# protocol | suite | method  | ENGINE
-# ---------+-------+---------+--------------------------------------------------
-# OSCORE   |       |         | TINYCRYPT or MBEDTLS
-# EDHOC    | 0/1   | 0/1/2   | COMPACT25519 with (TINYCRYPT or MBEDTLS)
-# EDHOC    | 0/1   | 3       | MBEDTLS
-# EDHOC    | 2     | 0/1/2/3 | MBEDTLS
-# EDHOC    | 3     | 0/1/2/3 | MBEDTLS
+# +--------+---------+---------+-------------------------------------------
+# protocol | suite   | method  | ENGINE
+# +--------+---------+---------+-------------------------------------------
+# | OSCORE |         |         | TINYCRYPT or MBEDTLS
+# | EDHOC  | 0/1     | 0/1/2   | COMPACT25519 with (TINYCRYPT or MBEDTLS)
+# | EDHOC  | 0/1     | 3       | MBEDTLS or (COMPACT25519 with TINYCRYPT)
+# | EDHOC  | 2/3     | 0/1/2/3 | MBEDTLS
+# | EDHOC  | 0/1/2/3 | 0/1/2/3 | MBEDTLS and COMPACT25519
 
-CRYPTO_ENGINE += -DTINYCRYPT
+
+#CRYPTO_ENGINE += -DTINYCRYPT
 CRYPTO_ENGINE += -DCOMPACT25519
-#CRYPTO_ENGINE += -DMBEDTLS
+CRYPTO_ENGINE += -DMBEDTLS
