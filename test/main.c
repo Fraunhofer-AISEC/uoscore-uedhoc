@@ -46,7 +46,23 @@ static void test_initiator13(void)
 {
 	test_edhoc(INITIATOR, 13);
 }
-
+static void test_initiator14(void)
+{
+	test_edhoc(INITIATOR, 14);
+}
+static void test_initiator15(void)
+{
+	test_edhoc(INITIATOR, 15);
+}
+static void test_initiator16(void)
+{
+	test_edhoc(INITIATOR, 16);
+}
+static void test_initiator17(void)
+{
+	test_edhoc(INITIATOR, 17);
+}
+/********************************/
 static void test_responder1(void)
 {
 	test_edhoc(RESPONDER, 1);
@@ -79,43 +95,68 @@ static void test_responder13(void)
 {
 	test_edhoc(RESPONDER, 13);
 }
+static void test_responder14(void)
+{
+	test_edhoc(RESPONDER, 14);
+}
+static void test_responder15(void)
+{
+	test_edhoc(RESPONDER, 15);
+}
+static void test_responder16(void)
+{
+	test_edhoc(RESPONDER, 16);
+}
+static void test_responder17(void)
+{
+	test_edhoc(RESPONDER, 17);
+}
+
 void test_main(void)
 {
 	/* EDHOC testvector tests  */
 
-	ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1),
-			 ztest_unit_test(test_initiator2),
-			 ztest_unit_test(test_initiator3),
-			 ztest_unit_test(test_initiator4),
-			 ztest_unit_test(test_initiator8),
-			 ztest_unit_test(test_initiator9),
-			 ztest_unit_test(test_initiator12),
-			 ztest_unit_test(test_initiator13));
+	// ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator1),
+	// 		 ztest_unit_test(test_initiator2),
+	// 		 ztest_unit_test(test_initiator3),
+	// 		 ztest_unit_test(test_initiator4),
+	// 		 ztest_unit_test(test_initiator8),
+	// 		 ztest_unit_test(test_initiator9),
+	// 		 ztest_unit_test(test_initiator12),
+	// 		 ztest_unit_test(test_initiator13),
+	// 		 ztest_unit_test(test_initiator14),
+	// 		 ztest_unit_test(test_initiator15),
+	// 		 ztest_unit_test(test_initiator16),
+	// 		 ztest_unit_test(test_initiator17));
 
-	// ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator13));
+	ztest_test_suite(initiator_tests, ztest_unit_test(test_initiator14));
 
-	ztest_test_suite(responder_tests, ztest_unit_test(test_responder1),
-			 ztest_unit_test(test_responder2),
-			 ztest_unit_test(test_responder3),
-			 ztest_unit_test(test_responder4),
-			 ztest_unit_test(test_responder8),
-			 ztest_unit_test(test_responder9),
-			 ztest_unit_test(test_responder12),
-			 ztest_unit_test(test_responder13));
+	// ztest_test_suite(responder_tests, ztest_unit_test(test_responder1),
+	// 		 ztest_unit_test(test_responder2),
+	// 		 ztest_unit_test(test_responder3),
+	// 		 ztest_unit_test(test_responder4),
+	// 		 ztest_unit_test(test_responder8),
+	// 		 ztest_unit_test(test_responder9),
+	// 		 ztest_unit_test(test_responder12),
+	// 		 ztest_unit_test(test_responder13),
+	// 		 ztest_unit_test(test_responder14),
+	// 		 ztest_unit_test(test_responder15),
+	// 		 ztest_unit_test(test_responder16),
+	// 		 ztest_unit_test(test_responder17));
 
-	//ztest_test_suite(responder_tests, ztest_unit_test(test_responder2));
+	// ztest_test_suite(responder_tests, ztest_unit_test(test_responder14));
 
 	ztest_run_test_suite(initiator_tests);
-	ztest_run_test_suite(responder_tests);
+	// ztest_run_test_suite(responder_tests);
 
 	/* OSCORE testvector tests */
 
-	ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
-			 ztest_unit_test(oscore_server_test2),
-			 ztest_unit_test(oscore_client_test3),
-			 ztest_unit_test(oscore_server_test4),
-			 ztest_unit_test(oscore_client_test5),
-			 ztest_unit_test(oscore_server_test6));
+	// ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
+	// 		 ztest_unit_test(oscore_server_test2),
+	// 		 ztest_unit_test(oscore_client_test3),
+	// 		 ztest_unit_test(oscore_server_test4),
+	// 		 ztest_unit_test(oscore_client_test5),
+	// 		 ztest_unit_test(oscore_server_test6));
 
-	ztest_run_test_suite(oscore_tests);
+	// ztest_run_test_suite(oscore_tests);
 }

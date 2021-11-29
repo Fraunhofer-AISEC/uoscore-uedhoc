@@ -387,9 +387,10 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 			PSA_RAW_KEY_AGREEMENT_OUTPUT_SIZE(type, bits);
 
 		size_t shared_secret_len = 0;
-		TRY(psa_raw_key_agreement(PSA_ALG_ECDH, key_id, pk, pk_len,
-					  shared_secret, shared_size,
-					  &shared_secret_len));
+		PRINT_ARRAY("pk", pk, pk_len);
+		TRY(psa_raw_key_agreement(PSA_ALG_ECDH, key_id, &pk[1],
+					  pk_len - 1, shared_secret,
+					  shared_size, &shared_secret_len));
 		TRY(psa_destroy_key(key_id));
 
 #endif

@@ -2,7 +2,7 @@
 OPT = -O3
 
 # Uncomment this to print intermediery results at runtime
-#DEBUG_PRINT += -DDEBUG_PRINT
+DEBUG_PRINT += -DDEBUG_PRINT
 
 
 # CBOR engine
@@ -10,7 +10,8 @@ OPT = -O3
 CBOR_ENGINE += -DCDDL_GEN
 
 # The uoscore-uedhoc can be used with different crypto angines. 
-# The user can provide as well additinal cryptoengines. 
+# The user can provide as well additinal cryptoengines by providing 
+# implementations of the function defined (as week) in the crypto_wrapper file.
 # Curretnly we have build in support for the following engines which 
 # allow fowing modes of operation and suites:
 #
