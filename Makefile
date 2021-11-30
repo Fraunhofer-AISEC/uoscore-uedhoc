@@ -7,9 +7,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-LIB_NAME = uoscore-uedhoc.a
+LIB_NAME = libuoscore-uedhoc.a
 
-include ../lib_test/makefile_config.mk
+include makefile_config.mk
 
 # $(info    LIB_NAME is $(LIB_NAME))
 # $(info    PREFIX is $(PREFIX))
@@ -21,80 +21,86 @@ include ../lib_test/makefile_config.mk
 # $(info    CRYPTO_ENGINE is $(CRYPTO_ENGINE))
 ################################################################################
 # Build directory
-DIR = $(PREFIX)
-
+# DIR = $(PREFIX)
+DIR = build
+$(shell mkdir -p $(DIR))
 ################################################################################
 # C Source files
 
 # common source files for OSCORE and EDHOC
-C_SOURCES += $(wildcard ../../modules/common/src/*.c)
+C_SOURCES += $(wildcard modules/common/src/*.c)
 
 # EDHOC specific source files
-C_SOURCES += $(wildcard ../../modules/edhoc/src/*.c)
-C_SOURCES += $(wildcard ../../modules/edhoc/cbor/*.c)
+C_SOURCES += $(wildcard modules/edhoc/src/*.c)
+C_SOURCES += $(wildcard modules/edhoc/cbor/*.c)
 
 # OSCORE specific source files
-C_SOURCES += $(wildcard ../../modules/oscore/src/*.c)
-C_SOURCES += $(wildcard ../../modules/oscore/cbor/*.c)
+C_SOURCES += $(wildcard modules/oscore/src/*.c)
+C_SOURCES += $(wildcard modules/oscore/cbor/*.c)
 
 # Crypto engine
-ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519)
-C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
-C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
-endif
+#ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519)
+#C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
+#C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
+#endif
 
-ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
-C_SOURCES += $(wildcard ../../externals/tinycrypt/lib/source/*.c)
-endif
+#ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
+#C_SOURCES += $(wildcard ../../externals/tinycrypt/lib/source/*.c)
+#endif
 
-ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
-C_SOURCES += $(wildcard ../../externals/mbedtls/library/*.c)
-endif
+#ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
+#C_SOURCES += $(wildcard ../../externals/mbedtls/library/*.c)
+#C_SOURCES += $(wildcard ../../externals/mbedtls_ecp_compression/#ecc_point_compression.c)
+#endif
 
 # CBOR engine
-ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
-C_SOURCES += $(wildcard ../../externals/cddl-gen/src/*.c)
-endif
-
+#ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
+#C_SOURCES += $(wildcard ../../externals/cddl-gen/src/*.c)
+#endif
 
 
 #$(info    \n C_SOURCES is $(C_SOURCES))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 
 ################################################################################
+# libraries 
+
+
+################################################################################
 # C includes
 
 # common include files for OSCORE and EDHOC
-C_INCLUDES += -I../../modules/common/inc
+C_INCLUDES += -Imodules/common/inc
 
 # EDHOC specific include files
-C_INCLUDES += -I../../modules/edhoc/inc
-C_INCLUDES += -I../../modules/edhoc
+C_INCLUDES += -Imodules/edhoc/inc
+C_INCLUDES += -Imodules/edhoc
 
 # OSCORE specific inlude files
-C_INCLUDES += -I../../modules/oscore/inc
-C_INCLUDES += -I../../modules/oscore
+C_INCLUDES += -Imodules/oscore/inc
+C_INCLUDES += -Imodules/oscore
 
 # Crypto engine
 ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519) 
-C_INCLUDES += -I../../externals/compact25519/src/c25519/ 
-C_INCLUDES += -I../../externals/compact25519/src/ 
+C_INCLUDES += -Iexternals/compact25519/src/c25519/ 
+C_INCLUDES += -Iexternals/compact25519/src/ 
 endif
 
 ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
-C_INCLUDES += -I../../externals/tinycrypt/lib/include
+C_INCLUDES += -Iexternals/tinycrypt/lib/include
 endif
 
 ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
-C_INCLUDES += -I../../externals/mbedtls/library 
-C_INCLUDES += -I../../externals/mbedtls/include 
-C_INCLUDES += -I../../externals/mbedtls/include/mbedtls 
-C_INCLUDES += -I../../externals/mbedtls/include/psa 
+C_INCLUDES += -Iexternals/mbedtls/library 
+C_INCLUDES += -Iexternals/mbedtls/include 
+C_INCLUDES += -Iexternals/mbedtls/include/mbedtls 
+C_INCLUDES += -Iexternals/mbedtls/include/psa 
+C_INCLUDES += -Iexternals/mbedtls_ecp_compression
 endif
 
 # CBOR engine
 ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
-C_INCLUDES += -I../../externals/cddl-gen/include
+C_INCLUDES += -Iexternals/cddl-gen/include
 endif
 
 ################################################################################
@@ -121,6 +127,11 @@ CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
 # required for gddl-gen library
 CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 
+# use AddressSanitizer to find memory bugs
+# comment this out for better speed
+#CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+#CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+#LDFLAGS += -fsanitize=address -static-libasan
 
 #$(info    CFLAGS1 is $(CFLAGS1))
 ################################################################################
@@ -129,7 +140,8 @@ CFLAGS1 += -DCDDL_CBOR_CANONICAL
 OBJ = $(addprefix $(DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 #$(info    \n OBJ is $(OBJ))
 
-$(DIR)/libtest.a: $(OBJ)
+
+$(DIR)/$(LIB_NAME): $(OBJ)
 	@echo "[Link (Static)]"
 	@$(AR) -rcs $@ $^
 
@@ -137,3 +149,5 @@ $(DIR)/%.o: %.c
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS1) $< -o $@
 
+clean:
+	rm -fR $(DIR)

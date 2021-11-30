@@ -24,3 +24,6 @@
 	path = externals/mbedtls
 	url = git@github.com:ARMmbed/mbedtls.git
 
+[submodule "externals/mbedtls_ecp_compression"]
+	path = externals/mbedtls_ecp_compression
+	url = git@github.com:mwarning/mbedtls_ecp_compression.git

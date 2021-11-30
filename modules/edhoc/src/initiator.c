@@ -41,10 +41,11 @@
  * @param   msg2_struct pointer to a structure for the parsed message
  * @param   err_msg pointer to an error message structure
  */
-static inline enum err
-msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
-	   uint32_t msg2_len, uint8_t *g_y, uint64_t g_y_len, struct c_x *c_r,
-	   uint8_t *ciphertext2, uint64_t *ciphertext2_len)
+static inline enum err msg2_parse(const struct edhoc_initiator_context *c,
+				  uint8_t *msg2, uint32_t msg2_len,
+				  uint8_t *g_y, uint64_t g_y_len,
+				  struct c_x *c_r, uint8_t *ciphertext2,
+				  uint64_t *ciphertext2_len)
 {
 	uint32_t decode_len = 0;
 	struct m2 m;
@@ -78,9 +79,8 @@ msg2_parse(const struct edhoc_initiator_context *c, uint8_t *msg2,
  * @param   msg1 pointer to a buffer for holding the encoded message
  * @param   msg1_len length of the encoded message
  */
-static inline enum err
-msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
-	    uint32_t *msg1_len)
+static inline enum err msg1_encode(const struct edhoc_initiator_context *c,
+				   uint8_t *msg1, uint32_t *msg1_len)
 {
 	struct message_1 m1;
 
@@ -134,15 +134,16 @@ msg1_encode(const struct edhoc_initiator_context *c, uint8_t *msg1,
 	return ok;
 }
 
-enum err
-edhoc_initiator_run(const struct edhoc_initiator_context *c,
-		    struct other_party_cred *cred_r_array, uint16_t num_cred_r,
-		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_2,
-		    uint64_t *ead_2_len, uint8_t *ead_4, uint64_t *ead_4_len,
-		    uint8_t *prk_4x3m, uint8_t prk_4x3m_len, uint8_t *th4,
-		    uint8_t th4_len,
-		    enum err (*tx)(uint8_t *data, uint32_t data_len),
-		    enum err (*rx)(uint8_t *data, uint32_t *data_len))
+enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
+			     struct other_party_cred *cred_r_array,
+			     uint16_t num_cred_r, uint8_t *err_msg,
+			     uint32_t *err_msg_len, uint8_t *ead_2,
+			     uint64_t *ead_2_len, uint8_t *ead_4,
+			     uint64_t *ead_4_len, uint8_t *prk_4x3m,
+			     uint8_t prk_4x3m_len, uint8_t *th4,
+			     uint8_t th4_len,
+			     enum err (*tx)(uint8_t *data, uint32_t data_len),
+			     enum err (*rx)(uint8_t *data, uint32_t *data_len))
 {
 	struct suite suite;
 	bool static_dh_i = false, static_dh_r = false;

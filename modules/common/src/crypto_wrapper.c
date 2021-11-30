@@ -17,7 +17,7 @@
 #include "suites.h"
 #include "../../edhoc/edhoc.h"
 
-#define MBEDTLS
+//#define MBEDTLS
 
 #ifdef MBEDTLS
 /*
@@ -27,7 +27,20 @@ make sure MBEDTLS_PSA_CRYPTO_CONFIG is defined in include/mbedtls/mbedtls_config
 
 modify setting in include/psa/crypto_config.h 
 */
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #include <psa/crypto.h>
+
+#include "mbedtls/mbedtls_config.h"
+#include "mbedtls/ecp.h"
+#include "mbedtls/platform.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/ecdsa.h"
+#include "mbedtls/error.h"
+#include "mbedtls/rsa.h"
+#include "mbedtls/x509.h"
+
 #endif
 
 #ifdef COMPACT25519
@@ -43,6 +56,91 @@ modify setting in include/psa/crypto_config.h
 #include <tinycrypt/hmac.h>
 #include <tinycrypt/ecc_dsa.h>
 #include <tinycrypt/ecc_dh.h>
+#endif
+
+#ifdef MBEDTLS
+
+static inline int mbedtls_ecp_decompress(const mbedtls_ecp_group *grp,
+					 const unsigned char *input,
+					 size_t ilen, unsigned char *output,
+					 size_t *olen, size_t osize)
+{
+	int ret;
+	size_t plen;
+	mbedtls_mpi r;
+	mbedtls_mpi x;
+	mbedtls_mpi n;
+
+	plen = mbedtls_mpi_size(&grp->P);
+
+	*olen = 2 * plen + 1;
+
+	if (osize < *olen)
+		return (MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL);
+
+	if (ilen != plen + 1)
+		return (MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
+
+	if (input[0] != 0x02 && input[0] != 0x03)
+		return (MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
+
+	// output will consist of 0x04|X|Y
+	memcpy(output, input, ilen);
+	output[0] = 0x04;
+
+	mbedtls_mpi_init(&r);
+	mbedtls_mpi_init(&x);
+	mbedtls_mpi_init(&n);
+
+	// x <= input
+	MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&x, input + 1, plen));
+
+	// r = x^2
+	MBEDTLS_MPI_CHK(mbedtls_mpi_mul_mpi(&r, &x, &x));
+
+	// r = x^2 + a
+	if (grp->A.p == NULL) {
+		// Special case where a is -3
+		MBEDTLS_MPI_CHK(mbedtls_mpi_sub_int(&r, &r, 3));
+	} else {
+		MBEDTLS_MPI_CHK(mbedtls_mpi_add_mpi(&r, &r, &grp->A));
+	}
+
+	// r = x^3 + ax
+	MBEDTLS_MPI_CHK(mbedtls_mpi_mul_mpi(&r, &r, &x));
+
+	// r = x^3 + ax + b
+	MBEDTLS_MPI_CHK(mbedtls_mpi_add_mpi(&r, &r, &grp->B));
+
+	// Calculate square root of r over finite field P:
+	//   r = sqrt(x^3 + ax + b) = (x^3 + ax + b) ^ ((P + 1) / 4) (mod P)
+
+	// n = P + 1
+	MBEDTLS_MPI_CHK(mbedtls_mpi_add_int(&n, &grp->P, 1));
+
+	// n = (P + 1) / 4
+	MBEDTLS_MPI_CHK(mbedtls_mpi_shift_r(&n, 2));
+
+	// r ^ ((P + 1) / 4) (mod p)
+	MBEDTLS_MPI_CHK(mbedtls_mpi_exp_mod(&r, &r, &n, &grp->P, NULL));
+
+	// Select solution that has the correct "sign" (equals odd/even solution in finite group)
+	if ((input[0] == 0x03) != mbedtls_mpi_get_bit(&r, 0)) {
+		// r = p - r
+		MBEDTLS_MPI_CHK(mbedtls_mpi_sub_mpi(&r, &grp->P, &r));
+	}
+
+	// y => output
+	ret = mbedtls_mpi_write_binary(&r, output + 1 + plen, plen);
+
+cleanup:
+	mbedtls_mpi_free(&r);
+	mbedtls_mpi_free(&x);
+	mbedtls_mpi_free(&n);
+
+	return (ret);
+}
+
 #endif
 
 enum err __attribute__((weak))
@@ -73,7 +171,6 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 #ifdef MBEDTLS
 	psa_key_id_t key_id = 0;
 
-	psa_status_t status;
 	TRY(psa_crypto_init());
 
 	psa_algorithm_t alg =
@@ -118,8 +215,8 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 #endif
 	} else if (alg == ES256) {
 #if defined(MBEDTLS)
-		(void)pk;
-		(void)pk_len;
+		// (void)pk;
+		// (void)pk_len;
 		psa_algorithm_t alg;
 		size_t bits;
 
@@ -141,14 +238,20 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 						      PSA_ECC_FAMILY_SECP_R1));
 		psa_set_key_bits(&attributes, bits);
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
+
 		TRY(psa_import_key(&attributes, sk, sk_len, &key_id));
-		size_t sign_len = *out_len;
-		*out_len = 0;
-		TRY(psa_sign_message(key_id, alg, msg, msg_len, out, sign_len,
+		//size_t sign_len =
+		//*out_len = 0;
+
+		//PRINT_ARRAY("---sk", sk, sk_len);
+		//PRINT_ARRAY("---pk", pk, pk_len);
+		//PRINT_ARRAY("---msg", msg, msg_len);
+
+		TRY(psa_sign_message(key_id, alg, msg, msg_len, out, 64,
 				     out_len));
 
-		TRY(psa_destroy_key(key_id));
 		return ok;
+
 #endif
 	}
 	return unsupported_ecdh_curve;
@@ -230,7 +333,6 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 		TRY_EXPECT(tc_hmac_final(out, TC_SHA256_DIGEST_SIZE, &h), 1);
 #endif
 #ifdef MBEDTLS
-		psa_status_t status;
 		TRY(psa_crypto_init());
 		psa_algorithm_t psa_alg = PSA_ALG_HMAC(PSA_ALG_SHA_256);
 		psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
@@ -388,8 +490,26 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 
 		size_t shared_secret_len = 0;
 		PRINT_ARRAY("pk", pk, pk_len);
-		TRY(psa_raw_key_agreement(PSA_ALG_ECDH, key_id, &pk[1],
-					  pk_len - 1, shared_secret,
+
+		size_t pk_decompressed_len;
+		uint8_t pk_decompressed[P_256_PUB_KEY_DEFAULT_SIZE];
+
+		mbedtls_pk_context ctx_verify;
+		mbedtls_pk_init(&ctx_verify);
+		mbedtls_pk_setup(&ctx_verify,
+				 mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
+		mbedtls_ecp_group_load(&mbedtls_pk_ec(ctx_verify)->grp,
+				       MBEDTLS_ECP_DP_SECP256R1);
+		mbedtls_ecp_decompress(&mbedtls_pk_ec(ctx_verify)->grp, pk,
+				       pk_len, pk_decompressed,
+				       &pk_decompressed_len,
+				       sizeof(pk_decompressed));
+
+		PRINT_ARRAY("pk_decompressed", pk_decompressed,
+			    pk_decompressed_len);
+
+		TRY(psa_raw_key_agreement(PSA_ALG_ECDH, key_id, pk_decompressed,
+					  pk_decompressed_len, shared_secret,
 					  shared_size, &shared_secret_len));
 		TRY(psa_destroy_key(key_id));
 

@@ -145,6 +145,9 @@ signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
 
 			*signature_or_mac_len =
 				get_signature_len(suite->edhoc_sign);
+			PRINT_ARRAY("***sk", sk, sk_len);
+			PRINT_ARRAY("***pk", pk, pk_len);
+			PRINT_ARRAY("***signature_struct", signature_struct, signature_struct_len);
 			TRY(sign(suite->edhoc_sign, sk, sk_len, pk, pk_len,
 				 signature_struct, signature_struct_len,
 				 signature_or_mac, signature_or_mac_len));

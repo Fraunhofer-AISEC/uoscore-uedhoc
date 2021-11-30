@@ -17,6 +17,10 @@ include_directories(
   ../externals/jsmn
   ../externals/cddl-gen/include)
 
+add_definitions(
+  -DDEBUG_PRINT
+)
+
 # The external static library that we are linking with does not know
 # how to build for this platform so we export all the flags used in
 # this zephyr build to the external build system.

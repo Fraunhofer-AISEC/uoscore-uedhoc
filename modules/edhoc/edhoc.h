@@ -67,7 +67,6 @@
 #define G_X_DEFAULT_SIZE 64
 #define G_R_DEFAULT_SIZE 64
 #define G_I_DEFAULT_SIZE 64
-#define PK_DEFAULT_SIZE 32
 #define DATA_2_DEFAULT_SIZE                                                    \
 	(C_I_DEFAULT_SIZE + G_Y_DEFAULT_SIZE + C_R_DEFAULT_SIZE)
 #define TH_INPUT_DEFAULT_SIZE (MSG_1_DEFAULT_SIZE + DATA_2_DEFAULT_SIZE)
@@ -84,7 +83,7 @@
 #define AEAD_IV_DEFAULT_SIZE 13
 #define P_256_PRIV_KEY_DEFAULT_SIZE 32
 #define P_256_PUB_KEY_DEFAULT_SIZE 65
-
+#define PK_DEFAULT_SIZE P_256_PUB_KEY_DEFAULT_SIZE
 
 struct other_party_cred {
 	struct byte_array id_cred; /*ID_CRED_x of the other party*/
@@ -163,15 +162,16 @@ ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk,
  * @param   th4 transcript hash4 used in the exporter interface
  * @param   th4_len length of th4
  */
-enum err
-edhoc_initiator_run(const struct edhoc_initiator_context *c,
-		    struct other_party_cred *cred_r_array, uint16_t num_cred_r,
-		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_2,
-		    uint64_t *ead_2_len, uint8_t *ead_4, uint64_t *ead_4_len,
-		    uint8_t *prk_4x3m, uint8_t prk_4x3m_len, uint8_t *th4,
-		    uint8_t th4_len,
-		    enum err (*tx)(uint8_t *data, uint32_t data_len),
-		    enum err (*rx)(uint8_t *data, uint32_t *data_len));
+enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
+			     struct other_party_cred *cred_r_array,
+			     uint16_t num_cred_r, uint8_t *err_msg,
+			     uint32_t *err_msg_len, uint8_t *ead_2,
+			     uint64_t *ead_2_len, uint8_t *ead_4,
+			     uint64_t *ead_4_len, uint8_t *prk_4x3m,
+			     uint8_t prk_4x3m_len, uint8_t *th4,
+			     uint8_t th4_len,
+			     enum err (*tx)(uint8_t *data, uint32_t data_len),
+			     enum err (*rx)(uint8_t *data, uint32_t *data_len));
 
 /**
  * @brief   Executes the EDHOC protocol on the responder side
@@ -193,15 +193,16 @@ edhoc_initiator_run(const struct edhoc_initiator_context *c,
  * @param   th4 transcript hash4 used in the exporter interface
  * @param   th4_len length of th4
  */
-enum err
-edhoc_responder_run(struct edhoc_responder_context *c,
-		    struct other_party_cred *cred_i_array, uint16_t num_cred_i,
-		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_1,
-		    uint64_t *ead_1_len, uint8_t *ead_3, uint64_t *ead_3_len,
-		    uint8_t *prk_4x3m, uint16_t prk_4x3m_len, uint8_t *th4,
-		    uint16_t th4_len,
-		    enum err (*tx)(uint8_t *data, uint32_t data_len),
-		    enum err (*rx)(uint8_t *data, uint32_t *data_len));
+enum err edhoc_responder_run(struct edhoc_responder_context *c,
+			     struct other_party_cred *cred_i_array,
+			     uint16_t num_cred_i, uint8_t *err_msg,
+			     uint32_t *err_msg_len, uint8_t *ead_1,
+			     uint64_t *ead_1_len, uint8_t *ead_3,
+			     uint64_t *ead_3_len, uint8_t *prk_4x3m,
+			     uint16_t prk_4x3m_len, uint8_t *th4,
+			     uint16_t th4_len,
+			     enum err (*tx)(uint8_t *data, uint32_t data_len),
+			     enum err (*rx)(uint8_t *data, uint32_t *data_len));
 
 /**
  * @brief   used to create application specific symmetric keys using the 
@@ -217,9 +218,8 @@ edhoc_responder_run(struct edhoc_responder_context *c,
  * @param   out container for the derivide key
  * @param   out_len length of the derived key
  */
-enum err edhoc_exporter(enum hash_alg app_hash_alg,
-				const uint8_t *prk_4x3m, uint16_t prk_4x3m_len,
-				const uint8_t *th4, uint16_t th4_len,
-				const char *label, uint8_t *out,
-				uint16_t out_len);
+enum err edhoc_exporter(enum hash_alg app_hash_alg, const uint8_t *prk_4x3m,
+			uint16_t prk_4x3m_len, const uint8_t *th4,
+			uint16_t th4_len, const char *label, uint8_t *out,
+			uint16_t out_len);
 #endif
