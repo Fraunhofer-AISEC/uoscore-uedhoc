@@ -467,7 +467,6 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 	}
 	if (alg == P256) {
 #ifdef MBEDTLS
-		psa_status_t status;
 		psa_key_id_t key_id;
 		psa_algorithm_t alg;
 		size_t bits;

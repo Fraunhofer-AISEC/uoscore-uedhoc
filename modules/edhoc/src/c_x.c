@@ -21,7 +21,6 @@ enum err c_x_set(enum c_x_type t, const uint8_t *c_x_raw_buf,
 				 c_x_raw_buf, c_x_raw_buf_len);
 	}
 }
-
 // void c_x_get(struct c_x *c_x, enum c_x_type *t, uint8_t *c_x_raw_buf,
 // 	     uint32_t *c_x_raw_buf_len, int *c_x_int)
 // {

@@ -7,6 +7,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+# in order to rebuild the uoscore-uedhoc.a and initiator application call: 
+# make oscore_edhoc; make
+
 # toolchain
 CXX = g++
 CC = gcc
@@ -19,10 +22,14 @@ TARGET = initiator
 # build path
 BUILD_DIR = build
 
-# build for 32 bit x68
-CFLAGS = -m32
-CXXFLAGS = -m32
-LDFLAGS = -m32
+# libusocore-uedhoc path
+USOCORE_UEDHOC_PATH = ../../../
+USOCORE_UEDHOC_BUILD_PATH = $(USOCORE_UEDHOC_PATH)build
+
+# build for 32 bit x68 
+# export the varible so that it is availbale in the uoscore-uedhoc Makefile 
+ARCH = -m32
+export ARCH
 
 # debug build?
 DEBUG = 1
@@ -61,16 +68,17 @@ C_INCLUDES += -I../../../externals/mbedtls/include/psa
 C_DEFS += -DDEBUG_PRINT
 
 # Linked libraries
-LD_LIBRARY_PATH += -L../../../build
+LD_LIBRARY_PATH += -L$(USOCORE_UEDHOC_BUILD_PATH)
 
 LDFLAGS += $(LD_LIBRARY_PATH)
 LDFLAGS += -luoscore-uedhoc
+LDFLAGS += $(ARCH) 
 ##########################################
 # CFLAGS
 ##########################################
 #general c flags
-CFLAGS +=  $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall
-CXXFLAGS += $(C_DEFS) $(C_INCLUDES) $(OPT)
+CFLAGS +=  $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall
+CXXFLAGS +=  $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT)
 
 # have dubug information
 ifeq ($(DEBUG), 1)
@@ -93,17 +101,6 @@ CFLAGS += -DCDDL_CBOR_CANONICAL
 #CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 #LDFLAGS += -fsanitize=address -static-libasan
 
-
-
-
-# export the folliwing variables so that they are available as well 
-# in the sub makefiles WE NEED TO EXPORT ONLY THE -m32 option
-export CFLAGS
-export CXXFLAGS
-export LDFLAGS
-
-
-
 ###########################################
 # default action: build all
 ###########################################
@@ -115,7 +112,7 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(CPP_SOURCES:.cpp=.o)))
 vpath %.cpp $(sort $(dir $(CPP_SOURCES)))
 
-
+USOCORE_UEDHOC_OBJ = $(wildcard $(USOCORE_UEDHOC_PATH)/*.o) 
 
 $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR) 
 	$(CXX) -c $(CXXFLAGS) $< -o $@
@@ -123,21 +120,25 @@ $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR)
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
-$(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile
+$(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile $(USOCORE_UEDHOC_PATH)/Makefile $(USOCORE_UEDHOC_OBJ)
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH)
 	$(CXX) $(OBJECTS)  $(LDFLAGS) -o $@
 	$(SZ) $@
 
 $(BUILD_DIR):
 	mkdir $@
-	$(MAKE) -C ../../../
 
 
 
+oscore_edhoc:
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH)
 
+clean_oscore_edhoc:
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH) clean
 
 clean:
 	-rm -fR $(BUILD_DIR)
-	$(MAKE) -C ../../../ clean
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH) clean
 
 #######################################
 # dependencies

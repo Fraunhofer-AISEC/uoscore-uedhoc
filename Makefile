@@ -89,7 +89,7 @@ endif
 ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
 C_INCLUDES += -Iexternals/tinycrypt/lib/include
 endif
-
+ 
 ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
 C_INCLUDES += -Iexternals/mbedtls/library 
 C_INCLUDES += -Iexternals/mbedtls/include 
@@ -110,6 +110,7 @@ FILTERED_CFLAGS = -Os
 CFLAGS1 = $(filter-out $(FILTERED_CFLAGS), $(CFLAGS))
 
 #add options form configuration file 
+CFLAGS1 += $(ARCH)
 CFLAGS1 += $(OPT)
 CFLAGS1 += $(DEBUG_PRINT)
 CFLAGS1 += $(CBOR_ENGINE)
@@ -141,11 +142,11 @@ OBJ = $(addprefix $(DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 #$(info    \n OBJ is $(OBJ))
 
 
-$(DIR)/$(LIB_NAME): $(OBJ)
+$(DIR)/$(LIB_NAME): $(OBJ) 
 	@echo "[Link (Static)]"
 	@$(AR) -rcs $@ $^
 
-$(DIR)/%.o: %.c
+$(DIR)/%.o: %.c Makefile
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS1) $< -o $@
 
