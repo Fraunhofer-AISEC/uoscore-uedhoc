@@ -313,7 +313,7 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 	uint16_t cred_i_len = sizeof(cred_i);
 	uint8_t pk[PK_DEFAULT_SIZE];
 	uint16_t pk_len = sizeof(pk);
-	uint8_t g_i[G_I_DEFAULT_SIZE];
+	uint8_t g_i[G_I_DEFAULT_SIZE]; 
 	uint16_t g_i_len = sizeof(g_i);
 
 	TRY(retrieve_cred(static_dh_i, cred_i_array, num_cred_i, id_cred_i,

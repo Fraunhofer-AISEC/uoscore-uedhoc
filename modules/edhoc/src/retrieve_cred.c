@@ -96,10 +96,23 @@ enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
 				*cred_len = cred_array[i].cred.len;
 				if (static_dh_auth) {
 					*pk_len = 0;
-					TRY(_memcpy_s(g, *g_len,
-						      cred_array[i].g.ptr,
-						      cred_array[i].g.len));
-					*g_len = cred_array[i].g.len;
+					if (cred_array[i].g.len == 65) {
+						/*decompressed P256 DH pk*/
+						g[0] = 0x2;
+						TRY(_memcpy_s(
+							&g[1], *g_len - 1,
+							&cred_array[i].g.ptr[1],
+							32));
+						*g_len = 33;
+
+					} else {
+						TRY(_memcpy_s(
+							g, *g_len,
+							cred_array[i].g.ptr,
+							cred_array[i].g.len));
+						*g_len = cred_array[i].g.len;
+					}
+
 				} else {
 					*g_len = 0;
 					TRY(_memcpy_s(pk, *pk_len,

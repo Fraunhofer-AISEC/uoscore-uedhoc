@@ -26,7 +26,6 @@ extern "C" {
 }
 #include "../../../../externals/cantcoap/cantcoap.h"
 
-
 #define USE_IPV4
 
 CoapPDU *txPDU = new CoapPDU();
@@ -175,7 +174,7 @@ int main()
 	uint64_t ad_3_len = sizeof(ad_1);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 14;
+	const uint8_t TEST_VEC_NUM = 17;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_i;
 	struct edhoc_responder_context c_r;

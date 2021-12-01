@@ -146,7 +146,7 @@ int main()
 	uint64_t ad_4_len = sizeof(ad_2);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 14;
+	const uint8_t TEST_VEC_NUM = 17;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_r;
 	struct edhoc_initiator_context c_i;

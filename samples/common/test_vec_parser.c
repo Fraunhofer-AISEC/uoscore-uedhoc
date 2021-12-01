@@ -110,7 +110,8 @@ static int get_element(char *test_vec_buf, jsmntok_t *t, uint32_t t_len,
 		if (jsoneq(test_vec_buf, &t[i], element_name) == 0) {
 			uint32_t len = t[i + 1].end - t[i + 1].start;
 			char *stat_str = test_vec_buf + t[i + 1].start;
-			PRINTF("%s: %.*s\n", element_name, len, stat_str);
+			PRINTF("%s (size %d): %.*s\n", element_name, len >> 1,
+			       len, stat_str);
 			TRY(str2bytes(stat_str, len, element));
 			return 0;
 		}

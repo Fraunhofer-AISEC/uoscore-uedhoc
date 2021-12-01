@@ -42,28 +42,30 @@ C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
 # C_SOURCES += $(wildcard ../../../externals/mbedtls_ecp_compression/*.c)
-C_SOURCES += $(wildcard ../../../externals/tinycrypt/lib/source/*.c)
+# C_SOURCES += $(wildcard ../../../externals/tinycrypt/lib/source/*.c)
+C_SOURCES += $(wildcard ../../../externals/mbedtls/library/*.c)
 
 # C includes
-C_INCLUDES += -I../../../externals/cantcoap/ 
 C_INCLUDES += -I../../../modules/edhoc/ 
+C_INCLUDES += -I../../../externals/cantcoap/ 
 C_INCLUDES += -I../../../externals/jsmn 
 C_INCLUDES += -I../../../externals/cddl-gen/include 
-C_INCLUDES += -I../../../externals/tinycrypt/lib/include
-# C_INCLUDES += -I../../../mbedtls_ecp_compression
-# C_INCLUDES += -I../../../mbedtls/library 
-# C_INCLUDES += -I../../../mbedtls/include 
-# C_INCLUDES += -I../../../mbedtls/include/mbedtls 
-# C_INCLUDES += -I../../../mbedtls/include/psa 
+# C_INCLUDES += -I../../../externals/tinycrypt/lib/include
+C_INCLUDES += -I../../../externals/mbedtls_ecp_compression
+C_INCLUDES += -I../../../externals/mbedtls/library 
+C_INCLUDES += -I../../../externals/mbedtls/include 
+C_INCLUDES += -I../../../externals/mbedtls/include/mbedtls 
+C_INCLUDES += -I../../../externals/mbedtls/include/psa 
+
+# C defines
+# make PRINT_ARRAY macro usable in the main file
+C_DEFS += -DDEBUG_PRINT
 
 # Linked libraries
 LD_LIBRARY_PATH += -L../../../build
-LD_LIBRARY_PATH += -L../../../externals/mbedtls/library
 
 LDFLAGS += $(LD_LIBRARY_PATH)
 LDFLAGS += -luoscore-uedhoc
-LDFLAGS += -lmbedtls -lmbedx509 -lmbedcrypto
-
 ##########################################
 # CFLAGS
 ##########################################
@@ -127,7 +129,6 @@ $(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile
 $(BUILD_DIR):
 	mkdir $@
 	$(MAKE) -C ../../../
-	$(MAKE) -C ../../../externals/mbedtls no_test
 
 
 
@@ -135,7 +136,9 @@ $(BUILD_DIR):
 clean:
 	-rm -fR $(BUILD_DIR)
 	$(MAKE) -C ../../../ clean
-	$(MAKE) -C ../../../externals/mbedtls clean
+#	$(MAKE) -C ../../../externals/mbedtls clean
+
+
 
 #######################################
 # dependencies
