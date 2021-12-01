@@ -53,9 +53,8 @@ jobs:
       - name: Archive static lib
         uses: actions/upload-artifact@v2
         with:
-          name: uedhoc-x86
-          path: test/build_lib_test/libtest.a
-
+          name: uoscore-uedhoc-x86
+          path: test/build/uoscore_uedhoc/libuoscore-uedhoc.a
 
 # native_posix_64 
       - name: Build native_posix_64
@@ -66,3 +65,9 @@ jobs:
            rm -rf build_lib_test
            west build -b=native_posix_64
            west build -t run
+
+      - name: Archive static lib
+        uses: actions/upload-artifact@v2
+        with:
+          name: uoscore-uedhoc-x86-64
+          path: test/build/uoscore_uedhoc/libuoscore-uedhoc.a
