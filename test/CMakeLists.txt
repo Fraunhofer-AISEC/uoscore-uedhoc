@@ -10,15 +10,24 @@ FILE(GLOB app_sources
   edhoc_testvector_tests/*.c 
   oscore_testvector_tests/*.c 
   ../samples/common/test_vec_parser.c
-  ../samples/common/cbor/*.c)
+  ../samples/common/cbor/*.c
+  ../externals/cddl-gen/src/*.c
+  ../externals/compact25519/src/c25519/*.c
+  ../externals/compact25519/src/*.c
+  ../externals/mbedtls/library/*.c)
 target_sources(app PRIVATE ${app_sources})
 
 include_directories(
   ../externals/jsmn
-  ../externals/cddl-gen/include)
+  ../externals/cddl-gen/include 
+  ../externals/mbedtls/library 
+  ../externals/mbedtls/include 
+  ../externals/mbedtls/include/mbedtls 
+  ../externals/mbedtls/include/psa )
 
 add_definitions(
-  -DDEBUG_PRINT
+#  -DDEBUG_PRINT
+  -DCDDL_CBOR_CANONICAL
 )
 
 # The external static library that we are linking with does not know
@@ -38,12 +47,12 @@ include(ExternalProject)
 # Add an external project to be able download and build the third
 # party library. In this case downloading is not necessary as it has
 # been committed to the repository.
-set(lib_test_dir   ${CMAKE_CURRENT_SOURCE_DIR}/lib_test)
-set(build_lib_test_dir ${CMAKE_CURRENT_SOURCE_DIR}/build_lib_test)
+set(src_dir   ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(build_dir ${CMAKE_CURRENT_BINARY_DIR}/uoscore_uedhoc)
 
-set(LIB_TEST_LIB_DIR     ${CMAKE_CURRENT_SOURCE_DIR}/build_lib_test)
-set(LIB_EDHOC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/edhoc)
-set(LIB_OSCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/oscore)
+set(LIB_TEST_LIB_DIR     ${CMAKE_CURRENT_SOURCE_DIR}/../build)
+set(EDHOC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/edhoc)
+set(OSCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/oscore)
 
 if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
 # https://www.gnu.org/software/make/manual/html_node/MAKE-Variable.html
@@ -52,39 +61,55 @@ else() # Obviously no MAKEFLAGS. Let's hope a "make" can be found somewhere.
 set(submake "make")
 endif()
 
-
+message("build_dir: ${build_dir}")
 message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("LIB_TEST_LIB_DIR: ${LIB_TEST_LIB_DIR}")
-message("LIB_EDHOC_INCLUDE_DIR: ${LIB_EDHOC_INCLUDE_DIR}")
+message("EDHOC_INCLUDE_DIR: ${EDHOC_INCLUDE_DIR}")
 
+
+# ExternalProject_Add(
+#   libuoscore-uedhoc                 # Name for custom target
+#   PREFIX     ${build_lib_test_dir} # Root dir for entire project
+#   SOURCE_DIR ${lib_test_dir}
+#   BINARY_DIR ${lib_test_dir} # This particular build system is invoked from the root
+#   CONFIGURE_COMMAND ""    # Skip configuring the project, e.g. with autoconf
+#   BUILD_COMMAND
+#   ${submake}
+#   PREFIX=${build_lib_test_dir}
+#   CC=${CMAKE_C_COMPILER}
+#   AR=${CMAKE_AR}
+#   CFLAGS=${external_project_cflags}
+#   INSTALL_COMMAND ""      # This particular build system has no install command
+#   BUILD_BYPRODUCTS ${LIB_TEST_LIB_DIR}/libuoscore-uedhoc.a
+#   )
 
 ExternalProject_Add(
-  libtest                 # Name for custom target
-  PREFIX     ${build_lib_test_dir} # Root dir for entire project
-  SOURCE_DIR ${lib_test_dir}
-  BINARY_DIR ${lib_test_dir} # This particular build system is invoked from the root
+  oscore_edhoc_project                 # Name for custom target
+  PREFIX ${build_dir} # Root dir for entire project
+  SOURCE_DIR ${src_dir}
+  BINARY_DIR ${src_dir} # This particular build system is invoked from the root
   CONFIGURE_COMMAND ""    # Skip configuring the project, e.g. with autoconf
   BUILD_COMMAND
   ${submake}
-  PREFIX=${build_lib_test_dir}
+  PREFIX=${build_dir}
   CC=${CMAKE_C_COMPILER}
   AR=${CMAKE_AR}
   CFLAGS=${external_project_cflags}
   INSTALL_COMMAND ""      # This particular build system has no install command
-  BUILD_BYPRODUCTS ${LIB_TEST_LIB_DIR}/libtest.a
+  BUILD_BYPRODUCTS ${build_dir}/libuoscore-uedhoc.a
   )
 
 # Create a wrapper CMake library that our app can link with
 add_library(test STATIC IMPORTED GLOBAL)
 add_dependencies(
   test
-  libtest
+  oscore_edhoc_project
   )
-set_target_properties(test PROPERTIES IMPORTED_LOCATION             ${LIB_TEST_LIB_DIR}/libtest.a)
+set_target_properties(test PROPERTIES IMPORTED_LOCATION ${build_dir}/libuoscore-uedhoc.a)
 target_include_directories(test INTERFACE
-  ${LIB_EDHOC_INCLUDE_DIR}
-  ${LIB_OSCORE_INCLUDE_DIR}
+  ${EDHOC_INCLUDE_DIR}
+  ${OSCORE_INCLUDE_DIR}
 )
 
 

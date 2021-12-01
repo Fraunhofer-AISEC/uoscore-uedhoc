@@ -240,16 +240,19 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
 
 		TRY(psa_import_key(&attributes, sk, sk_len, &key_id));
-		//size_t sign_len =
-		//*out_len = 0;
+		size_t signature_length;
+		//out_len = 0;
 
 		//PRINT_ARRAY("---sk", sk, sk_len);
 		//PRINT_ARRAY("---pk", pk, pk_len);
 		//PRINT_ARRAY("---msg", msg, msg_len);
 
-		TRY(psa_sign_message(key_id, alg, msg, msg_len, out, 64,
-				     out_len));
-
+		TRY(psa_sign_message(key_id, alg, msg, msg_len, out,
+				     SIGNATURE_DEFAULT_SIZE,
+				     &signature_length));
+		if (signature_length != SIGNATURE_DEFAULT_SIZE) {
+			return sign_failed;
+		}
 		return ok;
 
 #endif
@@ -532,9 +535,10 @@ ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 		TRY_EXPECT(tc_sha256_final(extended_seed, &s), 1);
 #endif
 #ifdef MBEDTLS
-		uint32_t length;
-		TRY(psa_hash_compute(PSA_ALG_SHA_256, (uint8_t *)seed,
-				     sizeof(seed), sk, 32, &length));
+		size_t length;
+		TRY(psa_hash_compute(PSA_ALG_SHA_256, (uint8_t *)&seed,
+				     sizeof(seed), sk, SHA_DEFAULT_SIZE,
+				     &length));
 		if (length != 32) {
 			return sha_failed;
 		}
@@ -596,10 +600,10 @@ hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
 		TRY_EXPECT(tc_sha256_final(out, &s), 1);
 #endif
 #ifdef MBEDTLS
-		uint32_t length;
-		TRY(psa_hash_compute(PSA_ALG_SHA_256, in, in_len, out, 32,
-				     &length));
-		if (length != 32) {
+		size_t length;
+		TRY(psa_hash_compute(PSA_ALG_SHA_256, in, in_len, out,
+				     SHA_DEFAULT_SIZE, &length));
+		if (length != SHA_DEFAULT_SIZE) {
 			return sha_failed;
 		}
 #endif

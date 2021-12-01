@@ -21,8 +21,8 @@ include makefile_config.mk
 # $(info    CRYPTO_ENGINE is $(CRYPTO_ENGINE))
 ################################################################################
 # Build directory
-# DIR = $(PREFIX)
-DIR = build
+PREFIX ?= build
+DIR = $(PREFIX)
 $(shell mkdir -p $(DIR))
 ################################################################################
 # C Source files
@@ -126,7 +126,7 @@ CFLAGS1 += -g -gdwarf-2
 CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
 
 # required for gddl-gen library
-CFLAGS1 += -DCDDL_CBOR_CANONICAL 
+#CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
@@ -146,7 +146,7 @@ $(DIR)/$(LIB_NAME): $(OBJ)
 	@echo "[Link (Static)]"
 	@$(AR) -rcs $@ $^
 
-$(DIR)/%.o: %.c Makefile
+$(DIR)/%.o: %.c Makefile makefile_config.mk
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS1) $< -o $@
 

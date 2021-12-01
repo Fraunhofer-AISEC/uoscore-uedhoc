@@ -84,6 +84,7 @@
 #define P_256_PRIV_KEY_DEFAULT_SIZE 32
 #define P_256_PUB_KEY_DEFAULT_SIZE 65
 #define PK_DEFAULT_SIZE P_256_PUB_KEY_DEFAULT_SIZE
+#define SIGNATURE_DEFAULT_SIZE 64
 
 struct other_party_cred {
 	struct byte_array id_cred; /*ID_CRED_x of the other party*/

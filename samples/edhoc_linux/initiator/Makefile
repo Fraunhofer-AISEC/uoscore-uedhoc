@@ -42,26 +42,32 @@ CPP_SOURCES += src/main.cpp
 CPP_SOURCES += ../../../externals/cantcoap/cantcoap.cpp
 
 # C sources 
+# rename files avaible with the same name in diferent libraries
+# todo clean up this
+$(shell mv ../../../externals/compact25519/src/c25519/sha512.c ../../../externals/compact25519/src/c25519/_sha512.c )
+
 C_SOURCES += $(wildcard ../../common/*.c) 
 C_SOURCES += $(wildcard ../../common/cbor/*.c) 
 C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
+C_SOURCES += $(wildcard ../../../externals/mbedtls/library/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
-# C_SOURCES += $(wildcard ../../../externals/mbedtls_ecp_compression/*.c)
+
 # C_SOURCES += $(wildcard ../../../externals/tinycrypt/lib/source/*.c)
-C_SOURCES += $(wildcard ../../../externals/mbedtls/library/*.c)
 
 # C includes
-C_INCLUDES += -I../../../externals/cantcoap/ 
+
 C_INCLUDES += -I../../../modules/edhoc/ 
+C_INCLUDES += -I../../../externals/cantcoap/ 
 C_INCLUDES += -I../../../externals/jsmn 
 C_INCLUDES += -I../../../externals/cddl-gen/include 
-#C_INCLUDES += -I../../../externals/tinycrypt/lib/include
-C_INCLUDES += -I../../../externals/mbedtls_ecp_compression
 C_INCLUDES += -I../../../externals/mbedtls/library 
 C_INCLUDES += -I../../../externals/mbedtls/include 
 C_INCLUDES += -I../../../externals/mbedtls/include/mbedtls 
 C_INCLUDES += -I../../../externals/mbedtls/include/psa 
+C_INCLUDES += -I../../../externals/compact25519/src/
+C_INCLUDES += -I../../../externals/compact25519/src/c25519
+#C_INCLUDES += -I../../../externals/tinycrypt/lib/include
 
 # C defines
 # make PRINT_ARRAY macro usable in the main file
@@ -113,6 +119,8 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(CPP_SOURCES:.cpp=.o)))
 vpath %.cpp $(sort $(dir $(CPP_SOURCES)))
 
 USOCORE_UEDHOC_OBJ = $(wildcard $(USOCORE_UEDHOC_PATH)/*.o) 
+
+
 
 $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR) 
 	$(CXX) -c $(CXXFLAGS) $< -o $@
