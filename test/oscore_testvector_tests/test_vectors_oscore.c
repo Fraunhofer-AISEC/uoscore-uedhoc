@@ -298,3 +298,28 @@ uint8_t T7__OSCORE_RES[] = { 0x64, 0x44, 0x5d, 0x1f, 0x00, 0x00, 0x39,
 			     0xb2, 0xb6, 0x17, 0x5f, 0xf4, 0xb8, 0x65,
 			     0x8c, 0x66, 0x6a, 0x6c, 0xf8, 0x8e };
 uint8_t T7__OSCORE_RES_LEN = sizeof(T7__OSCORE_RES);
+
+/**
+ * Test 8:
+ * - Simple ACK packet should not be encrypted and result should be the same as input buffer (see RFC8613 Section 4.2)
+ */
+uint8_t T8__MASTER_SECRET[16] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+				  0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+				  0x0d, 0x0e, 0x0f, 0x10 };
+uint8_t T8__MASTER_SECRET_LEN = sizeof(T2__MASTER_SECRET);
+
+uint8_t T8__SENDER_ID[] = { 0x01 };
+uint8_t T8__SENDER_ID_LEN = sizeof(T2__SENDER_ID);
+
+uint8_t *T8__RECIPIENT_ID = NULL;
+uint8_t T8__RECIPIENT_ID_LEN = 0;
+
+uint8_t T8__MASTER_SALT[8] = { 0x9e, 0x7c, 0xa9, 0x22, 0x23, 0x78, 0x63, 0x40 };
+uint8_t T8__MASTER_SALT_LEN = sizeof(T2__MASTER_SALT);
+
+uint8_t *T8__ID_CONTEXT = NULL;
+uint8_t T8__ID_CONTEXT_LEN = 0;
+
+/*Simple ACK message (code 0=EMPTY, type 2=ACK, no payload).*/
+uint8_t T8__COAP_ACK[] = { 0x60, 0x00, 0x45, 0x69 };
+uint8_t T8__COAP_ACK_LEN = sizeof(T8__COAP_ACK);

@@ -293,3 +293,46 @@ void oscore_server_test6(void)
 			    c_server.cc.common_iv.len,
 			    "T6 common IV derivation failed");
 }
+
+/**
+ * Test 8:
+ * - Simple ACK packet should not be encrypted and result should be the same as input buffer (see RFC8613 Section 4.2)
+ */
+void oscore_misc_test8(void)
+{
+	enum err r;
+	struct context context;
+	struct oscore_init_params params = {
+		.dev_type = SERVER,
+		.master_secret.ptr = T7__MASTER_SECRET,
+		.master_secret.len = T7__MASTER_SECRET_LEN,
+		.sender_id.ptr = T7__SENDER_ID,
+		.sender_id.len = T7__SENDER_ID_LEN,
+		.recipient_id.ptr = T7__RECIPIENT_ID,
+		.recipient_id.len = T7__RECIPIENT_ID_LEN,
+		.master_salt.ptr = T7__MASTER_SALT,
+		.master_salt.len = T7__MASTER_SALT_LEN,
+		.id_context.ptr = T7__ID_CONTEXT,
+		.id_context.len = T7__ID_CONTEXT_LEN,
+		.aead_alg = OSCORE_AES_CCM_16_64_128,
+		.hkdf = OSCORE_SHA_256,
+	};
+
+	r = oscore_context_init(&params, &context);
+
+	zassert_equal(r, ok, "Error in oscore_context_init");
+
+	/*Test if encrypting simple ACK message results in valid unencrypted message, see Section 4.2*/
+	uint8_t buf_oscore[256];
+	uint16_t buf_oscore_len = sizeof(buf_oscore);
+
+	r = coap2oscore(T8__COAP_ACK, T8__COAP_ACK_LEN, 
+		(uint8_t *)&buf_oscore, &buf_oscore_len, &context);
+
+	zassert_equal(r, ok, "Error in coap2oscore");
+
+	zassert_mem_equal__(&buf_oscore, T8__COAP_ACK, T8__COAP_ACK_LEN,
+		"coap2oscore failed");
+
+	zassert_equal(buf_oscore_len, T8__COAP_ACK_LEN, "coap2oscore failed");
+}
