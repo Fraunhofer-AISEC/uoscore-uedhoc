@@ -319,10 +319,10 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 
 	if ((in_o_coap->header.code & CODE_CLASS_MASK) == REQUEST_CLASS) {
 		/*set code of requests to POST*/
-		out_oscore->header.code = POST;
+		out_oscore->header.code = CODE_REQ_POST;
 	} else {
 		/*set code of responses to Changed*/
-		out_oscore->header.code = Changed;
+		out_oscore->header.code = CODE_RESP_CHANGED;
 	}
 
 	/* U-options + OSCORE option (compare oscore option number with others)
@@ -376,7 +376,9 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 
 /**
  *@brief 	Converts a CoAP packet to OSCORE packet
- *
+ *@note		For messaging layer packets (simple ACK with no payload, code 0.00),
+ *			encryption is dismissed and raw input buffer is copied, 
+ *			as specified at section 4.2 in RFC8613.
  *@param	buf_o_coap a buffer containing a CoAP packet
  *@param	buf_o_coap_len length of the CoAP buffer
  *@param	buf_oscore a buffer where the OSCORE packet will be written
@@ -402,6 +404,13 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 
 	/*Parse the coap buf into a CoAP struct*/
 	TRY(buf2coap(&buf, &o_coap_pkt));
+
+	/* Dismiss OSCORE encryption if messaging layer detected (simple ACK, code=0.00) */
+	if ((CODE_EMPTY == o_coap_pkt.header.code) && (TYPE_ACK == o_coap_pkt.header.type)) {
+		PRINT_MSG("Messaging Layer CoAP packet detected, encryption dismissed\n");
+		*buf_oscore_len = buf_o_coap_len;
+		return _memcpy_s(buf_oscore, buf_o_coap_len, buf_o_coap, buf_o_coap_len);
+	}
 
 	/* 1. Divide CoAP options into E-option and U-option */
 	struct o_coap_option e_options[MAX_OPTION_COUNT];

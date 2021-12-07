@@ -46,10 +46,18 @@
 
 #define MAX_OPTION_COUNT 20
 
-#define CODE_CLASS_MASK 0b11100000
-#define CODE_DETAIL_MASK 0b00011111
-#define POST 0b00000010
-#define Changed 0b01000100
+
+#define TYPE_CON			0b00
+#define TYPE_NON			0b01
+#define TYPE_ACK			0b10
+#define TYPE_RST			0b11
+
+#define CODE_CLASS_MASK		0b11100000
+#define CODE_DETAIL_MASK	0b00011111
+#define CODE_EMPTY			0b00000000
+#define CODE_REQ_POST		0b00000010
+#define CODE_RESP_CHANGED	0b01000100
+
 #define REQUEST_CLASS 0
 
 /* all CoAP instances are preceeded with 'o_' to show correspondence to

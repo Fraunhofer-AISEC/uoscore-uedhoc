@@ -21,5 +21,5 @@ enum err _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
 	} else {
 		memcpy(dest, src, count);
 	}
-	return 0;
+	return ok;
 }
