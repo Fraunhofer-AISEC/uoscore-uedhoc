@@ -123,7 +123,7 @@ enum err rx(uint8_t *data, uint32_t *data_len)
 		*data_len = payload_len;
 	} else {
 		printf("insufficient space in buffer");
-		return dest_buffer_to_small;
+		return buffer_to_small;
 	}
 
 	delete recvPDU;

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "oscore.h"
 #include "../inc/aad.h"
 #include "../inc/byte_array.h"
 #include "../inc/coap.h"
@@ -138,7 +139,8 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 	for (uint8_t i = 0; i < E_options_cnt; i++)
 		temp_opt_bytes_len += 1 + 2 + 2 + E_options[i].len;
 	/* Setup buffer */
-	uint8_t temp_opt_bytes[temp_opt_bytes_len];
+	TRY(check_buffer_size(MAX_E_OPTIONS, temp_opt_bytes_len));
+	uint8_t temp_opt_bytes[MAX_E_OPTIONS];
 	memset(temp_opt_bytes, 0, temp_opt_bytes_len);
 	struct byte_array E_option_byte_string = {
 		.len = temp_opt_bytes_len,
@@ -393,8 +395,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 	struct byte_array buf;
 	uint16_t plaintext_len = 0;
 
-	PRINT_MSG(
-		"\n\n\ncoap2oscore*******************************************\n");
+	PRINT_MSG("\n\n\ncoap2oscore***************************************\n");
 	PRINT_ARRAY("Input CoAP packet", buf_o_coap, buf_o_coap_len);
 
 	buf.len = buf_o_coap_len;
@@ -423,7 +424,9 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 	}
 
 	/* Setup buffer for plaintext */
-	uint8_t plaintext_bytes[plaintext_len];
+
+	TRY(check_buffer_size(MAX_PLAINTEXT_LEN, plaintext_len));
+	uint8_t plaintext_bytes[MAX_PLAINTEXT_LEN];
 	struct byte_array plaintext = {
 		.len = plaintext_len,
 		.ptr = plaintext_bytes,
@@ -466,16 +469,18 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 	}
 
 	/*3. Encrypt the created plaintext*/
-	uint8_t ciphertext[plaintext.len + AUTH_TAG_LEN];
+	uint32_t ciphertext_len = plaintext.len + AUTH_TAG_LEN;
+	TRY(check_buffer_size(MAX_CIPHERTEXT_LEN, ciphertext_len));
+	uint8_t ciphertext[MAX_CIPHERTEXT_LEN];
 
 	TRY(plaintext_encrypt(c, &o_coap_pkt, &plaintext,
-			      (uint8_t *)&ciphertext, sizeof(ciphertext)));
+			      (uint8_t *)&ciphertext, ciphertext_len));
 
 	/*create an OSCORE packet*/
 	struct o_coap_packet oscore_pkt;
 	TRY(oscore_pkg_generate(&o_coap_pkt, &oscore_pkt, u_options,
 				u_options_cnt, (uint8_t *)&ciphertext,
-				sizeof(ciphertext), &oscore_option));
+				ciphertext_len, &oscore_option));
 
 	/*convert the oscore pkg to byte string*/
 	return coap2buf(&oscore_pkt, buf_oscore, buf_oscore_len);

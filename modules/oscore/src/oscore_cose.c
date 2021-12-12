@@ -12,7 +12,9 @@
 
 #include <stdio.h>
 
+#include "oscore.h"
 #include "../../common/inc/crypto_wrapper.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/security_context.h"
 #include "../cbor/enc_structure.h"
@@ -58,7 +60,8 @@ enum err cose_decrypt(struct byte_array *in_ciphertext,
 {
 	/* get enc_structure */
 	uint32_t aad_len = recipient_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
-	uint8_t aad_bytes[aad_len];
+	TRY(check_buffer_size(MAX_AAD_LEN, aad_len));
+	uint8_t aad_bytes[MAX_AAD_LEN];
 	struct byte_array aad = {
 		.len = aad_len,
 		.ptr = aad_bytes,
@@ -87,7 +90,8 @@ enum err cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 {
 	/* get enc_structure  */
 	uint32_t aad_len = sender_aad->len + ENCRYPT0_ENCODING_OVERHEAD;
-	uint8_t aad_bytes[aad_len];
+	TRY(check_buffer_size(MAX_AAD_LEN, aad_len));
+	uint8_t aad_bytes[MAX_AAD_LEN];
 	struct byte_array aad = {
 		.len = aad_len,
 		.ptr = aad_bytes,
@@ -99,14 +103,10 @@ enum err cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 		.ptr = out_ciphertext + in_plaintext->len,
 	};
 
-	//todo remove this struct
-	struct byte_array ctxt = {
-		.len = out_ciphertext_len,
-		.ptr = out_ciphertext,
-	};
 	TRY(aead(ENCRYPT, in_plaintext->ptr, in_plaintext->len, key->ptr,
-		 key->len, nonce->ptr, nonce->len, aad.ptr, aad.len, ctxt.ptr,
-		 ctxt.len - tag.len, tag.ptr, tag.len));
+		 key->len, nonce->ptr, nonce->len, aad.ptr, aad.len,
+		 out_ciphertext, out_ciphertext_len - tag.len, tag.ptr,
+		 tag.len));
 
 	PRINT_ARRAY("tag", tag.ptr, tag.len);
 	PRINT_ARRAY("Ciphertext", out_ciphertext, out_ciphertext_len);

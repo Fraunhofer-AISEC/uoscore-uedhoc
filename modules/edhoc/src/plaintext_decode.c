@@ -30,9 +30,8 @@
  * @param	
  */
 static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
-					 const void *id, uint64_t id_len,
-					 uint8_t *id_cred_x,
-					 uint32_t *id_cred_x_len)
+				 const void *id, uint64_t id_len,
+				 uint8_t *id_cred_x, uint32_t *id_cred_x_len)
 {
 	struct id_cred_x_map map;
 	uint32_t payload_len_out;
@@ -45,7 +44,8 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 	switch (label) {
 	case kid:
 		map._id_cred_x_map_kid_present = true;
-		map._id_cred_x_map_kid._id_cred_x_map_kid = *((int32_t *)id);
+		map._id_cred_x_map_kid._id_cred_x_map_kid =
+			*((const int32_t *)id);
 		break;
 	case x5chain:
 		map._id_cred_x_map_x5chain_present = true;
@@ -72,10 +72,9 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 }
 
 enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
-				 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
-				 uint8_t *sign_or_mac,
-				 uint32_t *sign_or_mac_len, uint8_t *ad,
-				 uint32_t *ad_len)
+			 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
+			 uint8_t *sign_or_mac, uint32_t *sign_or_mac_len,
+			 uint8_t *ad, uint32_t *ad_len)
 {
 	uint32_t decode_len = 0;
 	struct plaintext p;

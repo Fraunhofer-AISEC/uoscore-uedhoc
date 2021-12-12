@@ -149,7 +149,7 @@ enum err th2_calculate(enum hash_alg alg, uint8_t *msg1, uint32_t msg1_len,
 		       uint8_t *g_y, uint32_t g_y_len, struct c_x *c_r,
 		       uint8_t *th2)
 {
-	uint8_t th2_input[TH_INPUT_DEFAULT_SIZE];
+	uint8_t th2_input[TH2_INPUT_DEFAULT_SIZE];
 	uint16_t th2_input_len = sizeof(th2_input);
 
 	uint8_t hash_msg1[SHA_DEFAULT_SIZE];
@@ -166,8 +166,9 @@ enum err th3_calculate(enum hash_alg alg, uint8_t *th2, uint8_t th2_len,
 		       uint8_t *ciphertext_2, uint16_t ciphertext_2_len,
 		       uint8_t *th3)
 {
-	uint8_t th3_input[th2_len + ciphertext_2_len + 4];
-	uint16_t th3_input_len = sizeof(th3_input);
+	uint16_t th3_input_len = th2_len + ciphertext_2_len + 4;
+	TRY(check_buffer_size(TH3_INPUT_DEFAULT_SIZE, th3_input_len));
+	uint8_t th3_input[TH3_INPUT_DEFAULT_SIZE];
 
 	TRY(th3_input_encode(th2, th2_len, ciphertext_2, ciphertext_2_len,
 			     th3_input, &th3_input_len));
@@ -180,8 +181,9 @@ enum err th4_calculate(enum hash_alg alg, uint8_t *th3, uint8_t th3_len,
 		       uint8_t *ciphertext_3, uint16_t ciphertext_3_len,
 		       uint8_t *th4)
 {
-	uint8_t th4_input[th3_len + ciphertext_3_len + 4];
-	uint64_t th4_input_len = sizeof(th4_input);
+	uint64_t th4_input_len = th3_len + ciphertext_3_len + 4;
+	TRY(check_buffer_size(TH4_INPUT_DEFAULT_SIZE, th4_input_len));
+	uint8_t th4_input[TH4_INPUT_DEFAULT_SIZE];
 
 	TRY(th4_input_encode(th3, th3_len, ciphertext_3, ciphertext_3_len,
 			     th4_input, &th4_input_len));

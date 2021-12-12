@@ -128,6 +128,47 @@ CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
 # required for gddl-gen library
 #CFLAGS1 += -DCDDL_CBOR_CANONICAL 
 
+#GCC warning flags
+CFLAGS1 += -Waddress
+CFLAGS1 += -Waggregate-return
+CFLAGS1 += -Wformat-nonliteral
+CFLAGS1 += -Wformat-security
+CFLAGS1 += -Wformat
+CFLAGS1 += -Winit-self
+CFLAGS1 += -Wmissing-include-dirs
+CFLAGS1 += -Wno-multichar
+CFLAGS1 += -Wno-parentheses
+CFLAGS1 += -Wno-type-limits
+CFLAGS1 += -Wno-unused-parameter
+CFLAGS1 += -Wunreachable-code
+CFLAGS1 += -Wwrite-strings
+CFLAGS1 += -Wpointer-arith
+CFLAGS1 += -Wall
+CFLAGS1 += -Wextra
+CFLAGS1 += -Wcast-qual
+CFLAGS1 += -Wstack-usage=4096
+CFLAGS1 += -Wconversion
+# CFLAGS1 += -Wpedantic
+#CFLAGS1 += -Werror
+
+#Clang warning flahs
+# -Wcast-qual
+# -Wconversion
+# -Wexit-time-destructors
+# -Wglobal-constructors
+# -Wmissing-noreturn
+# -Wmissing-prototypes
+# -Wno-missing-braces
+# -Wold-style-cast
+# -Wshadow
+# -Wweak-vtables
+# -Wall
+# -Wextra
+# -Wpedantic
+# -Wstack-exhausted
+# -Wconversion
+# -Werror
+
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
 #CFLAGS += -fsanitize=address -fno-omit-frame-pointer

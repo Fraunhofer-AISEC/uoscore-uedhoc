@@ -17,17 +17,16 @@
 #include "../inc/suites.h"
 #include "../cbor/encode_info.h"
 
-enum err create_hkdf_info(const uint8_t *th, uint8_t th_len,
-				  const char *label, uint8_t *context,
-				  uint32_t context_len, uint64_t okm_len,
-				  uint8_t *out, uint8_t *out_len)
+enum err create_hkdf_info(const uint8_t *th, uint8_t th_len, const char *label,
+			  uint8_t *context, uint32_t context_len,
+			  uint64_t okm_len, uint8_t *out, uint8_t *out_len)
 {
 	struct info info;
 
 	info._info_transcript_hash.value = th;
 	info._info_transcript_hash.len = th_len;
 
-	info._info_label.value = (uint8_t *)label;
+	info._info_label.value = (const uint8_t *)label;
 	info._info_label.len = strlen(label);
 
 	info._info_context.value = context;

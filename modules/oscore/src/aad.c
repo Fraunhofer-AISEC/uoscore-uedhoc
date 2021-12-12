@@ -8,18 +8,18 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 */
-
+#include "oscore.h"
 #include "../inc/aad.h"
 #include "../inc/option.h"
 #include "../inc/print_util.h"
 #include "../cbor/aad_array.h"
 #include "../../common/inc/oscore_edhoc_error.h"
+#include "../../common/inc/memcpy_s.h"
 
 enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 		    enum AEAD_algorithm aead_alg, struct byte_array *kid,
 		    struct byte_array *piv, struct byte_array *out)
 {
-
 	struct aad_array aad_array;
 
 	aad_array._aad_array_oscore_version = 1;
@@ -34,7 +34,8 @@ enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 	/* options */
 	uint32_t encoded_opt_i_len =
 		encoded_option_len(options, opt_num, CLASS_I);
-	uint8_t encoded_opt_i_bytes[encoded_opt_i_len];
+	TRY(check_buffer_size(MAX_I_OPTIONS, encoded_opt_i_len));
+	uint8_t encoded_opt_i_bytes[MAX_I_OPTIONS];
 	struct byte_array opts_i = {
 		.len = encoded_opt_i_len,
 		.ptr = encoded_opt_i_bytes,

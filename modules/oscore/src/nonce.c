@@ -41,7 +41,7 @@ enum err create_nonce(struct byte_array *id_piv, struct byte_array *piv,
 		      sizeof(padded_piv), padded_piv, sizeof(padded_piv)));
 
 	/* "4. and then XORing with the Common IV."*/
-	for (int i = 0; i < common_iv->len; i++) {
+	for (uint32_t i = 0; i < common_iv->len; i++) {
 		nonce->ptr[i] ^= common_iv->ptr[i];
 	}
 

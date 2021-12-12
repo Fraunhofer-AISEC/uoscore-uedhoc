@@ -157,10 +157,8 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint32_t msg2_len = sizeof(msg2);
 	uint8_t msg4[MSG_4_DEFAULT_SIZE];
 	uint32_t msg4_len = sizeof(msg2);
-
-	/*in a given selected cipher suite the length of G_X and G_Y is equal*/
-	uint8_t g_y[c->g_x.len];
-	uint64_t g_y_len = sizeof(g_y);
+	uint8_t g_y[G_Y_DEFAULT_SIZE];
+	uint64_t g_y_len = get_ecdh_pk_len(suite.edhoc_ecdh);
 
 	uint8_t c_r_buf[C_R_DEFAULT_SIZE];
 	struct c_x c_r;
@@ -203,8 +201,8 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*calculate th2*/
 	uint8_t th2[SHA_DEFAULT_SIZE];
-	TRY(th2_calculate(suite.edhoc_hash, msg1, msg1_len, g_y, sizeof(g_y),
-			  &c_r, th2));
+	TRY(th2_calculate(suite.edhoc_hash, msg1, msg1_len, g_y, g_y_len, &c_r,
+			  th2));
 
 	/*calculate PRK_2e*/
 	uint8_t PRK_2e[PRK_DEFAULT_SIZE];
@@ -255,13 +253,13 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*derive prk_4x3m*/
 	TRY(prk_derive(static_dh_i, suite, (uint8_t *)&PRK_3e2m,
-		       sizeof(PRK_3e2m), g_y, sizeof(g_y), c->i.ptr, c->i.len,
+		       sizeof(PRK_3e2m), g_y, g_y_len, c->i.ptr, c->i.len,
 		       prk_4x3m));
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
 	/*calculate Signature_or_MAC_3*/
 	uint32_t sign_or_mac_3_len = get_signature_len(suite.edhoc_sign);
-	uint8_t sign_or_mac_3[sign_or_mac_3_len];
+	uint8_t sign_or_mac_3[SIGNATURE_DEFAULT_SIZE];
 
 	TRY(signature_or_mac(GENERATE, static_dh_i, &suite, c->sk_i.ptr,
 			     c->sk_i.len, c->pk_i.ptr, c->pk_i.len, prk_4x3m,
@@ -279,8 +277,9 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			   &ciphertext_3_len));
 
 	/*massage 3 create and send*/
-	uint8_t msg3[ciphertext_3_len + 2];
-	uint64_t msg3_len = sizeof(msg3);
+	uint64_t msg3_len = ciphertext_3_len + 2;
+	TRY(check_buffer_size(CIPHERTEXT3_DEFAULT_SIZE, msg3_len));
+	uint8_t msg3[CIPHERTEXT3_DEFAULT_SIZE];
 
 	TRY(encode_byte_string(ciphertext_3, ciphertext_3_len, msg3,
 			       &msg3_len));

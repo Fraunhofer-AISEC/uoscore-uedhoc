@@ -15,6 +15,7 @@
 #include "oscore_edhoc_error.h"
 #include "print_util.h"
 #include "suites.h"
+#include "memcpy_s.h"
 #include "../../edhoc/edhoc.h"
 
 //#define MBEDTLS
@@ -406,7 +407,10 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 		psa_key_id_t key_id = 0;
 		TRY(psa_import_key(&attr, prk, prk_len, &key_id));
 		size_t combo_len = 32 + info_len + 1;
-		uint8_t combo[combo_len];
+
+		TRY(check_buffer_size(INFO_DEFAULT_SIZE, combo_len));
+
+		uint8_t combo[INFO_DEFAULT_SIZE];
 		uint8_t tmp_out[32];
 		memset(tmp_out, 0, 32);
 		memcpy(combo + 32, info, info_len);

@@ -27,9 +27,8 @@
  * @param   out_len length of out
  * @return  err
  */
-enum err create_hkdf_info(const uint8_t *th, uint8_t th_len,
-				  const char *label, uint8_t *context,
-				  uint32_t context_len, uint64_t okm_len,
-				  uint8_t *out, uint8_t *out_len);
+enum err create_hkdf_info(const uint8_t *th, uint8_t th_len, const char *label,
+			  uint8_t *context, uint32_t context_len,
+			  uint64_t okm_len, uint8_t *out, uint8_t *out_len);
 
 #endif

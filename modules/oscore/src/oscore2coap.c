@@ -13,10 +13,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../inc/aad.h"
-#include "../inc/byte_array.h"
-#include "../inc/coap.h"
+#include "oscore.h"
+#include "../../common/inc/byte_array.h"
 #include "../../common/inc/oscore_edhoc_error.h"
+#include "../../common/inc/memcpy_s.h"
+#include "../inc/aad.h"
+#include "../inc/coap.h"
 #include "../inc/nonce.h"
 #include "../inc/option.h"
 #include "../inc/oscore_cose.h"
@@ -152,12 +154,11 @@ static inline enum err payload_decrypt(struct context *c,
  * @param E_options: input pointer to E-options array
  * @param E_options_cnt: count number of input E-options
  * @param out_o_coap_packet: output pointer to CoAP packet, which will have all reordered options
- * @return void
+ * @return ok or error code
  */
-void options_from_oscore_reorder(struct o_coap_packet *in_oscore_packet,
-				 struct o_coap_option *E_options,
-				 uint8_t E_options_cnt,
-				 struct o_coap_packet *out_o_coap_packet)
+static inline enum err options_from_oscore_reorder(
+	struct o_coap_packet *in_oscore_packet, struct o_coap_option *E_options,
+	uint8_t E_options_cnt, struct o_coap_packet *out_o_coap_packet)
 {
 	uint16_t temp_delta_sum = 0;
 	uint8_t temp_opt_cnt = in_oscore_packet->options_cnt + E_options_cnt;
@@ -165,7 +166,8 @@ void options_from_oscore_reorder(struct o_coap_packet *in_oscore_packet,
 
 	/* Get all option numbers */
 	if (o_coap_opt_cnt > 0) {
-		uint8_t temp_opt_number[o_coap_opt_cnt];
+		TRY(check_buffer_size(MAX_OPTION_COUNT, o_coap_opt_cnt));
+		uint8_t temp_opt_number[MAX_OPTION_COUNT];
 		memset(temp_opt_number, 0, o_coap_opt_cnt);
 
 		/* Get all option numbers but discard OSCORE option */
@@ -268,6 +270,7 @@ void options_from_oscore_reorder(struct o_coap_packet *in_oscore_packet,
 		/* No any options! */
 		out_o_coap_packet->options_cnt = 0;
 	}
+	return ok;
 }
 
 /**
@@ -476,8 +479,8 @@ o_coap_pkg_generate(struct byte_array *decrypted_payload,
 		out_o_coap_packet->payload = unprotected_o_coap_payload.ptr;
 
 	/* reorder all options, and copy it to output coap packet */
-	options_from_oscore_reorder(in_oscore_packet, E_options, E_options_cnt,
-				    out_o_coap_packet);
+	TRY(options_from_oscore_reorder(in_oscore_packet, E_options,
+					E_options_cnt, out_o_coap_packet));
 	return ok;
 }
 
@@ -566,8 +569,7 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
 	struct compressed_oscore_option oscore_option;
 	struct byte_array buf;
 
-	PRINT_MSG(
-		"\n\n\noscore2coap*******************************************\n");
+	PRINT_MSG("\n\n\noscore2coap***************************************\n");
 	PRINT_ARRAY("Input OSCORE packet", buf_in, buf_in_len);
 
 	buf.ptr = buf_in;
@@ -611,10 +613,12 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
 		}
 
 		/* Setup buffer for the plaintext. The plaintext is shorter than the ciphertext because of the authentication tag*/
-		uint8_t plaintext_bytes[oscore_packet.payload_len -
-					AUTH_TAG_LEN];
+		uint32_t plaintext_bytes_len =
+			oscore_packet.payload_len - AUTH_TAG_LEN;
+		TRY(check_buffer_size(MAX_PLAINTEXT_LEN, plaintext_bytes_len));
+		uint8_t plaintext_bytes[MAX_PLAINTEXT_LEN];
 		struct byte_array plaintext = {
-			.len = sizeof(plaintext_bytes),
+			.len = plaintext_bytes_len,
 			.ptr = plaintext_bytes,
 		};
 

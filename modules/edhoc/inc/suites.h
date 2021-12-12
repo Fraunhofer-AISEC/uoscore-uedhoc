@@ -78,4 +78,5 @@ uint32_t get_aead_mac_len(enum aead_alg alg);
 uint32_t get_aead_key_len(enum aead_alg alg);
 uint32_t get_aead_iv_len(enum aead_alg alg);
 uint32_t get_signature_len(enum sign_alg alg);
+uint32_t get_ecdh_pk_len(enum ecdh_alg alg);
 #endif

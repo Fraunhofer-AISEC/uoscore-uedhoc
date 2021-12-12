@@ -11,9 +11,10 @@
 
 #include "byte_array.h"
 
+uint8_t EMPTY_STRING[] = { "" };
 struct byte_array EMPTY_ARRAY = {
 	.len = 0,
-	.ptr = (uint8_t *)"",
+	.ptr = EMPTY_STRING,
 };
 
 struct byte_array NULL_ARRAY = {
@@ -33,7 +34,7 @@ bool array_equals(const struct byte_array *left, const struct byte_array *right)
 	if (left->len != right->len) {
 		return false;
 	}
-	for (int i = 0; i < left->len; i++) {
+	for (uint32_t i = 0; i < left->len; i++) {
 		if (left->ptr[i] != right->ptr[i]) {
 			return false;
 		}

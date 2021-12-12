@@ -9,15 +9,15 @@
    except according to those terms.
 */
 
-#include "../inc/coap.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "oscore.h"
 #include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
+#include "../inc/coap.h"
 
 enum err options_into_byte_string(struct o_coap_option *options,
 				  uint8_t options_cnt,
@@ -320,8 +320,9 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 	uint16_t temp_opt_bytes_len = 0;
 	for (uint8_t i = 0; i < in->options_cnt; i++)
 		temp_opt_bytes_len += 1 + 2 + 2 + in->options[i].len;
-	uint8_t temp_opt_bytes[temp_opt_bytes_len];
-	memset(temp_opt_bytes, 0, sizeof(temp_opt_bytes));
+	TRY(check_buffer_size(MAX_COAP_OPTIONS_LEN, temp_opt_bytes_len));
+	uint8_t temp_opt_bytes[MAX_COAP_OPTIONS_LEN];
+	memset(temp_opt_bytes, 0, temp_opt_bytes_len);
 
 	struct byte_array option_byte_string = {
 		.len = temp_opt_bytes_len,
@@ -339,7 +340,6 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 	TRY(_memcpy_s(temp_out_ptr, dest_size, temp_opt_bytes,
 		      option_byte_string.len));
 
-
 	temp_out_ptr += option_byte_string.len;
 
 	/* Payload */
@@ -350,7 +350,6 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
 			    (temp_out_ptr + 1 - out_byte_string);
 		TRY(_memcpy_s(++temp_out_ptr, dest_size, in->payload,
 			      in->payload_len));
-
 	}
 	*out_byte_string_len = 4 + in->header.TKL + option_byte_string.len;
 	if (in->payload_len) {
