@@ -69,7 +69,7 @@ static enum err derive_common_iv(struct common_context *cc)
 	TRY(derive(cc, &EMPTY_ARRAY, IV, &cc->common_iv));
 	PRINT_ARRAY("Common IV", cc->common_iv.ptr, cc->common_iv.len);
 	return ok;
-};
+}
 
 /**
  * @brief    Derives the Sender Key 
@@ -83,7 +83,7 @@ static enum err derive_sender_key(struct common_context *cc,
 	TRY(derive(cc, &sc->sender_id, KEY, &sc->sender_key));
 	PRINT_ARRAY("Sender Key", sc->sender_key.ptr, sc->sender_key.len);
 	return ok;
-};
+}
 
 /**
  * @brief    Derives the Recipient Key 
@@ -99,7 +99,7 @@ static enum err derive_recipient_key(struct common_context *cc,
 	PRINT_ARRAY("Recipient Key", rc->recipient_key.ptr,
 		    rc->recipient_key.len);
 	return ok;
-};
+}
 
 enum err context_update(enum dev_type dev, struct o_coap_option *options,
 			uint16_t opt_num, struct byte_array *new_piv,
@@ -244,8 +244,9 @@ enum err sender_seq_num2piv(uint64_t ssn, struct byte_array *piv)
 	//todo here we can start at 4?
 	for (int8_t i = 7; i >= 0; i--) {
 		if (*(p + i) > 0) {
-			TRY(_memcpy_s(piv->ptr, MAX_PIV_LEN, p, i + 1));
-			piv->len = i + 1;
+			TRY(_memcpy_s(piv->ptr, MAX_PIV_LEN, p,
+				      (uint32_t)(i + 1)));
+			piv->len = (uint32_t)(i + 1);
 			return ok;
 		}
 	}

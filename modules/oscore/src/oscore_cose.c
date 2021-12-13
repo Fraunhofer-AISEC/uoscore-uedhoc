@@ -36,7 +36,8 @@ static enum err create_enc_structure(struct byte_array *external_aad,
 
 	uint8_t context[] = { "Encrypt0" };
 	enc_structure._enc_structure_context.value = context;
-	enc_structure._enc_structure_context.len = strlen((char *)context);
+	enc_structure._enc_structure_context.len =
+		(uint32_t)strlen((char *)context);
 	enc_structure._enc_structure_protected.value = NULL;
 	enc_structure._enc_structure_protected.len = 0;
 	enc_structure._enc_structure_external_aad.value = external_aad->ptr;

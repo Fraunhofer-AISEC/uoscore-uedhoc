@@ -11,7 +11,7 @@
 OPT = -O3
 
 # Uncomment this to print intermediery results at runtime
-DEBUG_PRINT += -DDEBUG_PRINT
+#DEBUG_PRINT += -DDEBUG_PRINT
 
 
 # CBOR engine

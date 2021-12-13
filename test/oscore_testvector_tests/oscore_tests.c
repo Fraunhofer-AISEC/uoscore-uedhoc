@@ -43,7 +43,7 @@ void oscore_client_test1(void)
 	c_client.sc.sender_seq_num = 20;
 
 	uint8_t buf_oscore[256];
-	uint16_t buf_oscore_len = sizeof(buf_oscore);
+	uint32_t buf_oscore_len = sizeof(buf_oscore);
 
 	r = coap2oscore(T1__COAP_REQ, T1__COAP_REQ_LEN, (uint8_t *)&buf_oscore,
 			&buf_oscore_len, &c_client);
@@ -102,7 +102,7 @@ void oscore_client_test3(void)
 	c_client.sc.sender_seq_num = 20;
 
 	uint8_t buf_oscore[256];
-	uint16_t buf_oscore_len = sizeof(buf_oscore);
+	uint32_t buf_oscore_len = sizeof(buf_oscore);
 
 	r = coap2oscore(T3__COAP_REQ, T3__COAP_REQ_LEN, (uint8_t *)&buf_oscore,
 			&buf_oscore_len, &c_client);
@@ -150,7 +150,7 @@ void oscore_client_test5(void)
 	c_client.sc.sender_seq_num = 20;
 
 	uint8_t buf_oscore[256];
-	uint16_t buf_oscore_len = sizeof(buf_oscore);
+	uint32_t buf_oscore_len = sizeof(buf_oscore);
 
 	r = coap2oscore(T5__COAP_REQ, T5__COAP_REQ_LEN, (uint8_t *)&buf_oscore,
 			&buf_oscore_len, &c_client);
@@ -192,7 +192,7 @@ void oscore_server_test2(void)
 
 	/*Test decrypting of an incoming request*/
 	uint8_t buf_coap[256];
-	uint16_t buf_coap_len = sizeof(buf_coap);
+	uint32_t buf_coap_len = sizeof(buf_coap);
 	bool oscore_present_flag = false;
 
 	r = oscore2coap(T2__OSCORE_REQ, T2__OSCORE_REQ_LEN, buf_coap,
@@ -205,7 +205,7 @@ void oscore_server_test2(void)
 
 	/*Test generating an encrypted response, see Appendix C7*/
 	uint8_t buf_oscore[256];
-	uint16_t buf_oscore_len = sizeof(buf_oscore);
+	uint32_t buf_oscore_len = sizeof(buf_oscore);
 
 	r = coap2oscore(T2__COAP_RESPONSE, T2__COAP_RESPONSE_LEN,
 			(uint8_t *)&buf_oscore, &buf_oscore_len, &c_server);

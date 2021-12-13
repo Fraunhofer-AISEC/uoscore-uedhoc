@@ -15,11 +15,11 @@
 #include "print_util.h"
 #include "cose.h"
 
-enum err associated_data_encode(uint8_t *thX, const uint16_t thX_len,
-					uint8_t *out, uint16_t *out_len)
+enum err associated_data_encode(uint8_t *thX, const uint32_t thX_len,
+				uint8_t *out, uint32_t *out_len)
 {
 	uint8_t context_str[] = { "Encrypt0" };
 	return cose_enc_structure_encode(context_str,
-					 strlen((char *)context_str), NULL, 0,
-					 thX, thX_len, out, out_len);
+					 (uint32_t)strlen((char *)context_str),
+					 NULL, 0, thX, thX_len, out, out_len);
 }

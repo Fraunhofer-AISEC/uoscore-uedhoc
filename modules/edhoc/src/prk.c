@@ -17,10 +17,10 @@
 #include "../inc/suites.h"
 
 enum err prk_derive(bool static_dh_auth, struct suite suite,
-			    const uint8_t *prk_in, const uint8_t prk_in_len,
-			    const uint8_t *stat_pk, const uint16_t stat_pk_len,
-			    const uint8_t *stat_sk, const uint16_t stat_sk_len,
-			    uint8_t *prk_out)
+		    const uint8_t *prk_in, const uint32_t prk_in_len,
+		    const uint8_t *stat_pk, const uint32_t stat_pk_len,
+		    const uint8_t *stat_sk, const uint32_t stat_sk_len,
+		    uint8_t *prk_out)
 {
 	if (static_dh_auth) {
 		uint8_t dh_secret[ECDH_SECRET_DEFAULT_SIZE];

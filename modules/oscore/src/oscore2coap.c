@@ -92,7 +92,8 @@ oscore_option_parser(struct o_coap_packet *in,
 						temp_current_option_value_ptr;
 					out->piv.len = out->n;
 					temp_current_option_value_ptr += out->n;
-					temp_kid_len -= out->n;
+					temp_kid_len = (uint8_t)(temp_kid_len -
+								 out->n);
 					break;
 				}
 
@@ -107,8 +108,10 @@ oscore_option_parser(struct o_coap_packet *in,
 						++temp_current_option_value_ptr;
 					temp_current_option_value_ptr +=
 						out->kid_context.len;
-					temp_kid_len -=
-						(out->kid_context.len + 1);
+					temp_kid_len =
+						(uint8_t)(temp_kid_len -
+							  out->kid_context.len +
+							  1);
 				}
 
 				/* Get KID */
@@ -161,8 +164,9 @@ static inline enum err options_from_oscore_reorder(
 	uint8_t E_options_cnt, struct o_coap_packet *out_o_coap_packet)
 {
 	uint16_t temp_delta_sum = 0;
-	uint8_t temp_opt_cnt = in_oscore_packet->options_cnt + E_options_cnt;
-	uint8_t o_coap_opt_cnt = temp_opt_cnt - 1;
+	uint8_t temp_opt_cnt =
+		(uint8_t)(in_oscore_packet->options_cnt + E_options_cnt);
+	uint8_t o_coap_opt_cnt = (uint8_t)(temp_opt_cnt - 1);
 
 	/* Get all option numbers */
 	if (o_coap_opt_cnt > 0) {
@@ -190,7 +194,8 @@ static inline enum err options_from_oscore_reorder(
 		/* Reorder the option numbers from minimum to maximum */
 		// uint8_t min_opt_number;
 		for (uint8_t i = 0; i < o_coap_opt_cnt; i++) {
-			for (uint8_t k = i + 1; k < o_coap_opt_cnt; k++) {
+			uint8_t ipp = (uint8_t)(i + 1);
+			for (uint8_t k = ipp; k < o_coap_opt_cnt; k++) {
 				if (temp_opt_number[i] > temp_opt_number[k]) {
 					uint8_t temp;
 					temp = temp_opt_number[i];
@@ -212,9 +217,10 @@ static inline enum err options_from_oscore_reorder(
 				out_o_coap_packet
 					->options[out_o_coap_packet->options_cnt]
 					.delta =
-					in_oscore_packet->options[U_opt_idx]
-						.option_number -
-					temp_delta_sum;
+					(uint16_t)(in_oscore_packet
+							   ->options[U_opt_idx]
+							   .option_number -
+						   temp_delta_sum);
 				out_o_coap_packet
 					->options[out_o_coap_packet->options_cnt]
 					.len =
@@ -229,12 +235,11 @@ static inline enum err options_from_oscore_reorder(
 					.value =
 					in_oscore_packet->options[U_opt_idx]
 						.value;
-
-				temp_delta_sum +=
-					out_o_coap_packet
-						->options[out_o_coap_packet
-								  ->options_cnt]
-						.delta;
+				uint8_t j = out_o_coap_packet->options_cnt;
+				temp_delta_sum =
+					(uint16_t)(temp_delta_sum +
+						   out_o_coap_packet->options[j]
+							   .delta);
 				out_o_coap_packet->options_cnt++;
 				U_opt_idx++;
 				continue;
@@ -243,8 +248,9 @@ static inline enum err options_from_oscore_reorder(
 				out_o_coap_packet
 					->options[out_o_coap_packet->options_cnt]
 					.delta =
-					E_options[E_opt_idx].option_number -
-					temp_delta_sum;
+					(uint16_t)(E_options[E_opt_idx]
+							   .option_number -
+						   temp_delta_sum);
 				out_o_coap_packet
 					->options[out_o_coap_packet->options_cnt]
 					.len = E_options[E_opt_idx].len;
@@ -255,12 +261,11 @@ static inline enum err options_from_oscore_reorder(
 				out_o_coap_packet
 					->options[out_o_coap_packet->options_cnt]
 					.value = E_options[E_opt_idx].value;
-
-				temp_delta_sum +=
-					out_o_coap_packet
-						->options[out_o_coap_packet
-								  ->options_cnt]
-						.delta;
+				uint8_t j = out_o_coap_packet->options_cnt;
+				temp_delta_sum =
+					(uint16_t)(temp_delta_sum +
+						   out_o_coap_packet->options[j]
+							   .delta);
 				out_o_coap_packet->options_cnt++;
 				E_opt_idx++;
 				continue;
@@ -288,8 +293,8 @@ enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 	uint8_t *temp_options_ptr = in_data;
 	uint8_t temp_options_count = 0;
 	uint8_t temp_option_header_len = 0;
-	uint16_t temp_option_delta = 0;
-	uint16_t temp_option_len = 0;
+	uint8_t temp_option_delta = 0;
+	uint8_t temp_option_len = 0;
 	uint8_t temp_option_number = 0;
 
 	// Go through the in_data to find out how many options are there
@@ -305,16 +310,18 @@ enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 		// Special cases for extended option delta: 13 - 1 extra delta byte, 14 - 2 extra delta bytes, 15 - reserved
 		switch (temp_option_delta) {
 		case 13:
-			temp_option_header_len += 1;
-			temp_option_delta = *temp_options_ptr - 13;
+			temp_option_header_len =
+				(uint8_t)(temp_option_header_len + 1);
+			temp_option_delta = (uint8_t)(*temp_options_ptr - 13);
 			temp_options_ptr += 1;
 			break;
 		case 14:
-			temp_option_header_len += 2;
+			temp_option_header_len =
+				(uint8_t)(temp_option_header_len + 2);
 			temp_option_delta =
-				((uint16_t)(*temp_options_ptr) << 8 |
-				 *(temp_options_ptr + 1)) -
-				269;
+				(uint8_t)(((*temp_options_ptr) << 8 |
+					   *(temp_options_ptr + 1)) -
+					  269);
 			temp_options_ptr += 2;
 			break;
 		case 15:
@@ -328,15 +335,17 @@ enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 		// Special cases for extended option value length: 13 - 1 extra length byte, 14 - 2 extra length bytes, 15 - reserved
 		switch (temp_option_len) {
 		case 13:
-			temp_option_header_len += 1;
-			temp_option_len = *temp_options_ptr - 13;
+			temp_option_header_len =
+				(uint8_t)(temp_option_header_len + 1);
+			temp_option_len = (uint8_t)(*temp_options_ptr - 13);
 			temp_options_ptr += 1;
 			break;
 		case 14:
-			temp_option_header_len += 2;
-			temp_option_len = ((uint16_t)(*temp_options_ptr) << 8 |
-					   *(temp_options_ptr + 1)) -
-					  269;
+			temp_option_header_len =
+				(uint8_t)(temp_option_header_len + 2);
+			temp_option_len = (uint8_t)(((*temp_options_ptr) << 8 |
+						     *(temp_options_ptr + 1)) -
+						    269);
 			temp_options_ptr += 2;
 			break;
 		case 15:
@@ -347,7 +356,8 @@ enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 			break;
 		}
 
-		temp_option_number += temp_option_delta;
+		temp_option_number =
+			(uint8_t)(temp_option_number + temp_option_delta);
 		// Update in output options
 		out_options[temp_options_count].delta = temp_option_delta;
 		out_options[temp_options_count].len = temp_option_len;
@@ -360,7 +370,7 @@ enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
 				temp_options_ptr;
 
 		// Update parameters
-		i += temp_option_header_len + temp_option_len;
+		i = (uint16_t)(i + temp_option_header_len + temp_option_len);
 		temp_options_ptr += temp_option_len;
 		temp_options_count++;
 	}
@@ -387,7 +397,7 @@ enum err oscore_decrypted_payload_parser(struct byte_array *in_payload,
 					 struct byte_array *out_o_coap_payload)
 {
 	uint8_t *temp_payload_ptr = in_payload->ptr;
-	uint16_t temp_payload_len = in_payload->len;
+	uint32_t temp_payload_len = in_payload->len;
 
 	/* Code */
 	*out_code = *(temp_payload_ptr++);
@@ -425,7 +435,7 @@ enum err oscore_decrypted_payload_parser(struct byte_array *in_payload,
 		out_o_coap_payload->ptr = NULL;
 	} else {
 		/* Minus byte of 0xFF */
-		out_o_coap_payload->len = temp_payload_len - 1;
+		out_o_coap_payload->len = (uint32_t)(temp_payload_len - 1);
 		out_o_coap_payload->ptr = temp_payload_ptr;
 	}
 
@@ -549,19 +559,19 @@ static void update_replay_window(uint64_t sender_seq_number,
 			insert_sender_seq_number(sender_seq_number,
 						 replay_window, i);
 			PRINT_ARRAY("Replay window:", (uint8_t *)replay_window,
-				    replay_window_len *
-					    sizeof(replay_window[0]));
+				    (uint32_t)(replay_window_len *
+					       sizeof(replay_window[0])));
 			return;
 		}
 	}
 	insert_sender_seq_number(sender_seq_number, replay_window,
-				 replay_window_len - 1);
+				 (uint8_t)(replay_window_len - 1));
 	PRINT_ARRAY("Replay window:", (uint8_t *)replay_window,
-		    replay_window_len * sizeof(replay_window[0]));
+		    (uint32_t)(replay_window_len * sizeof(replay_window[0])));
 }
 
-enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
-		     uint16_t *buf_out_len, bool *oscore_pkg_flag,
+enum err oscore2coap(uint8_t *buf_in, uint32_t buf_in_len, uint8_t *buf_out,
+		     uint32_t *buf_out_len, bool *oscore_pkg_flag,
 		     struct context *c)
 {
 	uint8_t r = ok;

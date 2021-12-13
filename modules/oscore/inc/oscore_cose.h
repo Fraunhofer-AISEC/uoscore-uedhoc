@@ -13,7 +13,7 @@
 #define OSCORE_COSE_H
 
 #include "../../common/inc/byte_array.h"
-#include "error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 /**
  * @brief Decrypt the ciphertext
@@ -25,9 +25,9 @@
  * @return err
  */
 enum err cose_decrypt(struct byte_array *in_ciphertext,
-			       struct byte_array *out_plaintext,
-			       struct byte_array *nonce, struct byte_array *aad,
-			       struct byte_array *recipient_key);
+		      struct byte_array *out_plaintext,
+		      struct byte_array *nonce, struct byte_array *aad,
+		      struct byte_array *recipient_key);
 
 /**
  * @brief Encrypt the plaintext
@@ -38,8 +38,7 @@ enum err cose_decrypt(struct byte_array *in_ciphertext,
  * @param sender_key the sender key
  * @return err
  */
-enum err
-cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
-	     uint32_t out_ciphertext_len, struct byte_array *nonce,
-	     struct byte_array *sender_aad, struct byte_array *key);
+enum err cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
+		      uint32_t out_ciphertext_len, struct byte_array *nonce,
+		      struct byte_array *sender_aad, struct byte_array *key);
 #endif

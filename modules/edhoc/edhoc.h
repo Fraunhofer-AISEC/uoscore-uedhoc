@@ -88,6 +88,7 @@
 #define P_256_PUB_KEY_DEFAULT_SIZE 65
 #define PK_DEFAULT_SIZE P_256_PUB_KEY_DEFAULT_SIZE
 #define SIGNATURE_DEFAULT_SIZE 64
+#define SIGNATURE_STRUCT_DEFAULT_SIZE 300
 #define CONTEXT_MAC_DEFAULT_SIZE 200
 #define TH_ENC_DEFAULT_SIZE 42
 
@@ -172,10 +173,10 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			     struct other_party_cred *cred_r_array,
 			     uint16_t num_cred_r, uint8_t *err_msg,
 			     uint32_t *err_msg_len, uint8_t *ead_2,
-			     uint64_t *ead_2_len, uint8_t *ead_4,
-			     uint64_t *ead_4_len, uint8_t *prk_4x3m,
-			     uint8_t prk_4x3m_len, uint8_t *th4,
-			     uint8_t th4_len,
+			     uint32_t *ead_2_len, uint8_t *ead_4,
+			     uint32_t *ead_4_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
 			     enum err (*tx)(uint8_t *data, uint32_t data_len),
 			     enum err (*rx)(uint8_t *data, uint32_t *data_len));
 
@@ -203,10 +204,10 @@ enum err edhoc_responder_run(struct edhoc_responder_context *c,
 			     struct other_party_cred *cred_i_array,
 			     uint16_t num_cred_i, uint8_t *err_msg,
 			     uint32_t *err_msg_len, uint8_t *ead_1,
-			     uint64_t *ead_1_len, uint8_t *ead_3,
-			     uint64_t *ead_3_len, uint8_t *prk_4x3m,
-			     uint16_t prk_4x3m_len, uint8_t *th4,
-			     uint16_t th4_len,
+			     uint32_t *ead_1_len, uint8_t *ead_3,
+			     uint32_t *ead_3_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
 			     enum err (*tx)(uint8_t *data, uint32_t data_len),
 			     enum err (*rx)(uint8_t *data, uint32_t *data_len));
 
@@ -225,7 +226,7 @@ enum err edhoc_responder_run(struct edhoc_responder_context *c,
  * @param   out_len length of the derived key
  */
 enum err edhoc_exporter(enum hash_alg app_hash_alg, const uint8_t *prk_4x3m,
-			uint16_t prk_4x3m_len, const uint8_t *th4,
-			uint16_t th4_len, const char *label, uint8_t *out,
-			uint16_t out_len);
+			uint32_t prk_4x3m_len, const uint8_t *th4,
+			uint32_t th4_len, const char *label, uint8_t *out,
+			uint32_t out_len);
 #endif

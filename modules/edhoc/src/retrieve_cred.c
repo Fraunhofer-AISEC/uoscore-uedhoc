@@ -29,9 +29,9 @@
  * @param   pk_len the length pk
  * @param   verified true if verification successfull
  */
-static enum err cert_verify(const uint8_t *cert, uint16_t cert_len,
+static enum err cert_verify(const uint8_t *cert, uint32_t cert_len,
 			    const struct other_party_cred *cred_array,
-			    uint16_t cred_num, uint8_t *pk, uint16_t *pk_len,
+			    uint16_t cred_num, uint8_t *pk, uint32_t *pk_len,
 			    bool *verified)
 {
 	uint32_t decode_len = 0;
@@ -54,7 +54,7 @@ static enum err cert_verify(const uint8_t *cert, uint16_t cert_len,
 
 	/*get the CAs public key*/
 	uint8_t *root_pk = NULL;
-	uint8_t root_pk_len = 0;
+	uint32_t root_pk_len = 0;
 	for (uint16_t i = 0; i < cred_num; i++) {
 		if (memcmp(cred_array[i].ca.ptr, c._cert_issuer.value,
 			   cred_array[i].ca.len)) {
@@ -75,9 +75,10 @@ static enum err cert_verify(const uint8_t *cert, uint16_t cert_len,
 }
 
 enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
-		       uint16_t cred_num, uint8_t *id_cred, uint8_t id_cred_len,
-		       uint8_t *cred, uint16_t *cred_len, uint8_t *pk,
-		       uint16_t *pk_len, uint8_t *g, uint16_t *g_len)
+		       uint16_t cred_num, uint8_t *id_cred,
+		       uint32_t id_cred_len, uint8_t *cred, uint32_t *cred_len,
+		       uint8_t *pk, uint32_t *pk_len, uint8_t *g,
+		       uint32_t *g_len)
 {
 	bool verified;
 	uint32_t decode_len = 0;

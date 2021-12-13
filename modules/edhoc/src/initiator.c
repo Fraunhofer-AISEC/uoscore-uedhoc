@@ -43,9 +43,9 @@
  */
 static inline enum err msg2_parse(const struct edhoc_initiator_context *c,
 				  uint8_t *msg2, uint32_t msg2_len,
-				  uint8_t *g_y, uint64_t g_y_len,
+				  uint8_t *g_y, uint32_t g_y_len,
 				  struct c_x *c_r, uint8_t *ciphertext2,
-				  uint64_t *ciphertext2_len)
+				  uint32_t *ciphertext2_len)
 {
 	uint32_t decode_len = 0;
 	struct m2 m;
@@ -138,10 +138,10 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			     struct other_party_cred *cred_r_array,
 			     uint16_t num_cred_r, uint8_t *err_msg,
 			     uint32_t *err_msg_len, uint8_t *ead_2,
-			     uint64_t *ead_2_len, uint8_t *ead_4,
-			     uint64_t *ead_4_len, uint8_t *prk_4x3m,
-			     uint8_t prk_4x3m_len, uint8_t *th4,
-			     uint8_t th4_len,
+			     uint32_t *ead_2_len, uint8_t *ead_4,
+			     uint32_t *ead_4_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
 			     enum err (*tx)(uint8_t *data, uint32_t data_len),
 			     enum err (*rx)(uint8_t *data, uint32_t *data_len))
 {
@@ -158,14 +158,14 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint8_t msg4[MSG_4_DEFAULT_SIZE];
 	uint32_t msg4_len = sizeof(msg2);
 	uint8_t g_y[G_Y_DEFAULT_SIZE];
-	uint64_t g_y_len = get_ecdh_pk_len(suite.edhoc_ecdh);
+	uint32_t g_y_len = get_ecdh_pk_len(suite.edhoc_ecdh);
 
 	uint8_t c_r_buf[C_R_DEFAULT_SIZE];
 	struct c_x c_r;
 	c_x_init(&c_r, c_r_buf, sizeof(c_r_buf));
 
 	uint8_t ciphertext2[CIPHERTEXT2_DEFAULT_SIZE];
-	uint64_t ciphertext2_len = sizeof(ciphertext2);
+	uint32_t ciphertext2_len = sizeof(ciphertext2);
 
 	/********************* encode and send message 1***********************/
 
@@ -221,11 +221,11 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*check the authenticity of the responder*/
 	uint8_t cred_r[CRED_DEFAULT_SIZE];
-	uint16_t cred_r_len = sizeof(cred_r);
+	uint32_t cred_r_len = sizeof(cred_r);
 	uint8_t pk[PK_DEFAULT_SIZE];
-	uint16_t pk_len = sizeof(pk);
+	uint32_t pk_len = sizeof(pk);
 	uint8_t g_r[G_R_DEFAULT_SIZE];
-	uint16_t g_r_len = sizeof(g_r);
+	uint32_t g_r_len = sizeof(g_r);
 
 	TRY(retrieve_cred(static_dh_r, cred_r_array, num_cred_r, id_cred_r,
 			  id_cred_r_len, cred_r, &cred_r_len, pk, &pk_len, g_r,
@@ -277,7 +277,7 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			   &ciphertext_3_len));
 
 	/*massage 3 create and send*/
-	uint64_t msg3_len = ciphertext_3_len + 2;
+	uint32_t msg3_len = ciphertext_3_len + 2;
 	TRY(check_buffer_size(CIPHERTEXT3_DEFAULT_SIZE, msg3_len));
 	uint8_t msg3[CIPHERTEXT3_DEFAULT_SIZE];
 

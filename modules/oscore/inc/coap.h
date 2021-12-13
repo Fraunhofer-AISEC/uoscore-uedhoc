@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include "../../common/inc/byte_array.h"
-#include "error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 #define MAX_PIV_LEN 5
 #define MAX_KID_CONTEXT_LEN                                                    \
@@ -46,10 +46,10 @@
 
 #define MAX_OPTION_COUNT 20
 
-#define CODE_CLASS_MASK 0b11100000
-#define CODE_DETAIL_MASK 0b00011111
-#define POST 0b00000010
-#define Changed 0b01000100
+#define CODE_CLASS_MASK 0xe0
+#define CODE_DETAIL_MASK 0x1f
+#define POST 0x02
+#define Changed 0x44
 #define REQUEST_CLASS 0
 
 /* all CoAP instances are preceeded with 'o_' to show correspondence to
@@ -65,14 +65,14 @@ struct o_coap_header {
 
 struct o_coap_option {
 	uint16_t delta;
-	uint16_t len;
+	uint8_t len;
 	uint8_t *value;
 	uint8_t option_number;
 };
 
 struct oscore_option {
 	uint16_t delta;
-	uint16_t len;
+	uint8_t len;
 	uint8_t *value;
 	uint8_t buf[OSCORE_OPT_VALUE_LEN];
 	uint8_t option_number;
@@ -83,7 +83,7 @@ struct o_coap_packet {
 	uint8_t *token;
 	uint8_t options_cnt;
 	struct o_coap_option options[MAX_OPTION_COUNT];
-	uint16_t payload_len;
+	uint32_t payload_len;
 	uint8_t *payload;
 };
 
@@ -118,7 +118,7 @@ enum err buf2coap(struct byte_array *in, struct o_coap_packet *out);
  * @return  err
  */
 enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
-			   uint16_t *out_byte_string_len);
+		  uint32_t *out_byte_string_len);
 
 /**
  * @brief   Convert input options into byte string
@@ -129,6 +129,6 @@ enum err coap2buf(struct o_coap_packet *in, uint8_t *out_byte_string,
  *
  */
 enum err options_into_byte_string(struct o_coap_option *options,
-					   uint8_t options_cnt,
-					   struct byte_array *out_byte_string);
+				  uint8_t options_cnt,
+				  struct byte_array *out_byte_string);
 #endif

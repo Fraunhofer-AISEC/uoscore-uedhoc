@@ -33,13 +33,13 @@ int test_edhoc(enum role p, uint8_t vec_num)
 	uint8_t err_msg[ERR_MSG_DEFAULT_SIZE];
 	uint32_t err_msg_len = sizeof(err_msg);
 	uint8_t ad_1[AD_DEFAULT_SIZE];
-	uint64_t ad_1_len = sizeof(ad_1);
+	uint32_t ad_1_len = sizeof(ad_1);
 	uint8_t ad_2[AD_DEFAULT_SIZE];
-	uint64_t ad_2_len = sizeof(ad_2);
+	uint32_t ad_2_len = sizeof(ad_2);
 	uint8_t ad_3[AD_DEFAULT_SIZE];
-	uint64_t ad_3_len = sizeof(ad_3);
+	uint32_t ad_3_len = sizeof(ad_3);
 	uint8_t ad_4[AD_DEFAULT_SIZE];
-	uint64_t ad_4_len = sizeof(ad_2);
+	uint32_t ad_4_len = sizeof(ad_2);
 	/* test vector inputs */
 	char filename[] = { "../../samples/common/edhoc-vectors-json_v11.txt" };
 	char test_vec_buf[1024 * 160];

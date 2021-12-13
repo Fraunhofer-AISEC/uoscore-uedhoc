@@ -13,7 +13,7 @@
 #define NONCE_H
 
 #include "../../common/inc/byte_array.h"
-#include "error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 /**
  * @brief   Create the OSCORE nonce.
@@ -22,9 +22,7 @@
  * @param   common_iv MUST be 13 bytes long
  * @param   out MUST be 13 bytes long
  */
-enum err create_nonce(struct byte_array *id_piv,
-			       struct byte_array *piv,
-			       struct byte_array *common_iv,
-			       struct byte_array *nonce);
+enum err create_nonce(struct byte_array *id_piv, struct byte_array *piv,
+		      struct byte_array *common_iv, struct byte_array *nonce);
 
 #endif

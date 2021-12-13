@@ -145,10 +145,10 @@ cleanup:
 #endif
 
 enum err __attribute__((weak))
-aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
-     const uint8_t *key, const uint16_t key_len, uint8_t *nonce,
-     const uint16_t nonce_len, const uint8_t *aad, const uint16_t aad_len,
-     uint8_t *out, const uint16_t out_len, uint8_t *tag, const uint16_t tag_len)
+aead(enum aes_operation op, const uint8_t *in, const uint32_t in_len,
+     const uint8_t *key, const uint32_t key_len, uint8_t *nonce,
+     const uint32_t nonce_len, const uint8_t *aad, const uint32_t aad_len,
+     uint8_t *out, const uint32_t out_len, uint8_t *tag, const uint32_t tag_len)
 {
 #ifdef TINYCRYPT
 	struct tc_ccm_mode_struct c;
@@ -175,14 +175,14 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 	TRY(psa_crypto_init());
 
 	psa_algorithm_t alg =
-		PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_len);
+		PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, (uint32_t)tag_len);
 
 	psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
 	psa_set_key_usage_flags(&attr,
 				PSA_KEY_USAGE_DECRYPT | PSA_KEY_USAGE_ENCRYPT);
 	psa_set_key_algorithm(&attr, alg);
 	psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
-	psa_set_key_bits(&attr, key_len << 3);
+	psa_set_key_bits(&attr, (size_t)(key_len << 3));
 	psa_set_key_lifetime(&attr, PSA_KEY_LIFETIME_VOLATILE);
 	TRY(psa_import_key(&attr, key, key_len, &key_id));
 
@@ -194,8 +194,8 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 	} else {
 		size_t out_len_re;
 		TRY(psa_aead_encrypt(key_id, alg, nonce, nonce_len, aad,
-				     aad_len, in, in_len, out, in_len + tag_len,
-				     &out_len_re));
+				     aad_len, in, in_len, out,
+				     (size_t)(in_len + tag_len), &out_len_re));
 		memcpy(tag, out + out_len_re - tag_len, tag_len);
 	}
 	TRY(psa_destroy_key(key_id));
@@ -205,9 +205,9 @@ aead(enum aes_operation op, const uint8_t *in, const uint16_t in_len,
 }
 
 enum err __attribute__((weak))
-sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
-     const uint8_t *pk, const uint8_t pk_len, const uint8_t *msg,
-     const uint16_t msg_len, uint8_t *out, uint32_t *out_len)
+sign(enum sign_alg alg, const uint8_t *sk, const uint32_t sk_len,
+     const uint8_t *pk, const uint32_t pk_len, const uint8_t *msg,
+     const uint32_t msg_len, uint8_t *out, uint32_t *out_len)
 {
 	if (alg == EdDSA) {
 #if defined(COMPACT25519)
@@ -222,7 +222,7 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 		size_t bits;
 
 		alg = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
-		bits = PSA_BYTES_TO_BITS(sk_len);
+		bits = PSA_BYTES_TO_BITS((size_t)sk_len);
 
 		TRY(psa_crypto_init());
 
@@ -262,9 +262,9 @@ sign(enum sign_alg alg, const uint8_t *sk, const uint8_t sk_len,
 }
 
 enum err __attribute__((weak))
-verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
-       const uint8_t *msg, const uint16_t msg_len, const uint8_t *sgn,
-       const uint16_t sgn_len, bool *result)
+verify(enum sign_alg alg, const uint8_t *pk, const uint32_t pk_len,
+       const uint8_t *msg, const uint32_t msg_len, const uint8_t *sgn,
+       const uint32_t sgn_len, bool *result)
 {
 	if (alg == EdDSA) {
 #ifdef COMPACT25519
@@ -314,7 +314,7 @@ verify(enum sign_alg alg, const uint8_t *pk, const uint8_t pk_len,
 
 enum err __attribute__((weak))
 hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
-	     uint8_t *ikm, uint8_t ikm_len, uint8_t *out)
+	     uint8_t *ikm, uint32_t ikm_len, uint8_t *out)
 {
 	/*"Note that [RFC5869] specifies that if the salt is not provided, 
 	it is set to a string of zeros.  For implementation purposes, not providing the salt is the same as setting the salt to the empty byte 
@@ -362,9 +362,9 @@ hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
 }
 
 enum err __attribute__((weak))
-hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
-	    const uint8_t *info, const uint8_t info_len, uint8_t *out,
-	    uint64_t out_len)
+hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint32_t prk_len,
+	    const uint8_t *info, const uint32_t info_len, uint8_t *out,
+	    uint32_t out_len)
 {
 	if (alg == SHA_256) {
 		/* "N = ceil(L/HashLen)" */
@@ -406,16 +406,16 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 		psa_set_key_type(&attr, PSA_KEY_TYPE_HMAC);
 		psa_key_id_t key_id = 0;
 		TRY(psa_import_key(&attr, prk, prk_len, &key_id));
-		size_t combo_len = 32 + info_len + 1;
+		size_t combo_len = (size_t)(32 + info_len + 1);
 
-		TRY(check_buffer_size(INFO_DEFAULT_SIZE, combo_len));
+		TRY(check_buffer_size(INFO_DEFAULT_SIZE, (uint32_t)combo_len));
 
 		uint8_t combo[INFO_DEFAULT_SIZE];
 		uint8_t tmp_out[32];
 		memset(tmp_out, 0, 32);
 		memcpy(combo + 32, info, info_len);
 		size_t offset = 32;
-		for (uint32_t i = 1; i <= iterations; i++) {
+		for (uint8_t i = 1; i <= iterations; i++) {
 			memcpy(combo, tmp_out, 32);
 			combo[combo_len - 1] = i;
 			size_t tmp_out_len;
@@ -431,7 +431,7 @@ hkdf_expand(enum hash_alg alg, const uint8_t *prk, const uint8_t prk_len,
 			}
 			offset = 0;
 			uint8_t *dest = out + ((i - 1) << 5);
-			if (out_len < (i << 5)) {
+			if (out_len < (uint32_t)(i << 5)) {
 				memcpy(dest, tmp_out, out_len & 31);
 			} else {
 				memcpy(dest, tmp_out, 32);
@@ -450,7 +450,7 @@ enum err __attribute__((weak))
 hkdf_sha_256(struct byte_array *master_secret, struct byte_array *master_salt,
 	     struct byte_array *info, struct byte_array *out)
 {
-	uint8_t prk[32];
+	uint8_t prk[SHA_DEFAULT_SIZE];
 	TRY(hkdf_extract(SHA_256, master_salt->ptr, master_salt->len,
 			 master_secret->ptr, master_secret->len, prk));
 
@@ -512,7 +512,7 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 				       sizeof(pk_decompressed));
 
 		PRINT_ARRAY("pk_decompressed", pk_decompressed,
-			    pk_decompressed_len);
+			    (uint32_t)pk_decompressed_len);
 
 		TRY(psa_raw_key_agreement(PSA_ALG_ECDH, key_id, pk_decompressed,
 					  pk_decompressed_len, shared_secret,
@@ -561,7 +561,7 @@ ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 		alg = PSA_ALG_ECDH;
 		priv_key_size = P_256_PRIV_KEY_DEFAULT_SIZE;
 		pub_key_size = P_256_PUB_KEY_DEFAULT_SIZE;
-		bits = PSA_BYTES_TO_BITS(priv_key_size);
+		bits = PSA_BYTES_TO_BITS((size_t)priv_key_size);
 
 		TRY(psa_crypto_init());
 

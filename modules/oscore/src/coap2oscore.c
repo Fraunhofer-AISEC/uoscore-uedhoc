@@ -47,8 +47,8 @@ static inline enum err e_u_options_extract(struct o_coap_packet *in_o_coap,
 	/* Initialize to 0 */
 	*e_options_len = 0;
 
-	uint16_t temp_option_nr = 0;
-	uint16_t temp_len = 0;
+	uint8_t temp_option_nr = 0;
+	uint8_t temp_len = 0;
 	uint8_t temp_E_option_delta_sum = 0;
 	uint8_t temp_U_option_delta_sum = 0;
 	uint8_t delta_extra_bytes = 0;
@@ -58,7 +58,8 @@ static inline enum err e_u_options_extract(struct o_coap_packet *in_o_coap,
 		delta_extra_bytes = 0;
 		len_extra_bytes = 0;
 
-		temp_option_nr += in_o_coap->options[i].delta;
+		temp_option_nr =
+			(uint8_t)(temp_option_nr + in_o_coap->options[i].delta);
 		temp_len = in_o_coap->options[i].len;
 
 		/* Calculate extra byte length of option delta and option length */
@@ -77,7 +78,8 @@ static inline enum err e_u_options_extract(struct o_coap_packet *in_o_coap,
 		if (is_class_e(temp_option_nr) == 1) {
 			/* E-options, which will be copied in plaintext to be encrypted*/
 			e_options[*e_options_cnt].delta =
-				temp_option_nr - temp_E_option_delta_sum;
+				(uint16_t)(temp_option_nr -
+					   temp_E_option_delta_sum);
 			e_options[*e_options_cnt].len = temp_len;
 			e_options[*e_options_cnt].value =
 				in_o_coap->options[i].value;
@@ -85,18 +87,22 @@ static inline enum err e_u_options_extract(struct o_coap_packet *in_o_coap,
 				temp_option_nr;
 
 			/* Update delta sum of E-options */
-			temp_E_option_delta_sum +=
-				e_options[*e_options_cnt].delta;
+			temp_E_option_delta_sum =
+				(uint8_t)(temp_E_option_delta_sum +
+					  e_options[*e_options_cnt].delta);
 
 			/* Increment E-options count */
 			(*e_options_cnt)++;
 			/* Add option header length and value length */
-			(*e_options_len) += 1 + delta_extra_bytes +
-					    len_extra_bytes + temp_len;
+			(*e_options_len) =
+				(uint16_t)((*e_options_len) + 1 +
+					   delta_extra_bytes + len_extra_bytes +
+					   temp_len);
 		} else {
 			/* U-options */
 			U_options[*U_options_cnt].delta =
-				temp_option_nr - temp_U_option_delta_sum;
+				(uint16_t)(temp_option_nr -
+					   temp_U_option_delta_sum);
 			U_options[*U_options_cnt].len = temp_len;
 			U_options[*U_options_cnt].value =
 				in_o_coap->options[i].value;
@@ -104,8 +110,9 @@ static inline enum err e_u_options_extract(struct o_coap_packet *in_o_coap,
 				temp_option_nr;
 
 			/* Update delta sum of E-options */
-			temp_U_option_delta_sum +=
-				U_options[*U_options_cnt].delta;
+			temp_U_option_delta_sum =
+				(uint8_t)(temp_U_option_delta_sum +
+					  U_options[*U_options_cnt].delta);
 
 			/* Increment E-options count */
 			(*U_options_cnt)++;
@@ -137,7 +144,8 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 	have two bytes extra delta and length */
 	uint16_t temp_opt_bytes_len = 0;
 	for (uint8_t i = 0; i < E_options_cnt; i++)
-		temp_opt_bytes_len += 1 + 2 + 2 + E_options[i].len;
+		temp_opt_bytes_len = (uint16_t)(temp_opt_bytes_len + 1 + 2 + 2 +
+						E_options[i].len);
 	/* Setup buffer */
 	TRY(check_buffer_size(MAX_E_OPTIONS, temp_opt_bytes_len));
 	uint8_t temp_opt_bytes[MAX_E_OPTIONS];
@@ -152,8 +160,8 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 	TRY(options_into_byte_string(E_options, E_options_cnt,
 				     &E_option_byte_string));
 
-	uint64_t dest_size =
-		plaintext->len - (temp_plaintext_ptr + 1 - plaintext->ptr);
+	uint32_t dest_size = (uint32_t)(plaintext->len - (temp_plaintext_ptr +
+							  1 - plaintext->ptr));
 	TRY(_memcpy_s(++temp_plaintext_ptr, dest_size, temp_opt_bytes,
 		      E_option_byte_string.len));
 	temp_plaintext_ptr += E_option_byte_string.len;
@@ -163,8 +171,8 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 		/* An extra byte 0xFF before payload*/
 		*temp_plaintext_ptr = 0xff;
 
-		dest_size = plaintext->len -
-			    (temp_plaintext_ptr + 1 - plaintext->ptr);
+		dest_size = (uint32_t)(plaintext->len - (temp_plaintext_ptr +
+							 1 - plaintext->ptr));
 		TRY(_memcpy_s(++temp_plaintext_ptr, dest_size,
 			      in_o_coap->payload, in_o_coap->payload_len));
 	}
@@ -200,12 +208,12 @@ static inline enum err plaintext_encrypt(struct context *c,
  * @param   kid_context set to ID context in request when present. If not present or a response set to NULL
  * @return  length of the OSCORE option value
  */
-static inline uint16_t get_oscore_opt_val_len(struct byte_array *piv,
-					      struct byte_array *kid,
-					      struct byte_array *kid_context)
+static inline uint8_t get_oscore_opt_val_len(struct byte_array *piv,
+					     struct byte_array *kid,
+					     struct byte_array *kid_context)
 {
-	uint16_t l;
-	l = piv->len + kid_context->len + kid->len;
+	uint8_t l;
+	l = (uint8_t)(piv->len + kid_context->len + kid->len);
 	if (l) {
 		/*if any of piv, kit_context or kit is present 1 byte for the flags is reserved */
 		l++;
@@ -235,7 +243,7 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 		       struct byte_array *kid_context,
 		       struct oscore_option *oscore_option)
 {
-	uint64_t dest_size;
+	uint32_t dest_size;
 	oscore_option->option_number = COAP_OPTION_OSCORE;
 
 	if (oscore_option->len == 0) {
@@ -247,11 +255,13 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 
 		if (piv->len != 0) {
 			/* Set header bits of PIV */
-			oscore_option->value[0] |= piv->len;
+			oscore_option->value[0] =
+				(uint8_t)(oscore_option->value[0] | piv->len);
 			/* copy PIV (sender sequence) */
 
-			dest_size = oscore_option->len -
-				    (temp_ptr + 1 - oscore_option->value);
+			dest_size = (uint32_t)(oscore_option->len -
+					       (temp_ptr + 1 -
+						oscore_option->value));
 			TRY(_memcpy_s(++temp_ptr, dest_size, piv->ptr,
 				      piv->len));
 
@@ -262,10 +272,11 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 			/* Set header flag bit of KID context */
 			oscore_option->value[0] |= COMP_OSCORE_OPT_KIDC_H_MASK;
 			/* Copy length and context value */
-			*temp_ptr = kid_context->len;
+			*temp_ptr = (uint8_t)(kid_context->len);
 
-			dest_size = oscore_option->len -
-				    (temp_ptr + 1 - oscore_option->value);
+			dest_size = (uint32_t)(oscore_option->len -
+					       (temp_ptr + 1 -
+						oscore_option->value));
 			TRY(_memcpy_s(++temp_ptr, dest_size, kid_context->ptr,
 				      kid_context->len));
 
@@ -278,8 +289,9 @@ oscore_option_generate(struct byte_array *piv, struct byte_array *kid,
 		oscore_option->value[0] |= COMP_OSCORE_OPT_KID_K_MASK;
 		if (kid->len != 0) {
 			/* Copy KID */
-			dest_size = oscore_option->len -
-				    (temp_ptr - oscore_option->value);
+			dest_size =
+				(uint32_t)(oscore_option->len -
+					   (temp_ptr - oscore_option->value));
 			TRY(_memcpy_s(temp_ptr, dest_size, kid->ptr, kid->len));
 		}
 	}
@@ -339,7 +351,7 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 	}
 
 	/* Update options count number to output*/
-	out_oscore->options_cnt = 1 + u_options_cnt;
+	out_oscore->options_cnt = (uint8_t)(1 + u_options_cnt);
 
 	uint8_t temp_opt_number_sum = 0;
 	/* Show the position of U-options */
@@ -348,8 +360,8 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 		if (i == oscore_opt_pos) {
 			/* OSCORE_option */
 			out_oscore->options[i].delta =
-				oscore_option->option_number -
-				temp_opt_number_sum;
+				(uint16_t)(oscore_option->option_number -
+					   temp_opt_number_sum);
 			out_oscore->options[i].len = oscore_option->len;
 			out_oscore->options[i].option_number =
 				oscore_option->option_number;
@@ -357,8 +369,8 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 		} else {
 			/* U-options */
 			out_oscore->options[i].delta =
-				u_options[u_opt_pos].option_number -
-				temp_opt_number_sum;
+				(uint16_t)(u_options[u_opt_pos].option_number -
+					   temp_opt_number_sum);
 			out_oscore->options[i].len = u_options[u_opt_pos].len;
 			out_oscore->options[i].option_number =
 				u_options[u_opt_pos].option_number;
@@ -367,7 +379,8 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
 
 			u_opt_pos++;
 		}
-		temp_opt_number_sum += out_oscore->options[i].delta;
+		temp_opt_number_sum = (uint8_t)(temp_opt_number_sum +
+						out_oscore->options[i].delta);
 	}
 
 	/* Protected Payload */
@@ -387,13 +400,13 @@ static inline enum err oscore_pkg_generate(struct o_coap_packet *in_o_coap,
  *
  *@return	err
  */
-enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
-		     uint8_t *buf_oscore, uint16_t *buf_oscore_len,
+enum err coap2oscore(uint8_t *buf_o_coap, uint32_t buf_o_coap_len,
+		     uint8_t *buf_oscore, uint32_t *buf_oscore_len,
 		     struct context *c)
 {
 	struct o_coap_packet o_coap_pkt;
 	struct byte_array buf;
-	uint16_t plaintext_len = 0;
+	uint32_t plaintext_len = 0;
 
 	PRINT_MSG("\n\n\ncoap2oscore***************************************\n");
 	PRINT_ARRAY("Input CoAP packet", buf_o_coap, buf_o_coap_len);
@@ -417,7 +430,7 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
 
 	/* 2. Create plaintext (code + E-options + o_coap_payload) */
 	/* Calculate complete plaintext length: 1 byte code + E-options + 1 byte 0xFF + payload */
-	plaintext_len = 1 + e_options_len;
+	plaintext_len = (uint32_t)(1 + e_options_len);
 
 	if (o_coap_pkt.payload_len) {
 		plaintext_len = plaintext_len + 1 + o_coap_pkt.payload_len;

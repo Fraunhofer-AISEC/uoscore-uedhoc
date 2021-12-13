@@ -30,10 +30,10 @@ static inline void xor_arrays(const uint8_t *in1, const uint8_t *in2,
  */
 static enum err ciphertext_encrypt_decrypt(
 	enum ciphertext ctxt, enum aes_operation op, const uint8_t *in,
-	const uint16_t in_len, const uint8_t *key, const uint16_t key_len,
-	uint8_t *nonce, const uint16_t nonce_len, const uint8_t *aad,
-	const uint16_t aad_len, uint8_t *out, const uint16_t out_len,
-	uint8_t *tag, const uint16_t tag_len)
+	const uint32_t in_len, const uint8_t *key, const uint32_t key_len,
+	uint8_t *nonce, const uint32_t nonce_len, const uint8_t *aad,
+	const uint32_t aad_len, uint8_t *out, const uint32_t out_len,
+	uint8_t *tag, const uint32_t tag_len)
 {
 	if (ctxt == CIPHERTEXT2) {
 		xor_arrays(in, key, key_len, out);
@@ -118,7 +118,7 @@ enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
 
 	/*Associated data*/
 	uint8_t associated_data[ASSOCIATED_DATA_DEFAULT_SIZE];
-	uint16_t associated_data_len = sizeof(associated_data);
+	uint32_t associated_data_len = sizeof(associated_data);
 	TRY(associated_data_encode(th, th_len, (uint8_t *)&associated_data,
 				   &associated_data_len));
 
@@ -172,8 +172,8 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 			uint8_t *id_cred, uint32_t id_cred_len,
 			uint8_t *signature_or_mac,
 			uint32_t signature_or_mac_len, uint8_t *ead,
-			uint32_t ead_len, uint8_t *prk, uint8_t prk_len,
-			uint8_t *th, uint8_t th_len, uint8_t *ciphertext,
+			uint32_t ead_len, uint8_t *prk, uint32_t prk_len,
+			uint8_t *th, uint32_t th_len, uint8_t *ciphertext,
 			uint32_t *ciphertext_len)
 {
 	/*Encode plaintext*/
@@ -183,7 +183,7 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 	TRY(check_buffer_size(SGN_OR_MAC_DEFAULT_SIZE,
 			      signature_or_mac_len + 2));
 	uint8_t signature_or_mac_enc[SGN_OR_MAC_DEFAULT_SIZE];
-	uint64_t signature_or_mac_enc_len = signature_or_mac_len + 2;
+	uint32_t signature_or_mac_enc_len = signature_or_mac_len + 2;
 	TRY(encode_byte_string(signature_or_mac, signature_or_mac_len,
 			       signature_or_mac_enc,
 			       &signature_or_mac_enc_len));
@@ -223,7 +223,8 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 	}
 	if (ead_len > 0) {
 		TRY(_memcpy_s(plaintext + plaintext_len,
-			      sizeof(plaintext) - plaintext_len, ead, ead_len));
+			      (uint32_t)sizeof(plaintext) - plaintext_len, ead,
+			      ead_len));
 
 		plaintext_len += ead_len;
 	}
@@ -233,7 +234,7 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 	/*Calculate keys and encrypt*/
 	if (ctxt == CIPHERTEXT2) {
 		/*Derive KEYSTREAM_2*/
-		uint64_t KEYSTREAM_2_len = plaintext_len;
+		uint32_t KEYSTREAM_2_len = plaintext_len;
 		TRY(check_buffer_size(PLAINTEXT_DEFAULT_SIZE, KEYSTREAM_2_len));
 		uint8_t KEYSTREAM_2[PLAINTEXT_DEFAULT_SIZE];
 		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
@@ -275,13 +276,13 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 
 	/*Associated data*/
 	uint8_t associated_data[ASSOCIATED_DATA_DEFAULT_SIZE];
-	uint16_t associated_data_len = sizeof(associated_data);
+	uint32_t associated_data_len = sizeof(associated_data);
 	TRY(associated_data_encode(th, th_len, (uint8_t *)&associated_data,
 				   &associated_data_len));
 	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
 
 	/*Ciphertext 3 calculate*/
-	uint8_t mac_len = get_aead_mac_len(suite->edhoc_aead);
+	uint32_t mac_len = get_aead_mac_len(suite->edhoc_aead);
 	TRY(check_buffer_size(MAC_DEFAULT_SIZE, mac_len));
 	uint8_t tag[MAC_DEFAULT_SIZE];
 	*ciphertext_len = plaintext_len;

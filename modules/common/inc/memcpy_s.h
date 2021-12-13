@@ -15,14 +15,14 @@
 
 #include "oscore_edhoc_error.h"
 
-enum err check_buffer_size(uint64_t is_size, uint64_t required_size);
+enum err check_buffer_size(uint32_t is_size, uint32_t required_size);
 
 /**
  * @brief memcpy_s (see [1]) may not be available in some setups thus our own 
  * implementation 
  * [1]: https://docs.microsoft.com/de-de/cpp/c-runtime-library/reference/memcpy-s-wmemcpy-s?view=msvc-160
  */
-enum err _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
-		   uint64_t count);
+enum err _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
+		   uint32_t count);
 
 #endif

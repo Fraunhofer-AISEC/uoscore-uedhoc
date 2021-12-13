@@ -21,8 +21,8 @@
 #include "../cbor/decode_id_cred_x.h"
 #include "../cbor/encode_int_type.h"
 
-enum err id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
-			     uint8_t *_kid, uint32_t *kid_len)
+enum err id_cred2kid(const uint8_t *id_cred, uint32_t id_cred_len, uint8_t *_kid,
+		     uint32_t *kid_len)
 {
 	struct id_cred_x_map map;
 	uint32_t payload_len_out;
@@ -66,14 +66,13 @@ enum err id_cred2kid(const uint8_t *id_cred, uint8_t id_cred_len,
 	return ok;
 }
 
-enum err plaintext_encode(const uint8_t *id_cred, uint8_t id_cred_len,
-				  const uint8_t *sgn_or_mac,
-				  uint8_t sgn_or_mac_len, const uint8_t *ad,
-				  uint16_t ad_len, uint8_t *plaintext,
-				  uint16_t *plaintext_len)
+enum err plaintext_encode(const uint8_t *id_cred, uint32_t id_cred_len,
+			  const uint8_t *sgn_or_mac, uint32_t sgn_or_mac_len,
+			  const uint8_t *ad, uint32_t ad_len,
+			  uint8_t *plaintext, uint32_t *plaintext_len)
 {
-	uint16_t l;
-	uint64_t enc_sgn_or_mac_len = sgn_or_mac_len + 2;
+	uint32_t l;
+	uint32_t enc_sgn_or_mac_len = sgn_or_mac_len + 2;
 	uint8_t kid_buf[KID_DEFAULT_SIZE];
 	uint32_t kid_len = sizeof(kid_buf);
 	TRY(id_cred2kid(id_cred, id_cred_len, kid_buf, &kid_len));

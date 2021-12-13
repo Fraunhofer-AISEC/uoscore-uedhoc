@@ -80,8 +80,8 @@ enum err oscore_context_init(struct oscore_init_params *params,
  * @param 	oscore_pkg indicates if an incoming packet is OSCORE
  * @return	err
  */
-enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
-		     uint16_t *buf_out_len, bool *oscore_pkg_flag,
+enum err oscore2coap(uint8_t *buf_in, uint32_t buf_in_len, uint8_t *buf_out,
+		     uint32_t *buf_out_len, bool *oscore_pkg_flag,
 		     struct context *c);
 
 /**
@@ -94,8 +94,8 @@ enum err oscore2coap(uint8_t *buf_in, uint16_t buf_in_len, uint8_t *buf_out,
  *@param	c a struct containing the OSCORE context
  *@return	err
  */
-enum err coap2oscore(uint8_t *buf_o_coap, uint16_t buf_o_coap_len,
-		     uint8_t *buf_oscore, uint16_t *buf_oscore_len,
+enum err coap2oscore(uint8_t *buf_o_coap, uint32_t buf_o_coap_len,
+		     uint8_t *buf_oscore, uint32_t *buf_oscore_len,
 		     struct context *c);
 
 #endif

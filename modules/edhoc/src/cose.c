@@ -16,9 +16,9 @@
 #include "../cbor/encode_sig_structure.h"
 
 enum err cose_enc_structure_encode(
-	const uint8_t *context, uint16_t context_len, const uint8_t *protected,
-	uint16_t protected_len, const uint8_t *external_aad,
-	uint16_t external_aad_len, uint8_t *out, uint16_t *out_len)
+	const uint8_t *context, uint32_t context_len, const uint8_t *protected,
+	uint32_t protected_len, const uint8_t *external_aad,
+	uint32_t external_aad_len, uint8_t *out, uint32_t *out_len)
 {
 	struct enc_structure enc_structure;
 
@@ -38,11 +38,11 @@ enum err cose_enc_structure_encode(
 }
 
 enum err
-cose_sig_structure_encode(const uint8_t *context, uint16_t context_len,
-			  const uint8_t *protected, uint16_t protected_len,
+cose_sig_structure_encode(const uint8_t *context, uint32_t context_len,
+			  const uint8_t *protected, uint32_t protected_len,
 			  const uint8_t *external_aad,
-			  uint16_t external_aad_len, const uint8_t *payload,
-			  uint16_t payload_len, uint8_t *out, uint16_t *out_len)
+			  uint32_t external_aad_len, const uint8_t *payload,
+			  uint32_t payload_len, uint8_t *out, uint32_t *out_len)
 {
 	struct sig_structure sig_structure;
 

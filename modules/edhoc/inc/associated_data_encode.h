@@ -23,7 +23,7 @@
  * @param   A_Xae pointer to hold the encoded data
  * @param   A_Xae_len length of the encoded data
  */
-enum err associated_data_encode(uint8_t *th, const uint16_t th_len,
-			      uint8_t *A_Xae, uint16_t *A_Xae_len);
+enum err associated_data_encode(uint8_t *th, const uint32_t th_len,
+				uint8_t *A_Xae, uint32_t *A_Xae_len);
 
 #endif

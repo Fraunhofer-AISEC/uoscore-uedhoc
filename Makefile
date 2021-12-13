@@ -148,7 +148,7 @@ CFLAGS1 += -Wextra
 CFLAGS1 += -Wcast-qual
 CFLAGS1 += -Wstack-usage=4096
 CFLAGS1 += -Wconversion
-# CFLAGS1 += -Wpedantic
+CFLAGS1 += -Wpedantic
 #CFLAGS1 += -Werror
 
 #Clang warning flahs
