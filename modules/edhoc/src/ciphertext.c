@@ -50,11 +50,10 @@ static enum err ciphertext_encrypt_decrypt(
  * 
  * 
  */
-static enum err ciphertext_key_gen(enum ciphertext ctxt,
-				   enum hash_alg edhoc_hash, uint8_t *prk,
-				   uint8_t prk_len, uint8_t *th, uint8_t th_len,
-				   uint8_t *key, uint32_t key_len, uint8_t *iv,
-				   uint32_t iv_len)
+static enum err
+ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
+		   uint32_t prk_len, uint8_t *th, uint32_t th_len, uint8_t *key,
+		   uint32_t key_len, uint8_t *iv, uint32_t iv_len)
 {
 	switch (ctxt) {
 	case CIPHERTEXT2:
@@ -91,8 +90,8 @@ static enum err ciphertext_key_gen(enum ciphertext ctxt,
  * 
  */
 enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
-				  uint8_t *prk, uint8_t prk_len, uint8_t *th,
-				  uint8_t th_len, uint8_t *ciphertext,
+				  uint8_t *prk, uint32_t prk_len, uint8_t *th,
+				  uint32_t th_len, uint8_t *ciphertext,
 				  uint32_t ciphertext_len, uint8_t *id_cred,
 				  uint32_t *id_cred_len,
 				  uint8_t *signature_or_mac,

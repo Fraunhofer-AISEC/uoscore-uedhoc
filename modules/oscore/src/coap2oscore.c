@@ -191,7 +191,6 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
  *
  */
 static inline enum err plaintext_encrypt(struct context *c,
-					 struct o_coap_packet *in_o_coap,
 					 struct byte_array *in_plaintext,
 					 uint8_t *out_ciphertext,
 					 uint32_t out_ciphertext_len)
@@ -486,8 +485,8 @@ enum err coap2oscore(uint8_t *buf_o_coap, uint32_t buf_o_coap_len,
 	TRY(check_buffer_size(MAX_CIPHERTEXT_LEN, ciphertext_len));
 	uint8_t ciphertext[MAX_CIPHERTEXT_LEN];
 
-	TRY(plaintext_encrypt(c, &o_coap_pkt, &plaintext,
-			      (uint8_t *)&ciphertext, ciphertext_len));
+	TRY(plaintext_encrypt(c, &plaintext, (uint8_t *)&ciphertext,
+			      ciphertext_len));
 
 	/*create an OSCORE packet*/
 	struct o_coap_packet oscore_pkt;

@@ -62,7 +62,7 @@ static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 		   true);
 
 	/*METHOD*/
-	*method = m._message_1_METHOD;
+	*method = (enum method_type) m._message_1_METHOD;
 	PRINTF("msg1 METHOD: %d\n", (int)*method);
 
 	/*SUITES_I*/
@@ -121,7 +121,7 @@ static inline bool selected_suite_is_supported(uint8_t selected,
 					       struct byte_array *suites_r)
 {
 	for (uint8_t i = 0; i < suites_r->len; i++) {
-		if ((suites_r->ptr[i] == selected))
+		if (suites_r->ptr[i] == selected)
 			return true;
 	}
 	return false;

@@ -22,8 +22,8 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 			uint32_t *ciphertext_len);
 
 enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
-				  uint8_t *prk, uint8_t prk_len, uint8_t *th,
-				  uint8_t th_len, uint8_t *ciphertext,
+				  uint8_t *prk, uint32_t prk_len, uint8_t *th,
+				  uint32_t th_len, uint8_t *ciphertext,
 				  uint32_t ciphertext_len, uint8_t *id_cred,
 				  uint32_t *id_cred_len,
 				  uint8_t *signature_or_mac,

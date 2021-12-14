@@ -23,9 +23,9 @@
  * @param   msg_struct contains all messsage fields
  * @param   msg the encoded error message
  */
-static inline enum err err_msg_crate(struct error_msg *msg_struct,
-					     struct byte_array *msg)
-{
+// static inline enum err err_msg_crate(struct error_msg *msg_struct,
+// 					     struct byte_array *msg)
+// {
 	// 	bool success;
 	// 	struct message_error mr;
 
@@ -86,8 +86,8 @@ static inline enum err err_msg_crate(struct error_msg *msg_struct,
 	// msg->len = payload_len_out;
 
 	// PRINT_ARRAY("Error message (CBOR Sequence)", msg->ptr, msg->len);
-	return ok;
-}
+// 	return ok;
+// }
 
 enum err tx_err_msg(enum role role, uint8_t corr, uint8_t *c_x,
 			    uint8_t c_x_len, uint8_t *err_msg_str,

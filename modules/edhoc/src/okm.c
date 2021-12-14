@@ -13,6 +13,7 @@
 #include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/print_util.h"
+#include "../inc/okm.h"
 
 enum err okm_calc(enum hash_alg hash_alg, const uint8_t *prk, uint32_t prk_len,
 		  const uint8_t *th, uint32_t th_len, const char *label,

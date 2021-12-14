@@ -14,6 +14,7 @@
 #include "oscore_edhoc_error.h"
 #include "print_util.h"
 #include "cose.h"
+#include "associated_data_encode.h"
 
 enum err associated_data_encode(uint8_t *thX, const uint32_t thX_len,
 				uint8_t *out, uint32_t *out_len)

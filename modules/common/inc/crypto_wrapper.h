@@ -102,16 +102,14 @@ enum err hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
  * @param   sk secret key
  * @param   sk_len length of sk
  * @param   pk public key
- * @param   pk_len length of pk
  * @param   msg the message to be signed
  * @param   msg_len length of msg
  * @param   out signature
- * @param   out_len length of out
  * @retval  an err code
  */
 enum err sign(enum sign_alg alg, const uint8_t *sk, const uint32_t sk_len,
-	      const uint8_t *pk, const uint32_t pk_len, const uint8_t *msg,
-	      const uint32_t msg_len, uint8_t *out, uint32_t *out_len);
+	      const uint8_t *pk, const uint8_t *msg, const uint32_t msg_len,
+	      uint8_t *out);
 
 /**
  * @brief   Verifies an asymmetric signature

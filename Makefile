@@ -11,6 +11,7 @@ LIB_NAME = libuoscore-uedhoc.a
 
 include makefile_config.mk
 
+$(info    CC is $(CC))
 # $(info    LIB_NAME is $(LIB_NAME))
 # $(info    PREFIX is $(PREFIX))
 # $(info    SOURCE_DIR is $(SOURCE_DIR))
@@ -106,68 +107,67 @@ endif
 ################################################################################
 # CFLAGS
 ################################################################################
-FILTERED_CFLAGS = -Os
-CFLAGS1 = $(filter-out $(FILTERED_CFLAGS), $(CFLAGS))
-
 #add options form configuration file 
-CFLAGS1 += $(ARCH)
-CFLAGS1 += $(OPT)
-CFLAGS1 += $(DEBUG_PRINT)
-CFLAGS1 += $(CBOR_ENGINE)
-CFLAGS1 += $(CRYPTO_ENGINE)
+CFLAGS += $(ARCH)
+CFLAGS += $(OPT)
+CFLAGS += $(DEBUG_PRINT)
+CFLAGS += $(CBOR_ENGINE)
+CFLAGS += $(CRYPTO_ENGINE)
 
 #add include paths
-CFLAGS1 += $(C_INCLUDES)
+CFLAGS += $(C_INCLUDES)
 
 #generate debug symbols
-CFLAGS1 += -g -gdwarf-2
+CFLAGS += -g -gdwarf-2
 
 # Generate dependency information
-CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
+CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
-# required for gddl-gen library
-#CFLAGS1 += -DCDDL_CBOR_CANONICAL 
+
 
 #GCC warning flags
-CFLAGS1 += -Waddress
-CFLAGS1 += -Waggregate-return
-CFLAGS1 += -Wformat-nonliteral
-CFLAGS1 += -Wformat-security
-CFLAGS1 += -Wformat
-CFLAGS1 += -Winit-self
-CFLAGS1 += -Wmissing-include-dirs
-CFLAGS1 += -Wno-multichar
-CFLAGS1 += -Wno-parentheses
-CFLAGS1 += -Wno-type-limits
-CFLAGS1 += -Wno-unused-parameter
-CFLAGS1 += -Wunreachable-code
-CFLAGS1 += -Wwrite-strings
-CFLAGS1 += -Wpointer-arith
-CFLAGS1 += -Wall
-CFLAGS1 += -Wextra
-CFLAGS1 += -Wcast-qual
-CFLAGS1 += -Wstack-usage=4096
-CFLAGS1 += -Wconversion
-CFLAGS1 += -Wpedantic
-#CFLAGS1 += -Werror
+ifeq ($(CC),cc)
+CFLAGS += -Waddress
+CFLAGS += -Waggregate-return
+CFLAGS += -Wformat-nonliteral
+CFLAGS += -Wformat-security
+CFLAGS += -Wformat
+CFLAGS += -Winit-self
+CFLAGS += -Wmissing-include-dirs
+CFLAGS += -Wno-multichar
+CFLAGS += -Wno-parentheses
+CFLAGS += -Wno-type-limits
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wunreachable-code
+CFLAGS += -Wwrite-strings
+CFLAGS += -Wpointer-arith
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -Wcast-qual
+CFLAGS += -Wstack-usage=4096
+CFLAGS += -Wconversion
+CFLAGS += -Wpedantic
+#CFLAGS += -Werror
 
 #Clang warning flahs
-# -Wcast-qual
-# -Wconversion
-# -Wexit-time-destructors
-# -Wglobal-constructors
-# -Wmissing-noreturn
-# -Wmissing-prototypes
-# -Wno-missing-braces
-# -Wold-style-cast
-# -Wshadow
-# -Wweak-vtables
-# -Wall
-# -Wextra
-# -Wpedantic
-# -Wstack-exhausted
-# -Wconversion
-# -Werror
+else ifeq ($(CC),clang-13)
+CFLAGS += -Wcast-qual
+CFLAGS += -Wconversion
+CFLAGS += -Wexit-time-destructors
+CFLAGS += -Wglobal-constructors
+CFLAGS += -Wmissing-noreturn
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wno-missing-braces
+CFLAGS += -Wold-style-cast
+#CFLAGS += -Wshadow
+CFLAGS += -Wweak-vtables
+CFLAGS += -Wall
+#CFLAGS += -Wextra
+CFLAGS += -Wpedantic
+CFLAGS += -Wstack-exhausted
+CFLAGS += -Wconversion
+#CFLAGS += -Werror
+endif
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
@@ -175,7 +175,7 @@ CFLAGS1 += -Wpedantic
 #CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 #LDFLAGS += -fsanitize=address -static-libasan
 
-#$(info    CFLAGS1 is $(CFLAGS1))
+#$(info    CFLAGS is $(CFLAGS))
 ################################################################################
 # build the library
 ################################################################################
@@ -189,7 +189,7 @@ $(DIR)/$(LIB_NAME): $(OBJ)
 
 $(DIR)/%.o: %.c Makefile makefile_config.mk
 	@echo [Compile] $<
-	@$(CC) -c $(CFLAGS1) $< -o $@
+	@$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -fR $(DIR)

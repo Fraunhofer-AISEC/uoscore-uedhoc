@@ -25,7 +25,7 @@ enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 	aad_array._aad_array_oscore_version = 1;
 	aad_array._aad_array_algorithms_alg_aead_choice =
 		_aad_array_algorithms_alg_aead_int;
-	aad_array._aad_array_algorithms_alg_aead_int = aead_alg;
+	aad_array._aad_array_algorithms_alg_aead_int = (int32_t)aead_alg;
 	aad_array._aad_array_request_kid.value = kid->ptr;
 	aad_array._aad_array_request_kid.len = kid->len;
 	aad_array._aad_array_request_piv.value = piv->ptr;

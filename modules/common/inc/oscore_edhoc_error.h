@@ -78,13 +78,12 @@ enum err {
 
 };
 
-
 /*This macro checks if a function returns an error and if so it propages 
 	the error to the caller function*/
 #define TRY(x)                                                                     \
 	do {                                                                       \
-		int retval = (x);                                                  \
-		if (retval != 0) {                                                 \
+		enum err retval = (x);                                             \
+		if (retval != ok) {                                                \
 			PRINTF(RED                                                 \
 			       "Runtime error: %s error code %d at %s:%d\n" RESET, \
 			       #x, retval, __FILE__, __LINE__);                    \

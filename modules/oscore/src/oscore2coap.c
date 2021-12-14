@@ -286,9 +286,10 @@ static inline enum err options_from_oscore_reorder(
  * @param out_options_count: count number of output options
  * @return  err
  */
-enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
-				      struct o_coap_option *out_options,
-				      uint8_t *out_options_count)
+static inline enum err
+oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
+			     struct o_coap_option *out_options,
+			     uint8_t *out_options_count)
 {
 	uint8_t *temp_options_ptr = in_data;
 	uint8_t temp_options_count = 0;
@@ -390,11 +391,10 @@ enum err oscore_packet_options_parser(uint8_t *in_data, uint16_t in_data_len,
  * @param out_o_coap_payload: output pointer original unprotected CoAP payload
  * @return  err
  */
-enum err oscore_decrypted_payload_parser(struct byte_array *in_payload,
-					 uint8_t *out_code,
-					 struct o_coap_option *out_E_options,
-					 uint8_t *E_options_cnt,
-					 struct byte_array *out_o_coap_payload)
+static inline enum err oscore_decrypted_payload_parser(
+	struct byte_array *in_payload, uint8_t *out_code,
+	struct o_coap_option *out_E_options, uint8_t *E_options_cnt,
+	struct byte_array *out_o_coap_payload)
 {
 	uint8_t *temp_payload_ptr = in_payload->ptr;
 	uint32_t temp_payload_len = in_payload->len;
@@ -574,7 +574,7 @@ enum err oscore2coap(uint8_t *buf_in, uint32_t buf_in_len, uint8_t *buf_out,
 		     uint32_t *buf_out_len, bool *oscore_pkg_flag,
 		     struct context *c)
 {
-	uint8_t r = ok;
+	enum err r = ok;
 	struct o_coap_packet oscore_packet;
 	struct compressed_oscore_option oscore_option;
 	struct byte_array buf;

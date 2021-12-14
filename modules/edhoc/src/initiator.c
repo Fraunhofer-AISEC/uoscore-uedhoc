@@ -41,8 +41,7 @@
  * @param   msg2_struct pointer to a structure for the parsed message
  * @param   err_msg pointer to an error message structure
  */
-static inline enum err msg2_parse(const struct edhoc_initiator_context *c,
-				  uint8_t *msg2, uint32_t msg2_len,
+static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
 				  uint8_t *g_y, uint32_t g_y_len,
 				  struct c_x *c_r, uint8_t *ciphertext2,
 				  uint32_t *ciphertext2_len)
@@ -85,7 +84,7 @@ static inline enum err msg1_encode(const struct edhoc_initiator_context *c,
 	struct message_1 m1;
 
 	/*METHOD_CORR*/
-	m1._message_1_METHOD = c->method;
+	m1._message_1_METHOD = (int32_t)c->method;
 
 	/*SUITES_I*/
 	if (c->suites_i.len == 1) {
@@ -181,7 +180,7 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
     error_message_received. If this hapens edhoc_initiator_run will return. Then
     the caller needs to examine SUITES_R in err_msg re-initialize the initiator 
     and call edhoc_initiator_run again*/
-	TRY(msg2_parse(c, msg2, msg2_len, g_y, g_y_len, &c_r,
+	TRY(msg2_parse(msg2, msg2_len, g_y, g_y_len, &c_r,
 		       (uint8_t *)&ciphertext2, &ciphertext2_len));
 	// if (r == error_message_received) {
 	// 	/*provide the error message to the caller*/

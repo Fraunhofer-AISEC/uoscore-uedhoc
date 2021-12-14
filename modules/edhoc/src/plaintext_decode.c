@@ -16,6 +16,7 @@
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/retrieve_cred.h"
+#include "../inc/plaintext.h"
 #include "../inc/signature_or_mac_msg.h"
 #include "../cbor/decode_plaintext.h"
 #include "../cbor/encode_id_cred_x.h"
