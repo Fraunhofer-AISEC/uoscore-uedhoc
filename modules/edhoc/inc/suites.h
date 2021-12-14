@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "../../modules/common/inc/oscore_edhoc_error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 /*see https://www.iana.org/assignments/cose/cose.xhtml#algorithms for algorithm number reference*/
 

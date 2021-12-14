@@ -107,75 +107,78 @@ endif
 ################################################################################
 # CFLAGS
 ################################################################################
+FILTERED_CFLAGS = -Os
+EXTENDED_CFLAGS = $(filter-out $(FILTERED_CFLAGS), $(CFLAGS))
+
 #add options form configuration file 
-CFLAGS += $(ARCH)
-CFLAGS += $(OPT)
-CFLAGS += $(DEBUG_PRINT)
-CFLAGS += $(CBOR_ENGINE)
-CFLAGS += $(CRYPTO_ENGINE)
+EXTENDED_CFLAGS += $(ARCH)
+EXTENDED_CFLAGS += $(OPT)
+EXTENDED_CFLAGS += $(DEBUG_PRINT)
+EXTENDED_CFLAGS += $(CBOR_ENGINE)
+EXTENDED_CFLAGS += $(CRYPTO_ENGINE)
 
 #add include paths
-CFLAGS += $(C_INCLUDES)
+EXTENDED_CFLAGS += $(C_INCLUDES)
 
 #generate debug symbols
-CFLAGS += -g -gdwarf-2
+EXTENDED_CFLAGS += -g -gdwarf-2
 
 # Generate dependency information
-CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
+EXTENDED_CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
 
 
 #GCC warning flags
-ifeq ($(CC),cc)
-CFLAGS += -Waddress
-CFLAGS += -Waggregate-return
-CFLAGS += -Wformat-nonliteral
-CFLAGS += -Wformat-security
-CFLAGS += -Wformat
-CFLAGS += -Winit-self
-CFLAGS += -Wmissing-include-dirs
-CFLAGS += -Wno-multichar
-CFLAGS += -Wno-parentheses
-CFLAGS += -Wno-type-limits
-CFLAGS += -Wno-unused-parameter
-CFLAGS += -Wunreachable-code
-CFLAGS += -Wwrite-strings
-CFLAGS += -Wpointer-arith
-CFLAGS += -Wall
-CFLAGS += -Wextra
-CFLAGS += -Wcast-qual
-CFLAGS += -Wstack-usage=4096
-CFLAGS += -Wconversion
-CFLAGS += -Wpedantic
-#CFLAGS += -Werror
+ifeq ($(findstring cc,$(CC)),cc)
+EXTENDED_CFLAGS += -Waddress
+EXTENDED_CFLAGS += -Waggregate-return
+EXTENDED_CFLAGS += -Wformat-nonliteral
+EXTENDED_CFLAGS += -Wformat-security
+EXTENDED_CFLAGS += -Wformat
+EXTENDED_CFLAGS += -Winit-self
+EXTENDED_CFLAGS += -Wmissing-include-dirs
+EXTENDED_CFLAGS += -Wno-multichar
+EXTENDED_CFLAGS += -Wno-parentheses
+EXTENDED_CFLAGS += -Wno-type-limits
+EXTENDED_CFLAGS += -Wno-unused-parameter
+EXTENDED_CFLAGS += -Wunreachable-code
+EXTENDED_CFLAGS += -Wwrite-strings
+EXTENDED_CFLAGS += -Wpointer-arith
+EXTENDED_CFLAGS += -Wall
+EXTENDED_CFLAGS += -Wextra
+EXTENDED_CFLAGS += -Wcast-qual
+EXTENDED_CFLAGS += -Wstack-usage=4096
+#EXTENDED_CFLAGS += -Wconversion
+#EXTENDED_CFLAGS += -Wpedantic
+#EXTENDED_CFLAGS += -Werror
 
 #Clang warning flahs
-else ifeq ($(CC),clang-13)
-CFLAGS += -Wcast-qual
-CFLAGS += -Wconversion
-CFLAGS += -Wexit-time-destructors
-CFLAGS += -Wglobal-constructors
-CFLAGS += -Wmissing-noreturn
-CFLAGS += -Wmissing-prototypes
-CFLAGS += -Wno-missing-braces
-CFLAGS += -Wold-style-cast
-#CFLAGS += -Wshadow
-CFLAGS += -Wweak-vtables
-CFLAGS += -Wall
-#CFLAGS += -Wextra
-CFLAGS += -Wpedantic
-CFLAGS += -Wstack-exhausted
-CFLAGS += -Wconversion
-#CFLAGS += -Werror
+else ifeq ($(findstring clang,$(CC)),clang)
+EXTENDED_CFLAGS += -Wcast-qual
+EXTENDED_CFLAGS += -Wconversion
+EXTENDED_CFLAGS += -Wexit-time-destructors
+EXTENDED_CFLAGS += -Wglobal-constructors
+EXTENDED_CFLAGS += -Wmissing-noreturn
+EXTENDED_CFLAGS += -Wmissing-prototypes
+EXTENDED_CFLAGS += -Wno-missing-braces
+EXTENDED_CFLAGS += -Wold-style-cast
+#EXTENDED_CFLAGS += -Wshadow
+EXTENDED_CFLAGS += -Wweak-vtables
+EXTENDED_CFLAGS += -Wall
+#EXTENDED_CFLAGS += -Wextra
+EXTENDED_CFLAGS += -Wpedantic
+EXTENDED_CFLAGS += -Wstack-exhausted
+EXTENDED_CFLAGS += -Wconversion
+#EXTENDED_CFLAGS += -Werror
 endif
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
-#CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+#EXTENDED_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 #CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 #LDFLAGS += -fsanitize=address -static-libasan
 
-#$(info    CFLAGS is $(CFLAGS))
+$(info    EXTENDED_CFLAGS are $(EXTENDED_CFLAGS))
 ################################################################################
 # build the library
 ################################################################################
@@ -189,7 +192,7 @@ $(DIR)/$(LIB_NAME): $(OBJ)
 
 $(DIR)/%.o: %.c Makefile makefile_config.mk
 	@echo [Compile] $<
-	@$(CC) -c $(CFLAGS) $< -o $@
+	@$(CC) -c $(EXTENDED_CFLAGS) $< -o $@
 
 clean:
 	rm -fR $(DIR)

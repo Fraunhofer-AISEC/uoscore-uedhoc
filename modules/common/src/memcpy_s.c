@@ -11,8 +11,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "oscore_edhoc_error.h"
-#include "memcpy_s.h"
+#include "../inc/oscore_edhoc_error.h"
+#include "../inc/memcpy_s.h"
 
 enum err check_buffer_size(uint32_t is_size, uint32_t required_size)
 {

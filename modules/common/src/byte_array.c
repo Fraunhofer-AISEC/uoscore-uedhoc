@@ -9,7 +9,7 @@
    except according to those terms.
 */
 
-#include "byte_array.h"
+#include "../inc/byte_array.h"
 
 uint8_t EMPTY_STRING[] = { "" };
 struct byte_array EMPTY_ARRAY = {

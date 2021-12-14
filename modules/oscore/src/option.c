@@ -22,12 +22,18 @@ bool is_class_e(uint16_t code)
 	       code != COAP_OPTION_PROXY_SCHEME;
 }
 
+static bool is_class_i(uint16_t code)
+{
+	/* "Note: There are currently no Class I option message fields defined." */
+	return false;
+}
+
 bool (*class_to_condition(enum option_class class))(uint16_t code)
 {
 	switch (class) {
 	case CLASS_I:
 		/* "Note: There are currently no Class I option message fields defined." */
-		return false;
+		return is_class_i;
 	case CLASS_E:
 		return is_class_e;
 	default:

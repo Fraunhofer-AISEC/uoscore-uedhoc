@@ -12,7 +12,7 @@
 #define SIGNATURE_OR_MAC_MSG_H
 
 #include <stdbool.h>
-#include "oscore_edhoc_error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "suites.h"
 
 enum sgn_or_mac_op { VERIFY, GENERATE };

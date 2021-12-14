@@ -14,8 +14,7 @@
 
 #include <stdint.h>
 
-#include "oscore_edhoc_error.h"
-
+#include "../../common/inc/oscore_edhoc_error.h"
 enum role { INITIATOR, RESPONDER };
 
 /**

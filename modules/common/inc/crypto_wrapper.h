@@ -13,7 +13,7 @@
 
 #include "byte_array.h"
 #include "oscore_edhoc_error.h"
-#include "suites.h"
+#include "../../edhoc/inc/suites.h"
 
 /*Indicates what kind of operation a symmetric cipher will execute*/
 enum aes_operation {

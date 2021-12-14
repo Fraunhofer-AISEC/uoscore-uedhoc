@@ -10,13 +10,13 @@
 */
 #include <string.h>
 
-#include "crypto_wrapper.h"
-#include "byte_array.h"
-#include "oscore_edhoc_error.h"
-#include "print_util.h"
-#include "suites.h"
-#include "memcpy_s.h"
+#include "../inc/crypto_wrapper.h"
+#include "../inc/byte_array.h"
+#include "../inc/oscore_edhoc_error.h"
+#include "../inc/print_util.h"
+#include "../inc/memcpy_s.h"
 #include "../../edhoc/edhoc.h"
+#include "../../edhoc/inc/suites.h"
 
 //#define MBEDTLS
 

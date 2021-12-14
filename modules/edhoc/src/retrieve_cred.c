@@ -15,8 +15,8 @@
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../../common/inc/oscore_edhoc_error.h"
-#include "../inc/print_util.h"
-#include "../inc/memcpy_s.h"
+#include "../../common/inc/print_util.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../cbor/decode_id_cred_x.h"
 #include "../cbor/decode_cert.h"
 /**

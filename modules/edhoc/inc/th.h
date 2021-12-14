@@ -11,8 +11,8 @@
 #ifndef TH_H
 #define TH_H
 
-#include "byte_array.h"
-#include "oscore_edhoc_error.h"
+#include "../../common/inc/byte_array.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "suites.h"
 #include "c_x.h"
 

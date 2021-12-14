@@ -3,11 +3,11 @@
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../../common/inc/oscore_edhoc_error.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../inc/okm.h"
 #include "../inc/ciphertext.h"
 #include "../inc/signature_or_mac_msg.h"
 #include "../inc/plaintext.h"
-#include "../inc/memcpy_s.h"
 #include "../inc/associated_data_encode.h"
 #include "../inc/suites.h"
 
