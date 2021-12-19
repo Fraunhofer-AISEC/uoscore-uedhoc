@@ -113,7 +113,7 @@
 #define PK_DEFAULT_SIZE P_256_PUB_KEY_DEFAULT_SIZE
 #define SIGNATURE_DEFAULT_SIZE 64
 #define TH_ENC_DEFAULT_SIZE 42
-#define ENCODING_OVERHEAD 4
+#define ENCODING_OVERHEAD 6
 
 struct other_party_cred {
 	struct byte_array id_cred; /*ID_CRED_x of the other party*/
