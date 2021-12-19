@@ -85,7 +85,7 @@ enum err {
 		enum err retval = (x);                                             \
 		if (retval != ok) {                                                \
 			PRINTF(RED                                                 \
-			       "Runtime error: %s error code %d at %s:%d\n" RESET, \
+			       "Runtime error: %s error code %d at %s:%d\n\n" RESET, \
 			       #x, retval, __FILE__, __LINE__);                    \
 			return retval;                                             \
 		}                                                                  \
@@ -100,7 +100,7 @@ enum err {
 		int retval = (x);                                                  \
 		if (retval != expected_result) {                                   \
 			PRINTF(RED                                                 \
-			       "Runtime error: %s error code %d at %s:%d\n" RESET, \
+			       "Runtime error: %s error code %d at %s:%d\n\n" RESET, \
 			       #x, retval, __FILE__, __LINE__);                    \
 			return unexpected_result_from_ext_lib;                     \
 		}                                                                  \

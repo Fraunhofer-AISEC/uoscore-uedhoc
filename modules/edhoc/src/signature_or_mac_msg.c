@@ -64,15 +64,14 @@ enum err mac(const uint8_t *prk, uint32_t prk_len, const uint8_t *th,
 	uint32_t context_mac_len = id_cred_len + cred_len + ead_len;
 	TRY(check_buffer_size(CONTEXT_MAC_DEFAULT_SIZE, context_mac_len));
 	uint8_t context_mac[CONTEXT_MAC_DEFAULT_SIZE];
-	TRY(_memcpy_s(context_mac, sizeof(context_mac), id_cred, id_cred_len));
+	TRY(_memcpy_s(context_mac, context_mac_len, id_cred, id_cred_len));
 
-	TRY(_memcpy_s(context_mac + id_cred_len,
-		      (uint32_t)sizeof(context_mac) - id_cred_len, cred,
-		      cred_len));
+	TRY(_memcpy_s((context_mac + id_cred_len),
+		      (context_mac_len - id_cred_len), cred, cred_len));
 
-	TRY(_memcpy_s(context_mac + id_cred_len + cred_len,
-		      (uint32_t)sizeof(context_mac) - id_cred_len - cred_len,
-		      ead, ead_len));
+	TRY(_memcpy_s((context_mac + id_cred_len + cred_len),
+		      (context_mac_len - id_cred_len - cred_len), ead,
+		      ead_len));
 
 	PRINT_ARRAY("MAC context", context_mac, context_mac_len);
 

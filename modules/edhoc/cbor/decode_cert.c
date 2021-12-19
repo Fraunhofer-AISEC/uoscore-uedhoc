@@ -22,13 +22,15 @@ static bool decode_cert(
 	cbor_print("%s\n", __func__);
 
 	bool tmp_result = (((((intx32_decode(state, (&(*result)._cert_type))))
-	&& ((bstrx_decode(state, (&(*result)._cert_serial_number))))
+	&& ((intx32_decode(state, (&(*result)._cert_serial_number))))
 	&& ((tstrx_decode(state, (&(*result)._cert_issuer))))
 	&& ((intx32_decode(state, (&(*result)._cert_validity_not_before))))
 	&& ((intx32_decode(state, (&(*result)._cert_validity_not_after))))
 	&& ((bstrx_decode(state, (&(*result)._cert_subject))))
+	&& ((intx32_decode(state, (&(*result)._cert_subject_public_key_algorithm))))
 	&& ((bstrx_decode(state, (&(*result)._cert_pk))))
 	&& ((intx32_decode(state, (&(*result)._cert_extensions))))
+	&& ((intx32_decode(state, (&(*result)._cert_issuer_signature_algorithm))))
 	&& ((bstrx_decode(state, (&(*result)._cert_signature)))))));
 
 	if (!tmp_result)
@@ -46,7 +48,7 @@ bool cbor_decode_cert(
 {
 	cbor_state_t states[2];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 9);
+	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 11);
 
 	bool ret = decode_cert(states, result);
 

@@ -166,7 +166,7 @@ enum err th3_calculate(enum hash_alg alg, uint8_t *th2, uint32_t th2_len,
 		       uint8_t *ciphertext_2, uint32_t ciphertext_2_len,
 		       uint8_t *th3)
 {
-	uint32_t th3_input_len = th2_len + ciphertext_2_len + 4;
+	uint32_t th3_input_len = th2_len + ciphertext_2_len + 6;
 	TRY(check_buffer_size(TH3_INPUT_DEFAULT_SIZE, th3_input_len));
 	uint8_t th3_input[TH3_INPUT_DEFAULT_SIZE];
 
@@ -181,7 +181,7 @@ enum err th4_calculate(enum hash_alg alg, uint8_t *th3, uint32_t th3_len,
 		       uint8_t *ciphertext_3, uint32_t ciphertext_3_len,
 		       uint8_t *th4)
 {
-	uint32_t th4_input_len = th3_len + ciphertext_3_len + 4;
+	uint32_t th4_input_len = th3_len + ciphertext_3_len + ENCODING_OVERHEAD;
 	TRY(check_buffer_size(TH4_INPUT_DEFAULT_SIZE, th4_input_len));
 	uint8_t th4_input[TH4_INPUT_DEFAULT_SIZE];
 

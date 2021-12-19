@@ -40,8 +40,8 @@ struct other_party_cred_bufs {
 	uint8_t cred[CERT_DEFAUT_SIZE];
 	uint8_t pk[PK_DEFAULT_SIZE];
 	uint8_t g[G_X_DEFAULT_SIZE];
-	uint8_t ca[5]; //todo check how is this defined in the new test vectors
-	uint8_t ca_pk[G_X_DEFAULT_SIZE]; //todo check how is this defined in the new test vectors
+	uint8_t ca[50]; //todo check how is this defined in the new test vectors
+	uint8_t ca_pk[G_X_DEFAULT_SIZE]; 
 };
 
 struct edhoc_initiator_context_bufs {

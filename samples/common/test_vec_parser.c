@@ -235,8 +235,8 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 	byte_array_init(bufs->cred, sizeof(bufs->cred), &c->cred);
 	byte_array_init(bufs->pk, sizeof(bufs->pk), &c->pk);
 	byte_array_init(bufs->g, sizeof(bufs->g), &c->g);
-	// byte_array_init(bufs->ca, sizeof(bufs->ca), &c->ca);
-	// byte_array_init(bufs->ca_pk, sizeof(bufs->ca_pk), &c->ca_pk);
+	byte_array_init(bufs->ca, sizeof(bufs->ca), &c->ca);
+	byte_array_init(bufs->ca_pk, sizeof(bufs->ca_pk), &c->ca_pk);
 
 	if (other_party_role == INITIATOR) {
 		PRINT_MSG(
@@ -256,6 +256,9 @@ int get_OTHER_PARTY_CRED_from_test_vec(enum role other_party_role,
 		get_element(test_vec_buf, t, r, "g_r_raw", vec_num, &c->g);
 		get_element(test_vec_buf, t, r, "pk_r_raw", vec_num, &c->pk);
 	}
+
+	get_element(test_vec_buf, t, r, "ca", vec_num, &c->ca);
+	get_element(test_vec_buf, t, r, "ca_pk", vec_num, &c->ca_pk);
 
 	return 0;
 }

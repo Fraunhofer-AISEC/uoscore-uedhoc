@@ -33,7 +33,7 @@
 #include "../cbor/encode_message_3.h"
 //#include "../cbor/decode_message_2_c_i.h"
 
-/**
+/** 
  * @brief   Parses message 2
  * @param   c initiator context
  * @param   msg2 pointer to a buffer containign message 2 
@@ -276,7 +276,7 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			   &ciphertext_3_len));
 
 	/*massage 3 create and send*/
-	uint32_t msg3_len = ciphertext_3_len + 2;
+	uint32_t msg3_len = ciphertext_3_len + ENCODING_OVERHEAD;
 	TRY(check_buffer_size(CIPHERTEXT3_DEFAULT_SIZE, msg3_len));
 	uint8_t msg3[CIPHERTEXT3_DEFAULT_SIZE];
 
