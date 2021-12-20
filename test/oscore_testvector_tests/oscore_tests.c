@@ -324,7 +324,7 @@ void oscore_misc_test8(void)
 
 	/*Test if encrypting simple ACK message results in valid unencrypted message, see Section 4.2*/
 	uint8_t buf_oscore[256];
-	uint16_t buf_oscore_len = sizeof(buf_oscore);
+	uint32_t buf_oscore_len = sizeof(buf_oscore);
 
 	r = coap2oscore(T8__COAP_ACK, T8__COAP_ACK_LEN, 
 		(uint8_t *)&buf_oscore, &buf_oscore_len, &context);
