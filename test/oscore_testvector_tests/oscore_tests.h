@@ -17,5 +17,6 @@ void oscore_client_test5(void);
 void oscore_server_test2(void);
 void oscore_server_test4(void);
 void oscore_server_test6(void);
+void oscore_misc_test8(void);
 
 #endif

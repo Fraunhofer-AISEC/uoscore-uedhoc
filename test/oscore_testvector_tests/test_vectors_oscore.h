@@ -238,4 +238,27 @@ extern uint8_t T7__COAP_RESPONSE_LEN;
 extern uint8_t T7__OSCORE_RES[];
 extern uint8_t T7__OSCORE_RES_LEN;
 
+/**
+ * Test 8:
+ * - Simple ACK packet should not be encrypted and result should be the same as input buffer (see RFC8613 Section 4.2)
+ */
+extern uint8_t T8__MASTER_SECRET[16];
+extern uint8_t T8__MASTER_SECRET_LEN;
+
+extern uint8_t T8__SENDER_ID[];
+extern uint8_t T8__SENDER_ID_LEN;
+
+extern uint8_t *T8__RECIPIENT_ID;
+extern uint8_t T8__RECIPIENT_ID_LEN;
+
+extern uint8_t T8__MASTER_SALT[8];
+extern uint8_t T8__MASTER_SALT_LEN;
+
+extern uint8_t *T8__ID_CONTEXT;
+extern uint8_t T8__ID_CONTEXT_LEN;
+
+/*Simple ACK message (code 0=EMPTY, type 2=ACK, no payload).*/
+extern uint8_t T8__COAP_ACK[];
+extern uint8_t T8__COAP_ACK_LEN;
+
 #endif
