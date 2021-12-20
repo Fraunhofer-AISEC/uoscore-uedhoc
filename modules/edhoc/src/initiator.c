@@ -260,13 +260,12 @@ msg3_gen(const struct edhoc_initiator_context *c, struct runtime_context *rc,
 			   &ciphertext_3_len));
 
 	/*massage 3 create and send*/
-	uint32_t msg3_len = ciphertext_3_len + ENCODING_OVERHEAD;
-	TRY(check_buffer_size(CIPHERTEXT3_DEFAULT_SIZE, msg3_len));
-	uint8_t msg3[CIPHERTEXT3_DEFAULT_SIZE];
+	TRY(check_buffer_size(CIPHERTEXT3_DEFAULT_SIZE,
+			      ciphertext_3_len + ENCODING_OVERHEAD));
 
-	TRY(encode_byte_string(ciphertext_3, ciphertext_3_len, msg3,
-			       &msg3_len));
-	PRINT_ARRAY("msg3", msg3, msg3_len);
+	TRY(encode_byte_string(ciphertext_3, ciphertext_3_len, rc->msg3,
+			       &rc->msg3_len));
+	PRINT_ARRAY("msg3", rc->msg3, rc->msg3_len);
 	/*TH4*/
 	TRY(th4_calculate(rc->suite.edhoc_hash, th3, sizeof(th3), ciphertext_3,
 			  ciphertext_3_len, th4));
@@ -279,7 +278,7 @@ static inline enum err msg4_process(const struct edhoc_initiator_context *c,
 				    uint32_t prk_4x3m_len, uint8_t *th4,
 				    uint32_t th4_len)
 {
-	PRINT_ARRAY("message_4 (CBOR Sequence)", msg4, msg4_len);
+	PRINT_ARRAY("message_4 (CBOR Sequence)", rc->msg4, rc->msg4_len);
 
 	uint8_t ciphertext_4[CIPHERTEXT4_DEFAULT_SIZE];
 	uint32_t ciphertext_4_len = sizeof(ciphertext_4);
@@ -294,30 +293,31 @@ static inline enum err msg4_process(const struct edhoc_initiator_context *c,
 	return ok;
 }
 
-enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
-			     struct other_party_cred *cred_r_array,
-			     uint16_t num_cred_r, uint8_t *err_msg,
-			     uint32_t *err_msg_len, uint8_t *ead_2,
-			     uint32_t *ead_2_len, uint8_t *ead_4,
-			     uint32_t *ead_4_len, uint8_t *prk_4x3m,
-			     uint32_t prk_4x3m_len, uint8_t *th4,
-			     uint32_t th4_len,
-			     enum err (*tx)(uint8_t *data, uint32_t data_len),
-			     enum err (*rx)(uint8_t *data, uint32_t *data_len))
+enum err edhoc_initiator_run(
+	const struct edhoc_initiator_context *c,
+	struct other_party_cred *cred_r_array, uint16_t num_cred_r,
+	uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_2,
+	uint32_t *ead_2_len, uint8_t *ead_4, uint32_t *ead_4_len,
+	uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4,
+	uint32_t th4_len,
+	enum err (*tx)(void *sock, uint8_t *data, uint32_t data_len),
+	enum err (*rx)(void *sock, uint8_t *data, uint32_t *data_len))
 {
 	struct runtime_context rc = { 0 };
 	runtime_context_init(&rc);
 
 	TRY(msg1_gen(c, &rc));
-	TRY(tx(rc.msg1, rc.msg1_len));
+	TRY(tx(c->sock, rc.msg1, rc.msg1_len));
 
-	TRY(rx(rc.msg2, &rc.msg2_len));
+	PRINT_MSG("waiting to receive message 2...");
+	TRY(rx(c->sock, rc.msg2, &rc.msg2_len));
 	TRY(msg3_gen(c, &rc, cred_r_array, num_cred_r, ead_2, ead_2_len,
 		     prk_4x3m, prk_4x3m_len, th4, th4_len));
-	TRY(tx(rc.msg3, rc.msg3_len));
+	TRY(tx(c->sock, rc.msg3, rc.msg3_len));
 
 	if (c->msg4) {
-		TRY(rx(rc.msg4, &rc.msg4_len));
+		PRINT_MSG("waiting to receive message 4...");
+		TRY(rx(c->sock, rc.msg4, &rc.msg4_len));
 		TRY(msg4_process(c, &rc, ead_4, ead_4_len, prk_4x3m,
 				 prk_4x3m_len, th4, th4_len));
 	}

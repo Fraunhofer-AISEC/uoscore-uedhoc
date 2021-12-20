@@ -353,29 +353,31 @@ static inline enum err msg4_gen(struct edhoc_responder_context *c,
 	return ok;
 }
 
-enum err edhoc_responder_run(struct edhoc_responder_context *c,
-			     struct other_party_cred *cred_i_array,
-			     uint16_t num_cred_i, uint8_t *err_msg,
-			     uint32_t *err_msg_len, uint8_t *ead_1,
-			     uint32_t *ead_1_len, uint8_t *ead_3,
-			     uint32_t *ead_3_len, uint8_t *prk_4x3m,
-			     uint32_t prk_4x3m_len, uint8_t *th4,
-			     uint32_t th4_len,
-			     enum err (*tx)(uint8_t *data, uint32_t data_len),
-			     enum err (*rx)(uint8_t *data, uint32_t *data_len))
+enum err edhoc_responder_run(
+	struct edhoc_responder_context *c,
+	struct other_party_cred *cred_i_array, uint16_t num_cred_i,
+	uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_1,
+	uint32_t *ead_1_len, uint8_t *ead_3, uint32_t *ead_3_len,
+	uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4,
+	uint32_t th4_len,
+	enum err (*tx)(void *sock, uint8_t *data, uint32_t data_len),
+	enum err (*rx)(void *sock, uint8_t *data, uint32_t *data_len))
 {
 	struct runtime_context rc = { 0 };
 	runtime_context_init(&rc);
 
-	TRY(rx(rc.msg1, &rc.msg1_len));
+	PRINT_MSG("waiting to receive message 1...");
+	TRY(rx(c->sock, rc.msg1, &rc.msg1_len));
 	TRY(msg2_gen(c, &rc, ead_1, ead_1_len));
-	TRY(tx(rc.msg2, rc.msg2_len));
-	TRY(rx(rc.msg3, &rc.msg3_len));
+	TRY(tx(c->sock, rc.msg2, rc.msg2_len));
+
+	PRINT_MSG("waiting to receive message 3...");
+	TRY(rx(c->sock, rc.msg3, &rc.msg3_len));
 	TRY(msg3_process(c, &rc, cred_i_array, num_cred_i, ead_3, ead_3_len,
 			 prk_4x3m, prk_4x3m_len, th4, th4_len));
 	if (c->msg4) {
 		TRY(msg4_gen(c, &rc, prk_4x3m, prk_4x3m_len, th4, th4_len));
-		TRY(tx(rc.msg4, rc.msg4_len));
+		TRY(tx(c->sock, rc.msg4, rc.msg4_len));
 	}
 
 	return ok;
