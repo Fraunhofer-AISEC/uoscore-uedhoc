@@ -41,7 +41,7 @@ int test_edhoc(enum role p, uint8_t vec_num)
 	uint8_t ad_4[AD_DEFAULT_SIZE];
 	uint32_t ad_4_len = sizeof(ad_2);
 	/* test vector inputs */
-	char filename[] = { "../../samples/common/edhoc-vectors-json_v11.txt" };
+	char filename[] = { "../../edhoc-vectors-json_v11.txt" };
 	char test_vec_buf[1024 * 160];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 	struct results_bufs res_bufs;
