@@ -19,4 +19,6 @@ void runtime_context_init(struct runtime_context *c)
 	c->msg2_len = sizeof(c->msg2);
 	c->msg3_len = sizeof(c->msg3);
 	c->msg4_len = sizeof(c->msg4);
+	c->th3_len = sizeof(c->th3);
+	c->PRK_3e2m_len = sizeof(c->PRK_3e2m);
 }
