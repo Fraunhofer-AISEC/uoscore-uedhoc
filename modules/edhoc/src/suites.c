@@ -117,3 +117,17 @@ uint32_t get_signature_len(enum sign_alg alg)
 	}
 	return 0;
 }
+
+uint32_t get_ecdh_pk_len(enum ecdh_alg alg)
+{
+	switch (alg) {
+	case P256:
+		/*The publick key is in compressed form*/
+		return 33;
+		break;
+	case X25519:
+		return 32;
+		break;
+	}
+	return 0;
+}

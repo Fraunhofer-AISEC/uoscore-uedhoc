@@ -63,7 +63,6 @@ static int start_coap_client(void)
 	return 0;
 }
 
-
 /**
  * @brief	Callback function called inside the frontend when data needs to 
  * 		be send over the network. We use here CoAP as transport 
@@ -123,7 +122,7 @@ enum err rx(uint8_t *data, uint32_t *data_len)
 		*data_len = payload_len;
 	} else {
 		printf("insufficient space in buffer");
-		return dest_buffer_to_small;
+		return buffer_to_small;
 	}
 
 	delete recvPDU;
@@ -141,30 +140,33 @@ int main()
 	uint8_t err_msg[ERR_MSG_DEFAULT_SIZE];
 	uint32_t err_msg_len = sizeof(err_msg);
 	uint8_t ad_2[AD_DEFAULT_SIZE];
-	uint64_t ad_2_len = sizeof(ad_2);
+	uint32_t ad_2_len = sizeof(ad_2);
 	uint8_t ad_4[AD_DEFAULT_SIZE];
-	uint64_t ad_4_len = sizeof(ad_2);
+	uint32_t ad_4_len = sizeof(ad_2);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 17;
+	const uint8_t TEST_VEC_NUM = 18;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_r;
 	struct edhoc_initiator_context c_i;
 	struct other_party_cred_bufs other_party_bufs;
 	struct edhoc_initiator_context_bufs initiator_context_bufs;
-	char filename[] = { "../../common/edhoc-vectors-json_v11.txt" };
+	char filename[] = { "../../../edhoc-vectors-json_v11.txt" };
 	char test_vec_buf[1024 * 160];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 
-	TRY(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len));
+	TRY_EXPECT(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len),
+		   0);
 
-	TRY(get_OTHER_PARTY_CRED_from_test_vec(RESPONDER, &other_party_bufs,
-					       &cred_r, TEST_VEC_NUM,
-					       test_vec_buf, test_vec_buf_len));
+	TRY_EXPECT(get_OTHER_PARTY_CRED_from_test_vec(
+			   RESPONDER, &other_party_bufs, &cred_r, TEST_VEC_NUM,
+			   test_vec_buf, test_vec_buf_len),
+		   0);
 
-	TRY(get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
-		&initiator_context_bufs, &c_i, TEST_VEC_NUM, test_vec_buf,
-		test_vec_buf_len));
+	TRY_EXPECT(get_EDHOC_INITIATOR_CONTEXT_from_test_vec(
+			   &initiator_context_bufs, &c_i, TEST_VEC_NUM,
+			   test_vec_buf, test_vec_buf_len),
+		   0);
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
 	uint32_t seed;
@@ -189,7 +191,7 @@ int main()
 
 #endif
 
-	TRY(start_coap_client());
+	TRY_EXPECT(start_coap_client(), 0);
 
 	TRY(edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, ad_4, &ad_4_len, PRK_4x3m,

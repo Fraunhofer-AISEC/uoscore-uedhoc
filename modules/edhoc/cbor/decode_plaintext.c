@@ -30,6 +30,20 @@ static bool decode_repeated_map_kid(
 	return tmp_result;
 }
 
+static bool decode_repeated_map_x5bag(
+		cbor_state_t *state, struct map_x5bag *result)
+{
+	cbor_print("%s\n", __func__);
+
+	bool tmp_result = ((((uintx32_expect(state, (32))))
+	&& (bstrx_decode(state, (&(*result)._map_x5bag)))));
+
+	if (!tmp_result)
+		cbor_trace();
+
+	return tmp_result;
+}
+
 static bool decode_repeated_map_x5chain(
 		cbor_state_t *state, struct map_x5chain *result)
 {
@@ -51,8 +65,9 @@ static bool decode_repeated_map_x5t(
 	bool int_res;
 
 	bool tmp_result = ((((uintx32_expect(state, (34))))
-	&& (list_start_decode(state) && (int_res = (((intx32_decode(state, (&(*result)._map_x5t_int))))
-	&& ((bstrx_decode(state, (&(*result)._map_x5t_bstr))))), ((list_end_decode(state)) && int_res)))));
+	&& (list_start_decode(state) && (int_res = (((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._map_x5t_alg_int)))) && (((*result)._map_x5t_alg_choice = _map_x5t_alg_int) || 1))
+	|| (((tstrx_decode(state, (&(*result)._map_x5t_alg_tstr)))) && (((*result)._map_x5t_alg_choice = _map_x5t_alg_tstr) || 1))), union_end_code(state), int_res)))
+	&& ((bstrx_decode(state, (&(*result)._map_x5t_hash))))), ((list_end_decode(state)) && int_res)))));
 
 	if (!tmp_result)
 		cbor_trace();
@@ -74,6 +89,65 @@ static bool decode_repeated_map_x5u(
 	return tmp_result;
 }
 
+static bool decode_repeated_map_c5b(
+		cbor_state_t *state, struct map_c5b *result)
+{
+	cbor_print("%s\n", __func__);
+
+	bool tmp_result = ((((uintx32_expect(state, (52))))
+	&& (bstrx_decode(state, (&(*result)._map_c5b)))));
+
+	if (!tmp_result)
+		cbor_trace();
+
+	return tmp_result;
+}
+
+static bool decode_repeated_map_c5c(
+		cbor_state_t *state, struct map_c5c *result)
+{
+	cbor_print("%s\n", __func__);
+
+	bool tmp_result = ((((uintx32_expect(state, (53))))
+	&& (bstrx_decode(state, (&(*result)._map_c5c)))));
+
+	if (!tmp_result)
+		cbor_trace();
+
+	return tmp_result;
+}
+
+static bool decode_repeated_map_c5t(
+		cbor_state_t *state, struct map_c5t_ *result)
+{
+	cbor_print("%s\n", __func__);
+	bool int_res;
+
+	bool tmp_result = ((((uintx32_expect(state, (54))))
+	&& (list_start_decode(state) && (int_res = (((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._map_c5t_alg_int)))) && (((*result)._map_c5t_alg_choice = _map_c5t_alg_int) || 1))
+	|| (((tstrx_decode(state, (&(*result)._map_c5t_alg_tstr)))) && (((*result)._map_c5t_alg_choice = _map_c5t_alg_tstr) || 1))), union_end_code(state), int_res)))
+	&& ((bstrx_decode(state, (&(*result)._map_c5t_hash))))), ((list_end_decode(state)) && int_res)))));
+
+	if (!tmp_result)
+		cbor_trace();
+
+	return tmp_result;
+}
+
+static bool decode_repeated_map_c5u(
+		cbor_state_t *state, struct map_c5u *result)
+{
+	cbor_print("%s\n", __func__);
+
+	bool tmp_result = ((((uintx32_expect(state, (55))))
+	&& (bstrx_decode(state, (&(*result)._map_c5u)))));
+
+	if (!tmp_result)
+		cbor_trace();
+
+	return tmp_result;
+}
+
 static bool decode_map(
 		cbor_state_t *state, struct map *result)
 {
@@ -81,9 +155,14 @@ static bool decode_map(
 	bool int_res;
 
 	bool tmp_result = (((map_start_decode(state) && (int_res = (present_decode(&((*result)._map_kid_present), (void *)decode_repeated_map_kid, state, (&(*result)._map_kid))
+	&& present_decode(&((*result)._map_x5bag_present), (void *)decode_repeated_map_x5bag, state, (&(*result)._map_x5bag))
 	&& present_decode(&((*result)._map_x5chain_present), (void *)decode_repeated_map_x5chain, state, (&(*result)._map_x5chain))
 	&& present_decode(&((*result)._map_x5t_present), (void *)decode_repeated_map_x5t, state, (&(*result)._map_x5t))
-	&& present_decode(&((*result)._map_x5u_present), (void *)decode_repeated_map_x5u, state, (&(*result)._map_x5u))), ((map_end_decode(state)) && int_res)))));
+	&& present_decode(&((*result)._map_x5u_present), (void *)decode_repeated_map_x5u, state, (&(*result)._map_x5u))
+	&& present_decode(&((*result)._map_c5b_present), (void *)decode_repeated_map_c5b, state, (&(*result)._map_c5b))
+	&& present_decode(&((*result)._map_c5c_present), (void *)decode_repeated_map_c5c, state, (&(*result)._map_c5c))
+	&& present_decode(&((*result)._map_c5t_present), (void *)decode_repeated_map_c5t, state, (&(*result)._map_c5t))
+	&& present_decode(&((*result)._map_c5u_present), (void *)decode_repeated_map_c5u, state, (&(*result)._map_c5u))), ((map_end_decode(state)) && int_res)))));
 
 	if (!tmp_result)
 		cbor_trace();
@@ -116,7 +195,7 @@ bool cbor_decode_plaintext(
 		struct plaintext *result,
 		uint32_t *payload_len_out)
 {
-	cbor_state_t states[5];
+	cbor_state_t states[6];
 
 	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 3);
 

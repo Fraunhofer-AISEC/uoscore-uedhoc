@@ -32,6 +32,7 @@ bool (*class_to_condition(enum option_class class))(uint16_t code)
 {
 	switch (class) {
 	case CLASS_I:
+		/* "Note: There are currently no Class I option message fields defined." */
 		return is_class_i;
 	case CLASS_E:
 		return is_class_e;
@@ -64,21 +65,22 @@ uint32_t encoded_option_len(struct o_coap_option *options, uint16_t opt_num,
 	uint32_t len = 0;
 	uint16_t total_delta = 0;
 	for (int i = 0; i < opt_num; i++) {
-		total_delta += options[i].delta;
+		total_delta = (uint16_t)(total_delta + options[i].delta);
 		uint16_t code = total_delta;
 		if (!condition(code)) {
 			continue;
 		}
 
-		len += 1 + option_field_len(options[i].delta) +
-		       option_field_len(options[i].len) + options[i].len;
+		len = (uint32_t)(len + 1 + option_field_len(options[i].delta) +
+				 option_field_len(options[i].len) +
+				 options[i].len);
 	}
 	return len;
 }
 
-enum err encode_options(struct o_coap_option *options,
-				 uint16_t opt_num, enum option_class class,
-				 uint8_t *out, uint8_t out_buf_len)
+enum err encode_options(struct o_coap_option *options, uint16_t opt_num,
+			enum option_class class, uint8_t *out,
+			uint32_t out_buf_len)
 {
 	bool (*condition)(uint16_t) = class_to_condition(class);
 
@@ -86,22 +88,23 @@ enum err encode_options(struct o_coap_option *options,
 	uint16_t skipped_delta = 0;
 	for (int i = 0; i < opt_num; i++) {
 		// skip options which aren't of requested class
-		uint16_t delta = options[i].delta + skipped_delta;
+		uint16_t delta = (uint16_t)(options[i].delta + skipped_delta);
 		if (!condition(delta)) {
-			skipped_delta += options[i].delta;
+			skipped_delta =
+				(uint16_t)(skipped_delta + options[i].delta);
 			continue;
 		}
 		skipped_delta = 0;
 
 		struct o_coap_option option = options[i];
 
-		uint16_t length = option.len;
+		uint8_t length = option.len;
 		uint8_t delta_length_field = 0;
 		uint8_t delta_len = option_field_len(delta);
 		uint8_t length_len = option_field_len(length);
 		// delta
 		if (delta_len == 0) {
-			delta_length_field |= delta << 4;
+			delta_length_field |= (uint8_t)(delta << 4);
 		} else if (delta_len == 1) {
 			delta_length_field |= 13 << 4;
 			out[index + 1] = (uint8_t)(delta - 13);
@@ -126,10 +129,10 @@ enum err encode_options(struct o_coap_option *options,
 				(uint8_t)(((length - 269) >> 0) & 0xff);
 		}
 		out[index] = delta_length_field;
-		index += 1 + delta_len + length_len;
+		index = (uint32_t)(index + 1 + delta_len + length_len);
 		// value
 		TRY(_memcpy_s(&out[index], (out_buf_len - index),
-				  &option.value[0], length));
+			      &option.value[0], length));
 
 		index += length;
 	}

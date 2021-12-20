@@ -17,7 +17,7 @@
 /**
  *@brief prints an array for debug pourposes 
  */
-void print_array(const uint8_t *in_data, uint16_t in_len);
+void print_array(const uint8_t *in_data, uint32_t in_len);
 
 #ifdef DEBUG_PRINT
 #define PRINT_ARRAY(msg, a, a_len)                                             \

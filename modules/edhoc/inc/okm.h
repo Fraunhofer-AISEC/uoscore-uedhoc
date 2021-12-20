@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "oscore_edhoc_error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "hkdf_info.h"
 #include "suites.h"
 
@@ -29,9 +29,9 @@
  * @param   okm ouput pointer
  * @param   okm_len length of okm
  */
-enum err okm_calc(enum hash_alg hash_alg, const uint8_t *prk,
-			  uint8_t prk_len, const uint8_t *th, uint8_t th_len,
-			  const char *label, uint8_t *context,
-			  uint32_t context_len, uint8_t *okm, uint64_t okm_len);
+enum err okm_calc(enum hash_alg hash_alg, const uint8_t *prk, uint32_t prk_len,
+		  const uint8_t *th, uint32_t th_len, const char *label,
+		  uint8_t *context, uint32_t context_len, uint8_t *okm,
+		  uint32_t okm_len);
 
 #endif

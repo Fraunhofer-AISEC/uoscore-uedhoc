@@ -9,55 +9,67 @@
 
 ; This file should be processed with cddl-gen (https://github.com/NordicSemiconductor/cddl-gen/tree/master) to create cbor encoding and decoding code 
 
-plaintext = (
-	ID_CRED_x: map / bstr / int, SGN_or_MAC_x: bstr, ? AD_x: bstr)
+plaintext = ( ID_CRED_x: map / bstr / int, SGN_or_MAC_x: bstr, ? AD_x: bstr)
 
 ;currently x5bag and x5u are not supported
 map = {
 	? kid: 4 =>  int, 
-;	? x5bag: 32 => bstr,
-	? x5chain: 33 => bstr, 
-	? x5t: 34 => [int, bstr], 
+	
+	? x5bag: 32 => bstr,
+	? x5chain: 33 => bstr,
+	? x5t: 34 => [alg: (int / tstr), hash: bstr ],  
 	? x5u: 35 => bstr, 
+
+	? c5b: 52 => bstr, 
+	? c5c: 53 => bstr,
+	? c5t: 54 => [alg: (int / tstr), hash: bstr ],
+	? c5u: 55 => bstr,
 }
 
 ;map and id_cred_x_map are identical. 
 ;We just need different names to resolve inclusion conflicts
 id_cred_x_map = {
 	? kid: 4 =>  int, 
-;	? x5bag: 32 => bstr,
-	? x5chain: 33 => bstr, 
-	? x5t: 34 => [int, bstr], 
-	? x5u: 35 => bstr, 
+;-------------------------------------------------------------------------------
+	? x5bag: 32 => bstr, ; unordered set of x509 certificates
+	? x5chain: 33 => bstr, ; chain of x509 certificates 
+	? x5t: 34 => [alg: (int / tstr), hash: bstr ], ; x509 certificate identified by hash value 
+	? x5u: 35 => bstr, ; x509 certificate identified by URI
+;-------------------------------------------------------------------------------
+	? c5b: 52 => bstr, ; unordered set of x509 certificates
+	? c5c: 53 => bstr, ; chain of c509 certificate 
+	? c5t: 54 => [alg: (int / tstr), hash: bstr ], ; c509 certificate identified by hash value 
+	? c5u: 55 => bstr, ; c509 certificate identified by URI
+;-------------------------------------------------------------------------------
+;	? kcwt: 42 => xxx, ; COSE Web Token (CWT)
+;	? kccs: 43 => xxx, ; CWT Claim Set (CCS) 
 }
 
+; COSE_CertHash = [ hashAlg: (int / tstr), hashValue: bstr ]
 
+; COSE_X509 = bstr / [ 2*certs: bstr ]
+; COSE_C509 = C509Certificate / [ 2* C509Certificate ]
 
+;     C509Certificate = [
+;        TBSCertificate,
+;        issuerSignatureValue : any,
+;     ]
 
-; Raw public keys are most optimally stored as COSE_Key objects and
-;    identified with a 'kid' parameter:
+;     ; The elements of the following group are used in a CBOR Sequence:
+;     TBSCertificate = (
+;        c509CertificateType: int,
+;        certificateSerialNumber: CertificateSerialNumber,
+;        issuer: Name,
+;        validityNotBefore: Time,
+;        validityNotAfter: Time,
+;        subject: Name,
+;        subjectPublicKeyAlgorithm: AlgorithmIdentifier,
+;        subjectPublicKey: any,
+;        extensions: Extensions,
+;        issuerSignatureAlgorithm: AlgorithmIdentifier,
+;     )
 
-;    *  ID_CRED_x = { 4 : kid_x }, where kid_x : bstr, for x = I or R.
+; CBOR Object Signing and Encryption (COSE): Header parameters for carrying and referencing X.509 certificates https://datatracker.ietf.org/doc/draft-ietf-cose-x509/
 
-; Public key certificates can be identified in different ways.  Header
-;    parameters for identifying CBOR certificates and X.509 certificates
-;    are defined in [I-D.mattsson-cose-cbor-cert-compress] and
-;    [I-D.ietf-cose-x509], for example:
+; CBOR Encoded X.509 Certificates (C509 Certificates) https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/
 
-;    *  by a hash value with the 'c5t' or 'x5t' parameters;
-
-;       -  ID_CRED_x = { 34 : COSE_CertHash }, for x = I or R,
-
-;       -  ID_CRED_x = { TDB3 : COSE_CertHash }, for x = I or R,
-
-;    *  by a URI with the 'c5u' or 'x5u' parameters;
-
-;       -  ID_CRED_x = { 35 : uri }, for x = I or R,
-
-;       -  ID_CRED_x = { TBD4 : uri }, for x = I or R,
-
-;    *  ID_CRED_x MAY contain the actual credential used for
-;       authentication, CRED_x.  For example, a DER encoded X.509
-;       certificate chain can be transported in ID_CRED_x with COSE header
-;       parameter x5chain, see Section 2 of [I-D.ietf-cose-x509].  This is
-;       typically how certificates are transported within EDHOC.

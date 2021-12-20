@@ -30,9 +30,9 @@
  * @param   prk_out pointer to the buffer for the newly created PRK
  */
 enum err prk_derive(bool static_dh_auth, struct suite suite,
-		      const uint8_t *prk_in, const uint8_t prk_in_len,
-		      const uint8_t *stat_pk, const uint16_t stat_pk_len,
-		      const uint8_t *stat_sk, const uint16_t stat_sk_len,
+		      const uint8_t *prk_in, const uint32_t prk_in_len,
+		      const uint8_t *stat_pk, const uint32_t stat_pk_len,
+		      const uint8_t *stat_sk, const uint32_t stat_sk_len,
 		      uint8_t *prk_out);
 
 #endif

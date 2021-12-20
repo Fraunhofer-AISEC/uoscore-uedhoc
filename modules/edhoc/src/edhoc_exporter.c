@@ -18,10 +18,10 @@
 #include "../inc/suites.h"
 
 enum err edhoc_exporter(enum hash_alg app_hash_alg,
-				const uint8_t *prk_4x3m, uint16_t prk_4x3m_len,
-				const uint8_t *th4, uint16_t th4_len,
+				const uint8_t *prk_4x3m, uint32_t prk_4x3m_len,
+				const uint8_t *th4, uint32_t th4_len,
 				const char *label, uint8_t *out,
-				uint16_t out_len)
+				uint32_t out_len)
 {
 	return okm_calc(app_hash_alg, prk_4x3m, prk_4x3m_len, th4, th4_len,
 			label, NULL, 0, out, out_len);

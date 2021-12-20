@@ -23,59 +23,58 @@
  * return value into an out-parameter.
  */
 enum err {
+	/*common errors*/
 	ok = 0,
+	buffer_to_small = 1,
+	hkdf_fialed = 2,
+	aead_failed = 3,
 
-	error_message_received = 1,
-	error_message_sent = 2,
+	/*EDHOC specifc errors*/
+	error_message_received = 101,
+	error_message_sent = 102,
 
-	hkdf_fialed = 3,
-	aead_failed = 4,
-	sign_failed = 5,
-	sha_failed = 6,
-	dh_failed = 7,
-	unsupported_cipher_suite = 8,
-	unsupported_ecdh_curve = 9,
-	unsupported_aead_algorithm = 10,
-	unsupported_hash_algorithm = 11,
-	unsupported_signature_algorithm = 12,
+	sign_failed = 103,
+	sha_failed = 104,
+	dh_failed = 105,
+	unsupported_cipher_suite = 106,
+	unsupported_ecdh_curve = 107,
+	unsupported_aead_algorithm = 108,
+	unsupported_hash_algorithm = 109,
+	unsupported_signature_algorithm = 110,
 
-	responder_authentication_failed = 13, /*todo remove this eventually*/
-	signature_authentication_failed = 14,
-	mac_authentication_failed = 15,
-	aead_authentication_failed = 16,
-	certificate_authentication_failed = 17,
+	responder_authentication_failed = 111, /*todo remove this eventually*/
+	signature_authentication_failed = 112,
+	mac_authentication_failed = 113,
+	aead_authentication_failed = 114,
+	certificate_authentication_failed = 115,
 
-	credential_not_found = 18,
-	no_such_ca = 19,
+	credential_not_found = 116,
+	no_such_ca = 117,
 
-	message_buff_to_small = 20,
-	dest_buffer_to_small = 21,
+	message_buff_to_small = 118,
 
-	cbor_encoding_error = 22,
-	cbor_decoding_error = 23,
-	suites_i_list_to_long = 24,
-	unexpected_result_from_ext_lib = 25,
+	cbor_encoding_error = 119,
+	cbor_decoding_error = 120,
+	suites_i_list_to_long = 121,
+	unexpected_result_from_ext_lib = 122,
 
 	/*OSCORE specific errors*/
-	oscore_tiny_crypt_error = 101,
-	oscore_unknown_hkdf = 102,
-	oscore_out_too_long = 103,
-	oscore_invalid_algorithm_aead = 104,
-	oscore_invalid_algorithm_hkdf = 105,
-	oscore_kid_recipent_id_mismatch = 106,
-	oscore_authentication_error = 107,
-	oscore_valuelen_to_long_error = 108,
-	oscore_inpkt_invalid_tkl = 109,
-	oscore_inpkt_invalid_option_delta = 110,
-	oscore_inpkt_invalid_optionlen = 111,
-	oscore_inpkt_invalid_piv = 112,
-	//oscore_info_to_long = 13,
-	//dest_buffer_to_small = 14,
-	delta_extra_byte_error = 115,
-	len_extra_byte_error = 116,
-	//cbor_encoding_error = 117,
-	not_valid_input_packet = 118,
-	replayed_packed_received = 119,
+	oscore_tiny_crypt_error = 201,
+	oscore_unknown_hkdf = 202,
+	oscore_out_too_long = 203,
+	oscore_invalid_algorithm_aead = 204,
+	oscore_invalid_algorithm_hkdf = 205,
+	oscore_kid_recipent_id_mismatch = 206,
+	oscore_authentication_error = 207,
+	oscore_valuelen_to_long_error = 208,
+	oscore_inpkt_invalid_tkl = 209,
+	oscore_inpkt_invalid_option_delta = 210,
+	oscore_inpkt_invalid_optionlen = 211,
+	oscore_inpkt_invalid_piv = 212,
+	delta_extra_byte_error = 215,
+	len_extra_byte_error = 216,
+	not_valid_input_packet = 218,
+	replayed_packed_received = 219,
 
 };
 
@@ -83,10 +82,10 @@ enum err {
 	the error to the caller function*/
 #define TRY(x)                                                                     \
 	do {                                                                       \
-		int retval = (x);                                                  \
-		if (retval != 0) {                                                 \
+		enum err retval = (x);                                             \
+		if (retval != ok) {                                                \
 			PRINTF(RED                                                 \
-			       "Runtime error: %s error code %d at %s:%d\n" RESET, \
+			       "Runtime error: %s error code %d at %s:%d\n\n" RESET, \
 			       #x, retval, __FILE__, __LINE__);                    \
 			return retval;                                             \
 		}                                                                  \
@@ -101,7 +100,7 @@ enum err {
 		int retval = (x);                                                  \
 		if (retval != expected_result) {                                   \
 			PRINTF(RED                                                 \
-			       "Runtime error: %s error code %d at %s:%d\n" RESET, \
+			       "Runtime error: %s error code %d at %s:%d\n\n" RESET, \
 			       #x, retval, __FILE__, __LINE__);                    \
 			return unexpected_result_from_ext_lib;                     \
 		}                                                                  \

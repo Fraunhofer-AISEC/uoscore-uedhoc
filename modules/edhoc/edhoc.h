@@ -23,9 +23,9 @@
 #include "inc/c_x.h"
 
 /*define EDHOC_BUF_SIZES_RPK in order to use smaller buffers and save some RAM if need when RPKs are used*/
-#ifndef EDHOC_BUF_SIZES_RPK
-#define EDHOC_BUF_SIZES_CERT
-#endif
+//#define EDHOC_BUF_SIZES_RPK
+//#define EDHOC_BUF_SIZES_C509_CERT
+#define EDHOC_BUF_SIZES_X509_CERT
 
 #if defined EDHOC_BUF_SIZES_RPK
 #define MSG_1_DEFAULT_SIZE 64
@@ -41,9 +41,12 @@
 #define ID_CRED_DEFAULT_SIZE 20
 #define PRK_3AE_DEFAULT_SIZE 100
 #define CERT_DEFAUT_SIZE 128
+#define CONTEXT_MAC_DEFAULT_SIZE 200
+#define INFO_DEFAULT_SIZE 250
+#define SIGNATURE_STRUCT_DEFAULT_SIZE 300
 #endif
 
-#if defined EDHOC_BUF_SIZES_CERT
+#if defined EDHOC_BUF_SIZES_C509_CERT
 #define MSG_1_DEFAULT_SIZE 255
 #define MSG_2_DEFAULT_SIZE 255
 #define MSG_3_DEFAULT_SIZE 255
@@ -58,6 +61,29 @@
 #define ID_CRED_DEFAULT_SIZE 255
 #define PLAINTEXT_DEFAULT_SIZE 255
 #define CERT_DEFAUT_SIZE 255
+#define CONTEXT_MAC_DEFAULT_SIZE 200
+#define INFO_DEFAULT_SIZE 250
+#define SIGNATURE_STRUCT_DEFAULT_SIZE 300
+#endif
+
+#if defined EDHOC_BUF_SIZES_X509_CERT
+#define MSG_1_DEFAULT_SIZE 255
+#define MSG_2_DEFAULT_SIZE 700
+#define MSG_3_DEFAULT_SIZE 700
+#define MSG_4_DEFAULT_SIZE 700
+#define PLAINTEXT_DEFAULT_SIZE 650
+#define CIPHERTEXT2_DEFAULT_SIZE PLAINTEXT_DEFAULT_SIZE
+#define CIPHERTEXT3_DEFAULT_SIZE PLAINTEXT_DEFAULT_SIZE
+#define CIPHERTEXT4_DEFAULT_SIZE PLAINTEXT_DEFAULT_SIZE
+#define A_2M_DEFAULT_SIZE 512
+#define M_3_DEFAULT_SIZE 512
+#define CRED_DEFAULT_SIZE 600
+#define SGN_OR_MAC_DEFAULT_SIZE 128
+#define ID_CRED_DEFAULT_SIZE 600
+#define CERT_DEFAUT_SIZE 600
+#define CONTEXT_MAC_DEFAULT_SIZE 1200
+#define INFO_DEFAULT_SIZE 1200
+#define SIGNATURE_STRUCT_DEFAULT_SIZE 1200
 #endif
 
 #define ERR_MSG_DEFAULT_SIZE 64
@@ -69,22 +95,25 @@
 #define G_I_DEFAULT_SIZE 65
 #define DATA_2_DEFAULT_SIZE                                                    \
 	(C_I_DEFAULT_SIZE + G_Y_DEFAULT_SIZE + C_R_DEFAULT_SIZE)
-#define TH_INPUT_DEFAULT_SIZE (MSG_1_DEFAULT_SIZE + DATA_2_DEFAULT_SIZE)
+#define TH2_INPUT_DEFAULT_SIZE (MSG_1_DEFAULT_SIZE + DATA_2_DEFAULT_SIZE)
+#define TH3_INPUT_DEFAULT_SIZE (SHA_DEFAULT_SIZE + CIPHERTEXT3_DEFAULT_SIZE)
+#define TH4_INPUT_DEFAULT_SIZE (SHA_DEFAULT_SIZE + CIPHERTEXT4_DEFAULT_SIZE)
 #define ECDH_SECRET_DEFAULT_SIZE 32
 #define DERIVED_SECRET_DEFAULT_SIZE 32
 #define AD_DEFAULT_SIZE 256
 #define PRK_DEFAULT_SIZE 32
-#define INFO_DEFAULT_SIZE 250
 #define ASSOCIATED_DATA_DEFAULT_SIZE 64
-//#define A_2AE_DEFAULT_SIZE 64
 #define KID_DEFAULT_SIZE 8
 #define SHA_DEFAULT_SIZE 32
 #define AEAD_KEY_DEFAULT_SIZE 16
+#define MAC_DEFAULT_SIZE 16
 #define AEAD_IV_DEFAULT_SIZE 13
 #define P_256_PRIV_KEY_DEFAULT_SIZE 32
 #define P_256_PUB_KEY_DEFAULT_SIZE 65
 #define PK_DEFAULT_SIZE P_256_PUB_KEY_DEFAULT_SIZE
 #define SIGNATURE_DEFAULT_SIZE 64
+#define TH_ENC_DEFAULT_SIZE 42
+#define ENCODING_OVERHEAD 6
 
 struct other_party_cred {
 	struct byte_array id_cred; /*ID_CRED_x of the other party*/
@@ -167,10 +196,10 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			     struct other_party_cred *cred_r_array,
 			     uint16_t num_cred_r, uint8_t *err_msg,
 			     uint32_t *err_msg_len, uint8_t *ead_2,
-			     uint64_t *ead_2_len, uint8_t *ead_4,
-			     uint64_t *ead_4_len, uint8_t *prk_4x3m,
-			     uint8_t prk_4x3m_len, uint8_t *th4,
-			     uint8_t th4_len,
+			     uint32_t *ead_2_len, uint8_t *ead_4,
+			     uint32_t *ead_4_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
 			     enum err (*tx)(uint8_t *data, uint32_t data_len),
 			     enum err (*rx)(uint8_t *data, uint32_t *data_len));
 
@@ -198,10 +227,10 @@ enum err edhoc_responder_run(struct edhoc_responder_context *c,
 			     struct other_party_cred *cred_i_array,
 			     uint16_t num_cred_i, uint8_t *err_msg,
 			     uint32_t *err_msg_len, uint8_t *ead_1,
-			     uint64_t *ead_1_len, uint8_t *ead_3,
-			     uint64_t *ead_3_len, uint8_t *prk_4x3m,
-			     uint16_t prk_4x3m_len, uint8_t *th4,
-			     uint16_t th4_len,
+			     uint32_t *ead_1_len, uint8_t *ead_3,
+			     uint32_t *ead_3_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
 			     enum err (*tx)(uint8_t *data, uint32_t data_len),
 			     enum err (*rx)(uint8_t *data, uint32_t *data_len));
 
@@ -220,7 +249,7 @@ enum err edhoc_responder_run(struct edhoc_responder_context *c,
  * @param   out_len length of the derived key
  */
 enum err edhoc_exporter(enum hash_alg app_hash_alg, const uint8_t *prk_4x3m,
-			uint16_t prk_4x3m_len, const uint8_t *th4,
-			uint16_t th4_len, const char *label, uint8_t *out,
-			uint16_t out_len);
+			uint32_t prk_4x3m_len, const uint8_t *th4,
+			uint32_t th4_len, const char *label, uint8_t *out,
+			uint32_t out_len);
 #endif

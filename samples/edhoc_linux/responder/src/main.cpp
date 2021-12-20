@@ -169,30 +169,33 @@ int main()
 	uint8_t err_msg[ERR_MSG_DEFAULT_SIZE];
 	uint32_t err_msg_len = sizeof(err_msg);
 	uint8_t ad_1[AD_DEFAULT_SIZE];
-	uint64_t ad_1_len = sizeof(ad_1);
+	uint32_t ad_1_len = sizeof(ad_1);
 	uint8_t ad_3[AD_DEFAULT_SIZE];
-	uint64_t ad_3_len = sizeof(ad_1);
+	uint32_t ad_3_len = sizeof(ad_1);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 17;
+	const uint8_t TEST_VEC_NUM = 18;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_i;
 	struct edhoc_responder_context c_r;
 	struct other_party_cred_bufs other_party_bufs;
 	struct edhoc_responder_context_bufs responder_context_bufs;
-	char filename[] = { "../../common/edhoc-vectors-json_v11.txt" };
+	char filename[] = { "../../../edhoc-vectors-json_v11.txt" };
 	char test_vec_buf[1024 * 160];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 
-	TRY(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len));
+	TRY_EXPECT(read_test_vectors(filename, test_vec_buf, &test_vec_buf_len),
+		   0);
 
-	TRY(get_OTHER_PARTY_CRED_from_test_vec(INITIATOR, &other_party_bufs,
-					       &cred_i, TEST_VEC_NUM,
-					       test_vec_buf, test_vec_buf_len));
+	TRY_EXPECT(get_OTHER_PARTY_CRED_from_test_vec(
+			   INITIATOR, &other_party_bufs, &cred_i, TEST_VEC_NUM,
+			   test_vec_buf, test_vec_buf_len),
+		   0);
 
-	TRY(get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
-		&responder_context_bufs, &c_r, TEST_VEC_NUM, test_vec_buf,
-		test_vec_buf_len));
+	TRY_EXPECT(get_EDHOC_RESPONDER_CONTEXT_from_test_vec(
+			   &responder_context_bufs, &c_r, TEST_VEC_NUM,
+			   test_vec_buf, test_vec_buf_len),
+		   0);
 
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
 	uint32_t seed;
@@ -204,7 +207,7 @@ int main()
 	c_r.y.len = sizeof(Y_random);
 #endif
 
-	TRY(start_coap_server());
+	TRY_EXPECT(start_coap_server(), 0);
 
 	while (1) {
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY

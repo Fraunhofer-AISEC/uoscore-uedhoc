@@ -11,15 +11,22 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "oscore_edhoc_error.h"
+#include "../inc/oscore_edhoc_error.h"
+#include "../inc/memcpy_s.h"
 
-enum err _memcpy_s(uint8_t *dest, uint64_t destSize, const uint8_t *src,
-			   uint64_t count)
+enum err check_buffer_size(uint32_t is_size, uint32_t required_size)
 {
-	if (destSize < count) {
-		return dest_buffer_to_small;
+	if (is_size < required_size) {
+		return buffer_to_small;
 	} else {
-		memcpy(dest, src, count);
+		return ok;
 	}
-	return ok;
+}
+
+enum err _memcpy_s(uint8_t *dest, uint32_t destSize, const uint8_t *src,
+		   uint32_t count)
+{
+	TRY(check_buffer_size(destSize, count));
+	memcpy(dest, src, count);
+	return 0;
 }

@@ -13,15 +13,7 @@
 
 #include "byte_array.h"
 #include "oscore_edhoc_error.h"
-#include "suites.h"
-
-
-
-
-
-
-
-
+#include "../../edhoc/inc/suites.h"
 
 /*Indicates what kind of operation a symmetric cipher will execute*/
 enum aes_operation {
@@ -46,13 +38,11 @@ enum aes_operation {
  * @param   tag_len the length of tag
  * @retval  err code
  */
-enum err aead(enum aes_operation op, const uint8_t *in,
-		      const uint16_t in_len, const uint8_t *key,
-		      const uint16_t key_len, uint8_t *nonce,
-		      const uint16_t nonce_len, const uint8_t *aad,
-		      const uint16_t aad_len, uint8_t *out,
-		      const uint16_t out_len, uint8_t *tag,
-		      const uint16_t tag_len);
+enum err aead(enum aes_operation op, const uint8_t *in, const uint32_t in_len,
+	      const uint8_t *key, const uint32_t key_len, uint8_t *nonce,
+	      const uint32_t nonce_len, const uint8_t *aad,
+	      const uint32_t aad_len, uint8_t *out, const uint32_t out_len,
+	      uint8_t *tag, const uint32_t tag_len);
 
 /**
  * @brief   Derives ECDH shared secret
@@ -64,9 +54,8 @@ enum err aead(enum aes_operation op, const uint8_t *in,
  * @retval  an err code
  */
 enum err shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
-				      const uint32_t sk_len, const uint8_t *pk,
-				      const uint32_t pk_len,
-				      uint8_t *shared_secret);
+			      const uint32_t sk_len, const uint8_t *pk,
+			      const uint32_t pk_len, uint8_t *shared_secret);
 
 /**
  * @brief   HKDF extract function, see rfc5869
@@ -78,9 +67,8 @@ enum err shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
  * @param   out result
  * @retval  an err code
  */
-enum err hkdf_extract(enum hash_alg alg, const uint8_t *salt,
-			      uint32_t salt_len, uint8_t *ikm, uint8_t ikm_len,
-			      uint8_t *out);
+enum err hkdf_extract(enum hash_alg alg, const uint8_t *salt, uint32_t salt_len,
+		      uint8_t *ikm, uint32_t ikm_len, uint8_t *out);
 
 /**
  * @brief   HKDF expand function, see rfc5869
@@ -94,9 +82,8 @@ enum err hkdf_extract(enum hash_alg alg, const uint8_t *salt,
  * @retval  an err code
  */
 enum err hkdf_expand(enum hash_alg alg, const uint8_t *prk,
-			     const uint8_t prk_len, const uint8_t *info,
-			     const uint8_t info_len, uint8_t *out,
-			     uint64_t out_len);
+		     const uint32_t prk_len, const uint8_t *info,
+		     const uint32_t info_len, uint8_t *out, uint32_t out_len);
 
 /**
  * @brief   calculates a hash
@@ -106,8 +93,8 @@ enum err hkdf_expand(enum hash_alg alg, const uint8_t *prk,
  * @param   out the hash 
  * @retval  an err code
  */
-enum err hash(enum hash_alg alg, const uint8_t *in,
-		      const uint64_t in_len, uint8_t *out);
+enum err hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
+	      uint8_t *out);
 
 /**
  * @brief   Verifies an asymmetric signature
@@ -115,17 +102,14 @@ enum err hash(enum hash_alg alg, const uint8_t *in,
  * @param   sk secret key
  * @param   sk_len length of sk
  * @param   pk public key
- * @param   pk_len length of pk
  * @param   msg the message to be signed
  * @param   msg_len length of msg
  * @param   out signature
- * @param   out_len length of out
  * @retval  an err code
  */
-enum err sign(enum sign_alg alg, const uint8_t *sk,
-		      const uint8_t sk_len, const uint8_t *pk,
-		      const uint8_t pk_len, const uint8_t *msg,
-		      const uint16_t msg_len, uint8_t *out, uint32_t *out_len);
+enum err sign(enum sign_alg alg, const uint8_t *sk, const uint32_t sk_len,
+	      const uint8_t *pk, const uint8_t *msg, const uint32_t msg_len,
+	      uint8_t *out);
 
 /**
  * @brief   Verifies an asymmetric signature
@@ -139,14 +123,9 @@ enum err sign(enum sign_alg alg, const uint8_t *sk,
  * @param   result true if the signature verification is successfully
  * @retval  an err code
  */
-enum err verify(enum sign_alg alg, const uint8_t *pk,
-			const uint8_t pk_len, const uint8_t *msg,
-			const uint16_t msg_len, const uint8_t *sgn,
-			const uint16_t sgn_len, bool *result);
-
-
-
-
+enum err verify(enum sign_alg alg, const uint8_t *pk, const uint32_t pk_len,
+		const uint8_t *msg, const uint32_t msg_len, const uint8_t *sgn,
+		const uint32_t sgn_len, bool *result);
 
 /**
  * @brief   aes_ccm_16_64_128 symmetric algorithm
@@ -176,13 +155,7 @@ enum err verify(enum sign_alg alg, const uint8_t *pk,
  * @param   out the derived Common IV, Recipient/Sender keys
  */
 enum err hkdf_sha_256(struct byte_array *master_secret,
-			       struct byte_array *master_salt,
-			       struct byte_array *info, struct byte_array *out);
-
-
-
-
-
-
+		      struct byte_array *master_salt, struct byte_array *info,
+		      struct byte_array *out);
 
 #endif

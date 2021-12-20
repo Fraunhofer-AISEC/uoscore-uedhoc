@@ -12,7 +12,7 @@
 #define SIGNATURE_OR_MAC_MSG_H
 
 #include <stdbool.h>
-#include "oscore_edhoc_error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "suites.h"
 
 enum sgn_or_mac_op { VERIFY, GENERATE };
@@ -25,11 +25,11 @@ enum sgn_or_mac_op { VERIFY, GENERATE };
  * @param   out_len length of out
  * @retval  edhoc error code
  */
-enum err encode_byte_string(const uint8_t *in, uint32_t in_len,
-				    uint8_t *out, uint64_t *out_len);
+enum err encode_byte_string(const uint8_t *in, uint32_t in_len, uint8_t *out,
+			    uint32_t *out_len);
 
 enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
-				    uint8_t *out, uint32_t *out_len);
+			    uint8_t *out, uint32_t *out_len);
 
 /**
  * @brief   If the calling party (initiator / responder) authenticates with 
@@ -63,18 +63,17 @@ enum err signature_or_mac_msg_create(
 	const uint8_t *ad, const uint8_t ad_len, uint8_t *m, uint16_t *m_len,
 	uint8_t *mac, uint8_t *mac_len);
 
-enum err mac(const uint8_t *prk, uint8_t prk_len, const uint8_t *th,
-		     uint8_t th_len, const uint8_t *id_cred,
-		     uint32_t id_cred_len, const uint8_t *cred,
-		     uint32_t cred_len, const uint8_t *ead, uint32_t ead_len,
-		     const char *mac_label, bool static_dh, struct suite *suite,
-		     uint8_t *mac, uint32_t *mac_len);
+enum err mac(const uint8_t *prk, uint32_t prk_len, const uint8_t *th,
+	     uint32_t th_len, const uint8_t *id_cred, uint32_t id_cred_len,
+	     const uint8_t *cred, uint32_t cred_len, const uint8_t *ead,
+	     uint32_t ead_len, const char *mac_label, bool static_dh,
+	     struct suite *suite, uint8_t *mac, uint32_t *mac_len);
 
 enum err
 signature_or_mac(enum sgn_or_mac_op op, bool static_dh, struct suite *suite,
-		 const uint8_t *sk, uint8_t sk_len, const uint8_t *pk,
-		 uint8_t pk_len, const uint8_t *prk, uint8_t prk_len,
-		 const uint8_t *th, uint8_t th_len, const uint8_t *id_cred,
+		 const uint8_t *sk, uint32_t sk_len, const uint8_t *pk,
+		 uint32_t pk_len, const uint8_t *prk, uint32_t prk_len,
+		 const uint8_t *th, uint32_t th_len, const uint8_t *id_cred,
 		 uint32_t id_cred_len, const uint8_t *cred, uint32_t cred_len,
 		 const uint8_t *ead, uint32_t ead_len, const char *mac_label,
 		 uint8_t *signature_or_mac, uint32_t *signature_or_mac_len);

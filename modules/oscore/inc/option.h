@@ -13,11 +13,10 @@
 #define OPTION_H
 
 #include <stdint.h>
-//#include <net/coap.h>
 
 #include "../../common/inc/byte_array.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 #include "coap.h"
-#include "error.h"
 
 enum o_coap_option_num {
 	COAP_OPTION_IF_MATCH = 1,
@@ -77,9 +76,8 @@ bool (*class_to_condition(enum option_class class))(uint16_t code);
  *          Can be NULL.
  * @return  err
  */
-enum err decode_options(struct byte_array options,
-				 struct o_coap_option *out,
-				 uint16_t *offset_out);
+enum err decode_options(struct byte_array options, struct o_coap_option *out,
+			uint16_t *offset_out);
 
 /**
  * @brief   Returns the length in bytes of the serialized options 
@@ -104,8 +102,8 @@ uint32_t encoded_option_len(struct o_coap_option *options, uint16_t opt_num,
  * @param   out_buf_len the length of of the out buffer
  * @return  err
  */
-enum err encode_options(struct o_coap_option *options,
-				 uint16_t opt_num, enum option_class class,
-				 uint8_t *out, uint8_t out_buf_len);
+enum err encode_options(struct o_coap_option *options, uint16_t opt_num,
+			enum option_class class, uint8_t *out,
+			uint32_t out_buf_len);
 
 #endif

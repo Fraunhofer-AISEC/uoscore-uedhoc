@@ -11,11 +11,12 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "../inc/print_util.h"
 
-void print_array(const uint8_t *in_data, uint16_t in_len)
+void print_array(const uint8_t *in_data, uint32_t in_len)
 {
-	printf(" (size %u):", in_len);
-	for (uint16_t i = 0; i < in_len; i++) {
+	printf(" (size %lu):", (unsigned long)in_len);
+	for (uint32_t i = 0; i < in_len; i++) {
 		if (i % 16 == 0)
 			printf("\n\t%02X ", in_data[i]);
 		else

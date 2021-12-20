@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "../../modules/common/inc/oscore_edhoc_error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 /*see https://www.iana.org/assignments/cose/cose.xhtml#algorithms for algorithm number reference*/
 
@@ -78,4 +78,5 @@ uint32_t get_aead_mac_len(enum aead_alg alg);
 uint32_t get_aead_key_len(enum aead_alg alg);
 uint32_t get_aead_iv_len(enum aead_alg alg);
 uint32_t get_signature_len(enum sign_alg alg);
+uint32_t get_ecdh_pk_len(enum ecdh_alg alg);
 #endif

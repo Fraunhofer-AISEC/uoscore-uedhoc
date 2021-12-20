@@ -48,10 +48,11 @@
  * @param   ad1_len length of ad1
  * @retval an err code
  */
-static inline enum err
-msg1_parse(uint8_t *msg1, uint32_t msg1_len, enum method_type *method,
-	   uint8_t *suites_i, uint64_t *suites_i_len, uint8_t *g_x,
-	   uint64_t *g_x_len, struct c_x *c_i, uint8_t *ad1, uint64_t *ad1_len)
+static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
+				  enum method_type *method, uint8_t *suites_i,
+				  uint32_t *suites_i_len, uint8_t *g_x,
+				  uint32_t *g_x_len, struct c_x *c_i,
+				  uint8_t *ad1, uint32_t *ad1_len)
 {
 	uint32_t i;
 	struct message_1 m;
@@ -61,13 +62,13 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, enum method_type *method,
 		   true);
 
 	/*METHOD*/
-	*method = m._message_1_METHOD;
+	*method = (enum method_type) m._message_1_METHOD;
 	PRINTF("msg1 METHOD: %d\n", (int)*method);
 
 	/*SUITES_I*/
 	if (m._message_1_SUITES_I_choice == _message_1_SUITES_I_int) {
 		/*the initiator supports only one suite*/
-		suites_i[0] = m._message_1_SUITES_I_int;
+		suites_i[0] = (uint8_t)m._message_1_SUITES_I_int;
 		*suites_i_len = 1;
 	} else {
 		/*the initiator supports more than one suite*/
@@ -76,7 +77,7 @@ msg1_parse(uint8_t *msg1, uint32_t msg1_len, enum method_type *method,
 		}
 
 		for (i = 0; i < m._SUITES_I__suite_suite_count; i++) {
-			suites_i[i] = m._SUITES_I__suite_suite[i];
+			suites_i[i] = (uint8_t)m._SUITES_I__suite_suite[i];
 		}
 		*suites_i_len = m._SUITES_I__suite_suite_count;
 	}
@@ -120,7 +121,7 @@ static inline bool selected_suite_is_supported(uint8_t selected,
 					       struct byte_array *suites_r)
 {
 	for (uint8_t i = 0; i < suites_r->len; i++) {
-		if ((suites_r->ptr[i] == selected))
+		if (suites_r->ptr[i] == selected)
 			return true;
 	}
 	return false;
@@ -141,23 +142,24 @@ static inline bool selected_suite_is_supported(uint8_t selected,
  * @param   msg2_len length of msg2
  * @retval  an err error code
  */
-static inline enum err msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
-					   struct c_x *c_r,
-					   const uint8_t *ciphertext_2,
-					   uint32_t ciphertext_2_len,
-					   uint8_t *msg2, uint32_t *msg2_len)
+static inline enum err msg2_encode(const uint8_t *g_y, uint32_t g_y_len,
+				   struct c_x *c_r, const uint8_t *ciphertext_2,
+				   uint32_t ciphertext_2_len, uint8_t *msg2,
+				   uint32_t *msg2_len)
 {
 	uint32_t payload_len_out;
 	struct m2 m;
+	uint32_t g_y_ciphertext_2_len = g_y_len + ciphertext_2_len;
+	TRY(check_buffer_size(G_Y_DEFAULT_SIZE + CIPHERTEXT2_DEFAULT_SIZE,
+			      g_y_ciphertext_2_len));
+	uint8_t g_y_ciphertext_2[G_Y_DEFAULT_SIZE + CIPHERTEXT2_DEFAULT_SIZE];
 
-	uint8_t G_Y_CIPHERTEXT_2[g_y_len + ciphertext_2_len];
+	memcpy(g_y_ciphertext_2, g_y, g_y_len);
+	memcpy(g_y_ciphertext_2 + g_y_len, ciphertext_2, ciphertext_2_len);
 
-	memcpy(G_Y_CIPHERTEXT_2, g_y, g_y_len);
-	memcpy(G_Y_CIPHERTEXT_2 + g_y_len, ciphertext_2, ciphertext_2_len);
-
-	/*Encode G_Y_CIPHERTEXT_2*/
-	m._m2_G_Y_CIPHERTEXT_2.value = G_Y_CIPHERTEXT_2;
-	m._m2_G_Y_CIPHERTEXT_2.len = sizeof(G_Y_CIPHERTEXT_2);
+	/*Encode g_y_ciphertext_2*/
+	m._m2_G_Y_CIPHERTEXT_2.value = g_y_ciphertext_2;
+	m._m2_G_Y_CIPHERTEXT_2.len = g_y_ciphertext_2_len;
 
 	/*Encode C_R*/
 	if (c_r->type == INT) {
@@ -176,15 +178,16 @@ static inline enum err msg2_encode(const uint8_t *g_y, uint8_t g_y_len,
 	return ok;
 }
 
-enum err
-edhoc_responder_run(struct edhoc_responder_context *c,
-		    struct other_party_cred *cred_i_array, uint16_t num_cred_i,
-		    uint8_t *err_msg, uint32_t *err_msg_len, uint8_t *ead_1,
-		    uint64_t *ead_1_len, uint8_t *ead_3, uint64_t *ead_3_len,
-		    uint8_t *prk_4x3m, uint16_t prk_4x3m_len, uint8_t *th4,
-		    uint16_t th4_len,
-		    enum err (*tx)(uint8_t *data, uint32_t data_len),
-		    enum err (*rx)(uint8_t *data, uint32_t *data_len))
+enum err edhoc_responder_run(struct edhoc_responder_context *c,
+			     struct other_party_cred *cred_i_array,
+			     uint16_t num_cred_i, uint8_t *err_msg,
+			     uint32_t *err_msg_len, uint8_t *ead_1,
+			     uint32_t *ead_1_len, uint8_t *ead_3,
+			     uint32_t *ead_3_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
+			     enum err (*tx)(uint8_t *data, uint32_t data_len),
+			     enum err (*rx)(uint8_t *data, uint32_t *data_len))
 {
 	/**************** receive and process message 1 ***********************/
 	uint8_t msg1[MSG_1_DEFAULT_SIZE];
@@ -195,9 +198,9 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 
 	enum method_type method = INITIATOR_SK_RESPONDER_SK;
 	uint8_t suites_i[5];
-	uint64_t suites_i_len = sizeof(suites_i);
+	uint32_t suites_i_len = sizeof(suites_i);
 	uint8_t g_x[G_X_DEFAULT_SIZE];
-	uint64_t g_x_len = sizeof(g_x);
+	uint32_t g_x_len = sizeof(g_x);
 	uint8_t c_i_buf[C_I_DEFAULT_SIZE];
 	struct c_x c_i;
 	c_x_init(&c_i, c_i_buf, sizeof(c_i_buf));
@@ -250,7 +253,9 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 
 	/*compute signature_or_MAC_2*/
 	uint32_t sign_or_mac_2_len = get_signature_len(suite.edhoc_sign);
-	uint8_t sign_or_mac_2[sign_or_mac_2_len];
+	TRY(check_buffer_size(SIGNATURE_DEFAULT_SIZE, sign_or_mac_2_len));
+
+	uint8_t sign_or_mac_2[SIGNATURE_DEFAULT_SIZE];
 	TRY(signature_or_mac(GENERATE, static_dh_r, &suite, c->sk_r.ptr,
 			     c->sk_r.len, c->pk_r.ptr, c->pk_r.len, PRK_3e2m,
 			     sizeof(PRK_3e2m), th2, sizeof(th2),
@@ -310,11 +315,11 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 
 	/*check the authenticity of the initiator*/
 	uint8_t cred_i[CRED_DEFAULT_SIZE];
-	uint16_t cred_i_len = sizeof(cred_i);
+	uint32_t cred_i_len = sizeof(cred_i);
 	uint8_t pk[PK_DEFAULT_SIZE];
-	uint16_t pk_len = sizeof(pk);
-	uint8_t g_i[G_I_DEFAULT_SIZE]; 
-	uint16_t g_i_len = sizeof(g_i);
+	uint32_t pk_len = sizeof(pk);
+	uint8_t g_i[G_I_DEFAULT_SIZE];
+	uint32_t g_i_len = sizeof(g_i);
 
 	TRY(retrieve_cred(static_dh_i, cred_i_array, num_cred_i, id_cred_i,
 			  id_cred_i_len, cred_i, &cred_i_len, pk, &pk_len, g_i,
@@ -345,7 +350,7 @@ edhoc_responder_run(struct edhoc_responder_context *c,
 		uint8_t ciphertext_4[CIPHERTEXT4_DEFAULT_SIZE];
 		uint32_t ciphertext_4_len = sizeof(ciphertext_4);
 		uint8_t msg4[MSG_4_DEFAULT_SIZE];
-		uint64_t msg4_len = sizeof(msg2);
+		uint32_t msg4_len = sizeof(msg2);
 		TRY(ciphertext_gen(CIPHERTEXT4, &suite, NULL, 0, NULL, 0,
 				   c->ead_4.ptr, c->ead_4.len, prk_4x3m,
 				   prk_4x3m_len, th4, th4_len, ciphertext_4,

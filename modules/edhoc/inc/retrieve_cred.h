@@ -15,11 +15,12 @@
 #include <stdint.h>
 
 #include "../edhoc.h"
-#include "oscore_edhoc_error.h"
+#include "../../common/inc/oscore_edhoc_error.h"
 
 enum id_cred_x_label {
 	/*ID_CRED_x contains a key ID used to identify a pre established RPK*/
 	kid = 4,
+	
 	/* ID_CRED_x contains an unordered bag of X.509 certificates*/
 	x5bag = 32,
 	/* ID_CRED_x contains an certificate chain*/
@@ -28,6 +29,15 @@ enum id_cred_x_label {
 	x5t = 34,
 	/*ID_CRED_x contains an uri used to identify a pre established cert*/
 	x5u = 35,
+	
+	/* ID_CRED_x contains an unordered bag of C509 certificates*/
+	c5b = 52,
+	/* ID_CRED_x contains an certificate chain of C509 certificates*/
+	c5c = 53,
+	/*ID_CRED_x contains a hash used to identify a pre established C509 cert*/
+	c5t = 54,
+	/*ID_CRED_x contains an uri used to identify a pre established C509 cert*/
+	c5u = 55,	
 };
 
 /**
@@ -46,10 +56,10 @@ enum id_cred_x_label {
  * @param   g static DH public key
  * @param   g_len length of g
  */
-enum err retrieve_cred(bool static_dh_auth,
-			 struct other_party_cred *cred_array, uint16_t cred_num,
-			 uint8_t *id_cred, uint8_t id_cred_len, uint8_t *cred,
-			 uint16_t *cred_len, uint8_t *pk, uint16_t *pk_len,
-			 uint8_t *g, uint16_t *g_len);
+enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
+		       uint16_t cred_num, uint8_t *id_cred,
+		       uint32_t id_cred_len, uint8_t *cred, uint32_t *cred_len,
+		       uint8_t *pk, uint32_t *pk_len, uint8_t *g,
+		       uint32_t *g_len);
 
 #endif

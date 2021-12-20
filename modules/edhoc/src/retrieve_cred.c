@@ -15,155 +15,189 @@
 #include "../edhoc.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../../common/inc/oscore_edhoc_error.h"
-#include "../inc/print_util.h"
-#include "../inc/memcpy_s.h"
+#include "../../common/inc/print_util.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../cbor/decode_id_cred_x.h"
-#include "../cbor/decode_cert.h"
+#include "../inc/cert.h"
+#include "../inc/signature_or_mac_msg.h"
+
 /**
- * @brief   Verifies an certificate
- * @param   cert a native CBOR encoded certificate
- * @param   cer_len the length of the certificate
- * @param   cred_array an array containing credentials 
- * @param   cred_num number of elements in cred_array
- * @param   pk public key contained in the certificate
- * @param   pk_len the length pk
- * @param   verified true if verification successfull
+ * @brief 	This function verifies a certificate and copies it to the cred 
+ * 		buffer. It also extracts the public key contained in the 
+ * 		certificate. 
+ * 
+ * @param static_dh_auth type of the key contained in the certificate -- 
+ * 			signature key or static DH key.
+ * @param cred_array array containing credentials
+ * @param cred_num number of credentials
+ * @param label map label of id_cred_x
+ * @param cert the certificate
+ * @param cert_len length of the certificate
+ * @param cred cred buffer
+ * @param cred_len length of cred
+ * @param pk public key buffer
+ * @param pk_len length of pk
+ * @param g static DH public key buffer
+ * @param g_len length of g
+ * @return enum err 
  */
-static enum err cert_verify(const uint8_t *cert, uint16_t cert_len,
-			    const struct other_party_cred *cred_array,
-			    uint16_t cred_num, uint8_t *pk, uint16_t *pk_len,
-			    bool *verified)
+static inline enum err
+verify_cert2cred(bool static_dh_auth, struct other_party_cred *cred_array,
+		 uint16_t cred_num, enum id_cred_x_label label,
+		 const uint8_t *cert, uint32_t cert_len, uint8_t *cred,
+		 uint32_t *cred_len, uint8_t *pk, uint32_t *pk_len, uint8_t *g,
+		 uint32_t *g_len)
 {
-	uint32_t decode_len = 0;
-	struct cert c;
+	PRINT_ARRAY("ID_CRED_x contains a certificate", cert, cert_len);
+	TRY(encode_byte_string(cert, cert_len, cred, cred_len));
 
-	TRY_EXPECT(cbor_decode_cert(cert, cert_len, &c, &decode_len), true);
-
-	PRINT_MSG("CBOR certificate parsed.\n");
-	PRINTF("Certificate type: %d\n", c._cert_type);
-	PRINT_ARRAY("Serial number", c._cert_serial_number.value,
-		    c._cert_serial_number.len);
-	PRINT_ARRAY("issuer", c._cert_issuer.value, c._cert_issuer.len);
-	PRINTF("validity_not_before: %d\n", c._cert_validity_not_before);
-	PRINTF("validity_not_after: %d\n", c._cert_validity_not_after);
-	PRINT_ARRAY("subject", c._cert_subject.value, c._cert_subject.len);
-	PRINT_ARRAY("PK", c._cert_pk.value, c._cert_pk.len);
-	PRINTF("extensions: %d\n", c._cert_extensions);
-	PRINT_ARRAY("Signature", c._cert_signature.value,
-		    c._cert_signature.len);
-
-	/*get the CAs public key*/
-	uint8_t *root_pk = NULL;
-	uint8_t root_pk_len = 0;
-	for (uint16_t i = 0; i < cred_num; i++) {
-		if (memcmp(cred_array[i].ca.ptr, c._cert_issuer.value,
-			   cred_array[i].ca.len)) {
-			root_pk = cred_array[i].ca_pk.ptr;
-			root_pk_len = cred_array[i].ca_pk.len;
-			PRINT_ARRAY("Root PK of the CA", root_pk, root_pk_len);
-			break;
+	bool verified = false;
+	switch (label) {
+	/* for now we transfer a single certificate, therefore bag and chain are the same */
+	case x5bag:
+	case x5chain:
+		if (static_dh_auth) {
+			*pk_len = 0;
+			TRY(cert_x509_verify(cert, cert_len, cred_array,
+					     cred_num, g, g_len, &verified));
+		} else {
+			*g_len = 0;
+			TRY(cert_x509_verify(cert, cert_len, cred_array,
+					     cred_num, pk, pk_len, &verified));
 		}
-		return no_such_ca;
+		break;
+	case c5b:
+	case c5c:
+		if (static_dh_auth) {
+			*pk_len = 0;
+			TRY(cert_c509_verify(cert, cert_len, cred_array,
+					     cred_num, g, g_len, &verified));
+		} else {
+			*g_len = 0;
+			TRY(cert_c509_verify(cert, cert_len, cred_array,
+					     cred_num, pk, pk_len, &verified));
+		}
+		break;
+		break;
+
+	default:
+		break;
 	}
 
-	TRY(_memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len));
-	*pk_len = c._cert_pk.len;
+	if (verified) {
+		PRINT_MSG("Certificate verification successful!\n");
+		return ok;
+	} else {
+		return certificate_authentication_failed;
+	}
+}
 
-	return verify(EdDSA, root_pk, root_pk_len, cert,
-		      cert_len - 2 - c._cert_signature.len,
-		      c._cert_signature.value, c._cert_signature.len, verified);
+static enum err get_local_cred(bool static_dh_auth,
+			       struct other_party_cred *cred_array,
+			       uint16_t cred_num, uint8_t *id_cred,
+			       uint32_t id_cred_len, uint8_t *cred,
+			       uint32_t *cred_len, uint8_t *pk,
+			       uint32_t *pk_len, uint8_t *g, uint32_t *g_len)
+{
+	for (uint16_t i = 0; i < cred_num; i++) {
+		if ((cred_array[i].id_cred.len == id_cred_len) &&
+		    (0 ==
+		     memcmp(cred_array[i].id_cred.ptr, id_cred, id_cred_len))) {
+			/*retrieve CRED_x*/
+			TRY(_memcpy_s(cred, *cred_len, cred_array[i].cred.ptr,
+				      cred_array[i].cred.len));
+			*cred_len = cred_array[i].cred.len;
+
+			/*retrieve PK*/
+			if (static_dh_auth) {
+				*pk_len = 0;
+				if (cred_array[i].g.len == 65) {
+					/*decompressed P256 DH pk*/
+					g[0] = 0x2;
+					TRY(_memcpy_s(&g[1], *g_len - 1,
+						      &cred_array[i].g.ptr[1],
+						      32));
+					*g_len = 33;
+
+				} else {
+					TRY(_memcpy_s(g, *g_len,
+						      cred_array[i].g.ptr,
+						      cred_array[i].g.len));
+					*g_len = cred_array[i].g.len;
+				}
+
+			} else {
+				*g_len = 0;
+				TRY(_memcpy_s(pk, *pk_len, cred_array[i].pk.ptr,
+					      cred_array[i].pk.len));
+				*pk_len = cred_array[i].pk.len;
+			}
+			return ok;
+		}
+	}
+
+	return credential_not_found;
 }
 
 enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
-		       uint16_t cred_num, uint8_t *id_cred, uint8_t id_cred_len,
-		       uint8_t *cred, uint16_t *cred_len, uint8_t *pk,
-		       uint16_t *pk_len, uint8_t *g, uint16_t *g_len)
+		       uint16_t cred_num, uint8_t *id_cred,
+		       uint32_t id_cred_len, uint8_t *cred, uint32_t *cred_len,
+		       uint8_t *pk, uint32_t *pk_len, uint8_t *g,
+		       uint32_t *g_len)
 {
-	bool verified;
 	uint32_t decode_len = 0;
 	struct id_cred_x_map map;
 
-	//TODO implement here retrieving of the public of the other party from CRED_x of the other party!!!
-
-	/*check first if the credential is preestablished (RPK)*/
-	for (uint16_t i = 0; i < cred_num; i++) {
-		if (cred_array[i].id_cred.len == id_cred_len) {
-			if (0 == memcmp(cred_array[i].id_cred.ptr, id_cred,
-					id_cred_len)) {
-				TRY(_memcpy_s(cred, *cred_len,
-					      cred_array[i].cred.ptr,
-					      cred_array[i].cred.len));
-				*cred_len = cred_array[i].cred.len;
-				if (static_dh_auth) {
-					*pk_len = 0;
-					if (cred_array[i].g.len == 65) {
-						/*decompressed P256 DH pk*/
-						g[0] = 0x2;
-						TRY(_memcpy_s(
-							&g[1], *g_len - 1,
-							&cred_array[i].g.ptr[1],
-							32));
-						*g_len = 33;
-
-					} else {
-						TRY(_memcpy_s(
-							g, *g_len,
-							cred_array[i].g.ptr,
-							cred_array[i].g.len));
-						*g_len = cred_array[i].g.len;
-					}
-
-				} else {
-					*g_len = 0;
-					TRY(_memcpy_s(pk, *pk_len,
-						      cred_array[i].pk.ptr,
-						      cred_array[i].pk.len));
-					*pk_len = cred_array[i].pk.len;
-				}
-				return ok;
-			}
-		}
-	}
-
-	/* Check if ID_CRED_x contains a certificate*/
 	TRY_EXPECT(cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
 					     &decode_len),
 		   true);
-	if (map._id_cred_x_map_x5chain_present != 0) {
-		PRINT_ARRAY(
-			"ID_CRED_x contains a certificate",
+	/*the cred should be locally available on the device if 
+	kid, x5u, x5t, c5u, c5t is used*/
+	if ((map._id_cred_x_map_kid_present != 0) ||
+	    (map._id_cred_x_map_x5u_present != 0) ||
+	    (map._id_cred_x_map_x5t_present != 0) ||
+	    (map._id_cred_x_map_c5u_present != 0) ||
+	    (map._id_cred_x_map_c5t_present != 0)) {
+		TRY(get_local_cred(static_dh_auth, cred_array, cred_num,
+				   id_cred, id_cred_len, cred, cred_len, pk,
+				   pk_len, g, g_len));
+		return ok;
+	}
+	/*x5chain*/
+	else if (map._id_cred_x_map_x5chain_present != 0) {
+		TRY(verify_cert2cred(
+			static_dh_auth, cred_array, cred_num, x5chain,
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
-			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len);
-		TRY(_memcpy_s(
-			cred, *cred_len,
-			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
-			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len));
-		*cred_len =
-			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len;
-		if (static_dh_auth) {
-			*pk_len = 0;
-			TRY(cert_verify(map._id_cred_x_map_x5chain
-						._id_cred_x_map_x5chain.value,
-					map._id_cred_x_map_x5chain
-						._id_cred_x_map_x5chain.len,
-					cred_array, cred_num, g, g_len,
-					&verified));
-		} else {
-			*g_len = 0;
-			TRY(cert_verify(map._id_cred_x_map_x5chain
-						._id_cred_x_map_x5chain.value,
-					map._id_cred_x_map_x5chain
-						._id_cred_x_map_x5chain.len,
-					cred_array, cred_num, pk, pk_len,
-					&verified));
-		}
-
-		if (verified) {
-			PRINT_MSG("Certificate verification successful!\n");
-			return ok;
-		} else {
-			return aead_authentication_failed;
-		}
+			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len,
+			cred, cred_len, pk, pk_len, g, g_len));
+		return ok;
+	}
+	/*x5bag*/
+	else if (map._id_cred_x_map_x5bag_present != 0) {
+		TRY(verify_cert2cred(
+			static_dh_auth, cred_array, cred_num, x5bag,
+			map._id_cred_x_map_x5bag._id_cred_x_map_x5bag.value,
+			map._id_cred_x_map_x5bag._id_cred_x_map_x5bag.len, cred,
+			cred_len, pk, pk_len, g, g_len));
+		return ok;
+	}
+	/*c5c*/
+	else if (map._id_cred_x_map_c5c_present != 0) {
+		TRY(verify_cert2cred(
+			static_dh_auth, cred_array, cred_num, c5c,
+			map._id_cred_x_map_c5c._id_cred_x_map_c5c.value,
+			map._id_cred_x_map_c5c._id_cred_x_map_c5c.len, cred,
+			cred_len, pk, pk_len, g, g_len));
+		return ok;
+	}
+	/*c5b*/
+	else if (map._id_cred_x_map_c5b_present != 0) {
+		TRY(verify_cert2cred(
+			static_dh_auth, cred_array, cred_num, c5b,
+			map._id_cred_x_map_c5b._id_cred_x_map_c5b.value,
+			map._id_cred_x_map_c5b._id_cred_x_map_c5b.len, cred,
+			cred_len, pk, pk_len, g, g_len));
+		return ok;
 	}
 
 	return credential_not_found;

@@ -11,6 +11,7 @@ LIB_NAME = libuoscore-uedhoc.a
 
 include makefile_config.mk
 
+$(info    CC is $(CC))
 # $(info    LIB_NAME is $(LIB_NAME))
 # $(info    PREFIX is $(PREFIX))
 # $(info    SOURCE_DIR is $(SOURCE_DIR))
@@ -107,34 +108,77 @@ endif
 # CFLAGS
 ################################################################################
 FILTERED_CFLAGS = -Os
-CFLAGS1 = $(filter-out $(FILTERED_CFLAGS), $(CFLAGS))
+EXTENDED_CFLAGS = $(filter-out $(FILTERED_CFLAGS), $(CFLAGS))
 
 #add options form configuration file 
-CFLAGS1 += $(ARCH)
-CFLAGS1 += $(OPT)
-CFLAGS1 += $(DEBUG_PRINT)
-CFLAGS1 += $(CBOR_ENGINE)
-CFLAGS1 += $(CRYPTO_ENGINE)
+EXTENDED_CFLAGS += $(ARCH)
+EXTENDED_CFLAGS += $(OPT)
+EXTENDED_CFLAGS += $(DEBUG_PRINT)
+EXTENDED_CFLAGS += $(CBOR_ENGINE)
+EXTENDED_CFLAGS += $(CRYPTO_ENGINE)
 
 #add include paths
-CFLAGS1 += $(C_INCLUDES)
+EXTENDED_CFLAGS += $(C_INCLUDES)
 
 #generate debug symbols
-CFLAGS1 += -g -gdwarf-2
+EXTENDED_CFLAGS += -g -gdwarf-2
 
 # Generate dependency information
-CFLAGS1 += -MMD -MP -MF"$(@:%.o=%.d)"
+EXTENDED_CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
-# required for gddl-gen library
-#CFLAGS1 += -DCDDL_CBOR_CANONICAL 
+
+
+#GCC warning flags
+ifeq ($(findstring cc,$(CC)),cc)
+EXTENDED_CFLAGS += -Waddress
+EXTENDED_CFLAGS += -Waggregate-return
+EXTENDED_CFLAGS += -Wformat-nonliteral
+EXTENDED_CFLAGS += -Wformat-security
+EXTENDED_CFLAGS += -Wformat
+EXTENDED_CFLAGS += -Winit-self
+EXTENDED_CFLAGS += -Wmissing-include-dirs
+EXTENDED_CFLAGS += -Wno-multichar
+EXTENDED_CFLAGS += -Wno-parentheses
+EXTENDED_CFLAGS += -Wno-type-limits
+EXTENDED_CFLAGS += -Wno-unused-parameter
+EXTENDED_CFLAGS += -Wunreachable-code
+EXTENDED_CFLAGS += -Wwrite-strings
+EXTENDED_CFLAGS += -Wpointer-arith
+EXTENDED_CFLAGS += -Wall
+EXTENDED_CFLAGS += -Wextra
+EXTENDED_CFLAGS += -Wcast-qual
+EXTENDED_CFLAGS += -Wstack-usage=7000
+#EXTENDED_CFLAGS += -Wconversion
+#EXTENDED_CFLAGS += -Wpedantic
+#EXTENDED_CFLAGS += -Werror
+
+#Clang warning flahs
+else ifeq ($(findstring clang,$(CC)),clang)
+EXTENDED_CFLAGS += -Wcast-qual
+EXTENDED_CFLAGS += -Wconversion
+EXTENDED_CFLAGS += -Wexit-time-destructors
+EXTENDED_CFLAGS += -Wglobal-constructors
+EXTENDED_CFLAGS += -Wmissing-noreturn
+EXTENDED_CFLAGS += -Wmissing-prototypes
+EXTENDED_CFLAGS += -Wno-missing-braces
+EXTENDED_CFLAGS += -Wold-style-cast
+#EXTENDED_CFLAGS += -Wshadow
+EXTENDED_CFLAGS += -Wweak-vtables
+EXTENDED_CFLAGS += -Wall
+#EXTENDED_CFLAGS += -Wextra
+EXTENDED_CFLAGS += -Wpedantic
+EXTENDED_CFLAGS += -Wstack-exhausted
+EXTENDED_CFLAGS += -Wconversion
+#EXTENDED_CFLAGS += -Werror
+endif
 
 # use AddressSanitizer to find memory bugs
 # comment this out for better speed
-#CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+#EXTENDED_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 #CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 #LDFLAGS += -fsanitize=address -static-libasan
 
-#$(info    CFLAGS1 is $(CFLAGS1))
+$(info    EXTENDED_CFLAGS are $(EXTENDED_CFLAGS))
 ################################################################################
 # build the library
 ################################################################################
@@ -148,7 +192,7 @@ $(DIR)/$(LIB_NAME): $(OBJ)
 
 $(DIR)/%.o: %.c Makefile makefile_config.mk
 	@echo [Compile] $<
-	@$(CC) -c $(CFLAGS1) $< -o $@
+	@$(CC) -c $(EXTENDED_CFLAGS) $< -o $@
 
 clean:
 	rm -fR $(DIR)

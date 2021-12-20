@@ -16,6 +16,7 @@
 #include "../inc/memcpy_s.h"
 #include "../inc/print_util.h"
 #include "../inc/retrieve_cred.h"
+#include "../inc/plaintext.h"
 #include "../inc/signature_or_mac_msg.h"
 #include "../cbor/decode_plaintext.h"
 #include "../cbor/encode_id_cred_x.h"
@@ -30,22 +31,18 @@
  * @param	
  */
 static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
-					 const void *id, uint64_t id_len,
-					 uint8_t *id_cred_x,
-					 uint32_t *id_cred_x_len)
+				 const void *id, uint32_t id_len,
+				 uint8_t *id_cred_x, uint32_t *id_cred_x_len)
 {
-	struct id_cred_x_map map;
+	struct id_cred_x_map map = {0};
 	uint32_t payload_len_out;
 
-	map._id_cred_x_map_kid_present = 0;
-	map._id_cred_x_map_x5chain_present = 0;
-	map._id_cred_x_map_x5t_present = 0;
-	map._id_cred_x_map_x5u_present = 0;
 
 	switch (label) {
 	case kid:
 		map._id_cred_x_map_kid_present = true;
-		map._id_cred_x_map_kid._id_cred_x_map_kid = *((int32_t *)id);
+		map._id_cred_x_map_kid._id_cred_x_map_kid =
+			*((const int32_t *)id);
 		break;
 	case x5chain:
 		map._id_cred_x_map_x5chain_present = true;
@@ -54,9 +51,11 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 		break;
 	case x5t:
 		map._id_cred_x_map_x5t_present = true;
-		map._id_cred_x_map_x5t._id_cred_x_map_x5t_int = algo;
-		map._id_cred_x_map_x5t._id_cred_x_map_x5t_bstr.value = id;
-		map._id_cred_x_map_x5t._id_cred_x_map_x5t_bstr.len = id_len;
+		map._id_cred_x_map_x5t._id_cred_x_map_x5t_alg_choice =
+			_id_cred_x_map_x5t_alg_int;
+		map._id_cred_x_map_x5t._id_cred_x_map_x5t_alg_int = algo;
+		map._id_cred_x_map_x5t._id_cred_x_map_x5t_hash.value = id;
+		map._id_cred_x_map_x5t._id_cred_x_map_x5t_hash.len = id_len;
 		break;
 	default:
 		break;
@@ -71,11 +70,10 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 	return ok;
 }
 
-enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
-				 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
-				 uint8_t *sign_or_mac,
-				 uint32_t *sign_or_mac_len, uint8_t *ad,
-				 uint32_t *ad_len)
+enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
+			 uint8_t *id_cred_x, uint32_t *id_cred_x_len,
+			 uint8_t *sign_or_mac, uint32_t *sign_or_mac_len,
+			 uint8_t *ad, uint32_t *ad_len)
 {
 	uint32_t decode_len = 0;
 	struct plaintext p;
@@ -101,11 +99,11 @@ enum err plaintext_split(uint8_t *ptxt, const uint16_t ptxt_len,
 			TRY(id_cred_x_encode(
 				x5t,
 				p._plaintext_ID_CRED_x__map._map_x5t
-					._map_x5t_int,
+					._map_x5t_alg_int,
 				p._plaintext_ID_CRED_x__map._map_x5t
-					._map_x5t_bstr.value,
+					._map_x5t_hash.value,
 				p._plaintext_ID_CRED_x__map._map_x5t
-					._map_x5t_bstr.len,
+					._map_x5t_hash.len,
 				id_cred_x, id_cred_x_len));
 		}
 	} else {

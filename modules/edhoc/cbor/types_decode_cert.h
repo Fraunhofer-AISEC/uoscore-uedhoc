@@ -17,13 +17,15 @@
 
 struct cert {
  	int32_t _cert_type;
-	cbor_string_type_t _cert_serial_number;
+	int32_t _cert_serial_number;
 	cbor_string_type_t _cert_issuer;
 	int32_t _cert_validity_not_before;
 	int32_t _cert_validity_not_after;
 	cbor_string_type_t _cert_subject;
+	int32_t _cert_subject_public_key_algorithm;
 	cbor_string_type_t _cert_pk;
 	int32_t _cert_extensions;
+	int32_t _cert_issuer_signature_algorithm;
 	cbor_string_type_t _cert_signature;
 };
 

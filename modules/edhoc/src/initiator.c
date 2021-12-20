@@ -33,7 +33,7 @@
 #include "../cbor/encode_message_3.h"
 //#include "../cbor/decode_message_2_c_i.h"
 
-/**
+/** 
  * @brief   Parses message 2
  * @param   c initiator context
  * @param   msg2 pointer to a buffer containign message 2 
@@ -41,11 +41,10 @@
  * @param   msg2_struct pointer to a structure for the parsed message
  * @param   err_msg pointer to an error message structure
  */
-static inline enum err msg2_parse(const struct edhoc_initiator_context *c,
-				  uint8_t *msg2, uint32_t msg2_len,
-				  uint8_t *g_y, uint64_t g_y_len,
+static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
+				  uint8_t *g_y, uint32_t g_y_len,
 				  struct c_x *c_r, uint8_t *ciphertext2,
-				  uint64_t *ciphertext2_len)
+				  uint32_t *ciphertext2_len)
 {
 	uint32_t decode_len = 0;
 	struct m2 m;
@@ -85,7 +84,7 @@ static inline enum err msg1_encode(const struct edhoc_initiator_context *c,
 	struct message_1 m1;
 
 	/*METHOD_CORR*/
-	m1._message_1_METHOD = c->method;
+	m1._message_1_METHOD = (int32_t)c->method;
 
 	/*SUITES_I*/
 	if (c->suites_i.len == 1) {
@@ -138,10 +137,10 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			     struct other_party_cred *cred_r_array,
 			     uint16_t num_cred_r, uint8_t *err_msg,
 			     uint32_t *err_msg_len, uint8_t *ead_2,
-			     uint64_t *ead_2_len, uint8_t *ead_4,
-			     uint64_t *ead_4_len, uint8_t *prk_4x3m,
-			     uint8_t prk_4x3m_len, uint8_t *th4,
-			     uint8_t th4_len,
+			     uint32_t *ead_2_len, uint8_t *ead_4,
+			     uint32_t *ead_4_len, uint8_t *prk_4x3m,
+			     uint32_t prk_4x3m_len, uint8_t *th4,
+			     uint32_t th4_len,
 			     enum err (*tx)(uint8_t *data, uint32_t data_len),
 			     enum err (*rx)(uint8_t *data, uint32_t *data_len))
 {
@@ -157,17 +156,15 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 	uint32_t msg2_len = sizeof(msg2);
 	uint8_t msg4[MSG_4_DEFAULT_SIZE];
 	uint32_t msg4_len = sizeof(msg2);
-
-	/*in a given selected cipher suite the length of G_X and G_Y is equal*/
-	uint8_t g_y[c->g_x.len];
-	uint64_t g_y_len = sizeof(g_y);
+	uint8_t g_y[G_Y_DEFAULT_SIZE];
+	uint32_t g_y_len = get_ecdh_pk_len(suite.edhoc_ecdh);
 
 	uint8_t c_r_buf[C_R_DEFAULT_SIZE];
 	struct c_x c_r;
 	c_x_init(&c_r, c_r_buf, sizeof(c_r_buf));
 
 	uint8_t ciphertext2[CIPHERTEXT2_DEFAULT_SIZE];
-	uint64_t ciphertext2_len = sizeof(ciphertext2);
+	uint32_t ciphertext2_len = sizeof(ciphertext2);
 
 	/********************* encode and send message 1***********************/
 
@@ -183,7 +180,7 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
     error_message_received. If this hapens edhoc_initiator_run will return. Then
     the caller needs to examine SUITES_R in err_msg re-initialize the initiator 
     and call edhoc_initiator_run again*/
-	TRY(msg2_parse(c, msg2, msg2_len, g_y, g_y_len, &c_r,
+	TRY(msg2_parse(msg2, msg2_len, g_y, g_y_len, &c_r,
 		       (uint8_t *)&ciphertext2, &ciphertext2_len));
 	// if (r == error_message_received) {
 	// 	/*provide the error message to the caller*/
@@ -203,8 +200,8 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*calculate th2*/
 	uint8_t th2[SHA_DEFAULT_SIZE];
-	TRY(th2_calculate(suite.edhoc_hash, msg1, msg1_len, g_y, sizeof(g_y),
-			  &c_r, th2));
+	TRY(th2_calculate(suite.edhoc_hash, msg1, msg1_len, g_y, g_y_len, &c_r,
+			  th2));
 
 	/*calculate PRK_2e*/
 	uint8_t PRK_2e[PRK_DEFAULT_SIZE];
@@ -223,11 +220,11 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*check the authenticity of the responder*/
 	uint8_t cred_r[CRED_DEFAULT_SIZE];
-	uint16_t cred_r_len = sizeof(cred_r);
+	uint32_t cred_r_len = sizeof(cred_r);
 	uint8_t pk[PK_DEFAULT_SIZE];
-	uint16_t pk_len = sizeof(pk);
+	uint32_t pk_len = sizeof(pk);
 	uint8_t g_r[G_R_DEFAULT_SIZE];
-	uint16_t g_r_len = sizeof(g_r);
+	uint32_t g_r_len = sizeof(g_r);
 
 	TRY(retrieve_cred(static_dh_r, cred_r_array, num_cred_r, id_cred_r,
 			  id_cred_r_len, cred_r, &cred_r_len, pk, &pk_len, g_r,
@@ -255,13 +252,13 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 
 	/*derive prk_4x3m*/
 	TRY(prk_derive(static_dh_i, suite, (uint8_t *)&PRK_3e2m,
-		       sizeof(PRK_3e2m), g_y, sizeof(g_y), c->i.ptr, c->i.len,
+		       sizeof(PRK_3e2m), g_y, g_y_len, c->i.ptr, c->i.len,
 		       prk_4x3m));
 	PRINT_ARRAY("prk_4x3m", prk_4x3m, prk_4x3m_len);
 
 	/*calculate Signature_or_MAC_3*/
 	uint32_t sign_or_mac_3_len = get_signature_len(suite.edhoc_sign);
-	uint8_t sign_or_mac_3[sign_or_mac_3_len];
+	uint8_t sign_or_mac_3[SIGNATURE_DEFAULT_SIZE];
 
 	TRY(signature_or_mac(GENERATE, static_dh_i, &suite, c->sk_i.ptr,
 			     c->sk_i.len, c->pk_i.ptr, c->pk_i.len, prk_4x3m,
@@ -279,8 +276,9 @@ enum err edhoc_initiator_run(const struct edhoc_initiator_context *c,
 			   &ciphertext_3_len));
 
 	/*massage 3 create and send*/
-	uint8_t msg3[ciphertext_3_len + 2];
-	uint64_t msg3_len = sizeof(msg3);
+	uint32_t msg3_len = ciphertext_3_len + ENCODING_OVERHEAD;
+	TRY(check_buffer_size(CIPHERTEXT3_DEFAULT_SIZE, msg3_len));
+	uint8_t msg3[CIPHERTEXT3_DEFAULT_SIZE];
 
 	TRY(encode_byte_string(ciphertext_3, ciphertext_3_len, msg3,
 			       &msg3_len));
