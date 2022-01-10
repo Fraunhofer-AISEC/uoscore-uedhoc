@@ -9,7 +9,7 @@
    except according to those terms.
 */
 
-#include <oscore.h>
+#include "../../../modules/oscore/oscore.h"
 
 /*Test vector C1.1: Key derivation with Master Salt*/
 uint8_t MASTER_SECRET[16] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,

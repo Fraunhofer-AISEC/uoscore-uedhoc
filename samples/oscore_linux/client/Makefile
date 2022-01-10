@@ -7,126 +7,121 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-######################################
-# target
-######################################
-TARGET = oscore_linux_client
+# in order to rebuild the uoscore-uedhoc.a and client application call: 
+# make oscore_edhoc; make
 
-######################################
-# building variables
-######################################
-# optimization
-OPT = -O0
-
-
-#######################################
-# paths
-#######################################
-# Build path
-BUILD_DIR = build
-
-######################################
-# source, defines and includes
-######################################
-
-# CPP sources
-CPP_SOURCES = \
-src/main.cpp \
-../../../externals/cantcoap/cantcoap.cpp
-
-
-DO_NOT_COMPILE_SOURCES = \
-../../../externals/tinycbor/src/open_memstream.c \
-../../../externals/tinycbor/src/cbortojson.c \
-../../../externals/tinycbor/src/cborpretty.c \
-../../../externals/tinycbor/src/cborencoder_close_container_checked.c \
-../../../externals/tinycbor/src/cborvalidation.c \
-../../../externals/tinycbor/src/cborparser_dup_string.c \
-../../../externals/tinycbor/src/cborpretty_stdio.c \
-../../../externals/tinycbor/src/cborerrorstrings.c \
-../../../externals/tinycrypt/lib/source/ctr_prng.c \
-../../../externals/tinycrypt/lib/source/ecc_dh.c \
-../../../externals/tinycrypt/lib/source/cbc_mode.c \
-../../../externals/tinycrypt/lib/source/hmac_prng.c \
-../../../externals/tinycrypt/lib/source/ctr_mode.c \
-../../../externals/tinycrypt/lib/source/ecc_platform_specific.c \
-../../../externals/tinycrypt/lib/source/cmac_mode.c \
-../../../externals/tinycrypt/lib/source/ecc.c \
-../../../externals/tinycrypt/lib/source/ecc_dsa.c 
-
-C_SOURCES = $(wildcard src/*.c)
-C_SOURCES += ../../common/sock.c
-C_SOURCES += $(wildcard ../../../modules/oscore/src/*.c)
-C_SOURCES += $(wildcard ../../../modules/oscore/cbor/*.c)
-#C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycbor/src/*.c))
-C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
-C_SOURCES += $(filter-out $(DO_NOT_COMPILE_SOURCES), $(wildcard ../../../externals/tinycrypt/lib/source/*.c))
-
-
-# C defines
-C_DEFS =  \
--DOSCORE_WITH_TINYCRYPT 
-#-DOSCORE_DEBUG_PRINT 
-
-# C++ defines
-CXX_DEFS =  
-
-
-# C includes
-C_INCLUDES =  \
--Iinc/ \
--I../common/ \
--I../../../externals/cantcoap/ \
--I../../../modules/oscore/ \
--I../../../externals/tinycbor/src/ \
--I../../../externals/tinycrypt/lib/include \
--I../../../externals/cddl-gen/include \
--I../../../externals/jsmn
-
-#-Iexternals/libcoap/examples/lwip/
-#########################################
-# Use gcc compiler with flags
-#########################################
+# toolchain
 CXX = g++
 CC = gcc
 SZ = size
+MAKE = make
 
+# target
+TARGET = client
 
+# build path
+BUILD_DIR = build
+
+# libusocore-uedhoc path
+USOCORE_UEDHOC_PATH = ../../../
+USOCORE_UEDHOC_BUILD_PATH = $(USOCORE_UEDHOC_PATH)build
+
+# build for 32 bit x68 
+# export the varible so that it is availbale in the uoscore-uedhoc Makefile 
+ARCH = -m32
+export ARCH
+
+# debug build?
+DEBUG = 1
+
+# optimization
+OPT = -Og
+
+# CPP sources
+CPP_SOURCES += src/main.cpp
+CPP_SOURCES += ../../../externals/cantcoap/cantcoap.cpp
+
+# C sources 
+# rename files avaible with the same name in diferent libraries
+# todo clean up this
+$(shell mv ../../../externals/compact25519/src/c25519/sha512.c ../../../externals/compact25519/src/c25519/_sha512.c )
+
+C_SOURCES += src/credentials.c
+C_SOURCES += $(wildcard ../../common/*.c) 
+C_SOURCES += $(wildcard ../../common/cbor/*.c) 
+C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
+C_SOURCES += $(wildcard ../../../externals/mbedtls/library/*.c)
+C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)
+C_SOURCES += $(wildcard ../../../externals/compact25519/src/*.c)
+
+# C_SOURCES += $(wildcard ../../../externals/tinycrypt/lib/source/*.c)
+
+# C includes
+
+C_INCLUDES += -I../../../modules/edhoc/ 
+C_INCLUDES += -I../../../externals/cantcoap/ 
+C_INCLUDES += -I../../../externals/jsmn 
+C_INCLUDES += -I../../../externals/cddl-gen/include 
+C_INCLUDES += -I../../../externals/mbedtls/library 
+C_INCLUDES += -I../../../externals/mbedtls/include 
+C_INCLUDES += -I../../../externals/mbedtls/include/mbedtls 
+C_INCLUDES += -I../../../externals/mbedtls/include/psa 
+C_INCLUDES += -I../../../externals/compact25519/src/
+C_INCLUDES += -I../../../externals/compact25519/src/c25519
+#C_INCLUDES += -I../../../externals/tinycrypt/lib/include
+
+# C defines
+# make PRINT_ARRAY macro usable in the main file
+C_DEFS += -DDEBUG_PRINT
+
+# Linked libraries
+LD_LIBRARY_PATH += -L$(USOCORE_UEDHOC_BUILD_PATH)
+
+LDFLAGS += $(LD_LIBRARY_PATH)
+LDFLAGS += -luoscore-uedhoc
+LDFLAGS += $(ARCH) 
 ##########################################
 # CFLAGS
 ##########################################
 #general c flags
-CFLAGS =  $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall 
-CXXFLAGS = $(CXX_DEFS) $(OPT) -Wall 
+CFLAGS +=  $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall
+CXXFLAGS +=  $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT)
 
 # have dubug information
+ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
 CXXFLAGS += -Wall -g
+endif
 
-
-# generate dependency information
+# Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" 
 
 # required for gddl-gen library
 CFLAGS += -DCDDL_CBOR_CANONICAL 
 
+
+
 # use AddressSanitizer to find memory bugs
-# comment this out for better speed 
-# CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-# CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-# LDFLAGS += -fsanitize=address -static-libasan
+# comment this out for better speed
+#CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+#CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+#LDFLAGS += -fsanitize=address -static-libasan
+
 ###########################################
 # default action: build all
 ###########################################
-all: $(BUILD_DIR)/$(TARGET)
-
 #list of objects from c files
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
+
 # list of objects from c++ file
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(CPP_SOURCES:.cpp=.o)))
 vpath %.cpp $(sort $(dir $(CPP_SOURCES)))
+
+USOCORE_UEDHOC_OBJ = $(wildcard $(USOCORE_UEDHOC_PATH)/*.o) 
+
+
 
 $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR) 
 	$(CXX) -c $(CXXFLAGS) $< -o $@
@@ -134,19 +129,26 @@ $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR)
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
-$(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile
+$(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile $(USOCORE_UEDHOC_PATH)/Makefile $(USOCORE_UEDHOC_OBJ)
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH)
 	$(CXX) $(OBJECTS)  $(LDFLAGS) -o $@
 	$(SZ) $@
 
 $(BUILD_DIR):
-	mkdir $@		
+	mkdir $@
 
-#######################################
-# clean up
-#######################################
+
+
+oscore_edhoc:
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH)
+
+clean_oscore_edhoc:
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH) clean
+
 clean:
 	-rm -fR $(BUILD_DIR)
-  
+	$(MAKE) -C $(USOCORE_UEDHOC_PATH) clean
+
 #######################################
 # dependencies
 #######################################

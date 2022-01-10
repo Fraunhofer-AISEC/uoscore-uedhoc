@@ -151,7 +151,7 @@ int main()
 	struct edhoc_initiator_context c_i;
 	struct other_party_cred_bufs other_party_bufs;
 	struct edhoc_initiator_context_bufs initiator_context_bufs;
-	char filename[] = { "../../../edhoc-vectors-json_v11.txt" };
+	char filename[] = { "../../../test_vectors/edhoc-vectors-json_v11.txt" };
 	char test_vec_buf[1024 * 160];
 	uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 

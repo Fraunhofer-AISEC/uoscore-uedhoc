@@ -14,14 +14,14 @@
 
 #include "oscore.h"
 #include "../inc/aad.h"
-#include "../inc/byte_array.h"
+#include "../../common/inc/byte_array.h"
 #include "../inc/coap.h"
 #include "../../common/inc/oscore_edhoc_error.h"
-#include "../inc/memcpy_s.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../inc/nonce.h"
 #include "../inc/option.h"
 #include "../inc/oscore_cose.h"
-#include "../inc/print_util.h"
+#include "../../common/inc/print_util.h"
 #include "../inc/security_context.h"
 
 /**

@@ -12,7 +12,7 @@
 
 #include <string.h>
 
-#include "../inc/memcpy_s.h"
+#include "../../common/inc/memcpy_s.h"
 
 bool is_class_e(uint16_t code)
 {

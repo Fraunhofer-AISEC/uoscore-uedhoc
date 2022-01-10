@@ -15,8 +15,8 @@
 
 #include "oscore.h"
 #include "../../common/inc/oscore_edhoc_error.h"
-#include "../inc/memcpy_s.h"
-#include "../inc/print_util.h"
+#include "../../common/inc/memcpy_s.h"
+#include "../../common/inc/print_util.h"
 #include "../inc/coap.h"
 
 enum err options_into_byte_string(struct o_coap_option *options,

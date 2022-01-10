@@ -19,9 +19,9 @@
 #include "../../common/inc/crypto_wrapper.h"
 #include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/oscore_hkdf_info.h"
-#include "../inc/memcpy_s.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../inc/nonce.h"
-#include "../inc/print_util.h"
+#include "../../common/inc/print_util.h"
 #include "../oscore.h"
 
 /**

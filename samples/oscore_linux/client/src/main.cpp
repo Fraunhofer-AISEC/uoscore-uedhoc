@@ -72,8 +72,8 @@ int main()
 	oscore_init_params params = {
 		CLIENT,	    MASTER_SECRET_LEN, MASTER_SECRET, SENDER_ID_LEN,
 		SENDER_ID,  RECIPIENT_ID_LEN,  RECIPIENT_ID,  ID_CONTEXT_LEN,
-		ID_CONTEXT, MASTER_SALT_LEN,   MASTER_SALT,   AES_CCM_16_64_128,
-		SHA_256,
+		ID_CONTEXT, MASTER_SALT_LEN,   MASTER_SALT,   OSCORE_AES_CCM_16_64_128,
+		OSCORE_SHA_256,
 	};
 	r = oscore_context_init(&params, &c_client);
 
@@ -82,9 +82,9 @@ int main()
 	}
 
 	uint8_t buf_oscore[256];
-	uint16_t buf_oscore_len = sizeof(buf_oscore);
+	uint32_t buf_oscore_len = sizeof(buf_oscore);
 	uint8_t coap_rx_buf[256];
-	uint16_t coap_rx_buf_len = 0;
+	uint32_t coap_rx_buf_len = 0;
 	CoapPDU *recvPDU;
 	bool request_secure_resource = true;
 	uint8_t request_payload[] = { "This is some payload" };

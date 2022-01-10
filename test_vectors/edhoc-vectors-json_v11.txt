@@ -1,5 +1,5 @@
 {
-   test_vector_1: {
+   "test_vector_1": {
       "method": "03",
       "suites_i": "00",
       "suites_r": "00",
@@ -89,7 +89,7 @@
       "oscore_secret_key_update_raw": "a515231d9ec5887482226bf9e0da05ce",
       "oscore_salt_key_update_raw": "5057e592ed8b1128"
    },
-   test_vector_2: {
+   "test_vector_2": {
       "method": "02",
       "suites_i": "00",
       "suites_r": "00",
@@ -179,7 +179,7 @@
       "oscore_secret_key_update_raw": "b237e16df097c43f8baf70fc92d43b5b",
       "oscore_salt_key_update_raw": "eb64194ee81ba49a"
    },
-   test_vector_3: {
+   "test_vector_3": {
       "method": "01",
       "suites_i": "00",
       "suites_r": "00",
@@ -269,7 +269,7 @@
       "oscore_secret_key_update_raw": "04edc50e6726e93f4477c827e851dcb5",
       "oscore_salt_key_update_raw": "8e071456ac49edd7"
    },
-   test_vector_4: {
+   "test_vector_4": {
       "method": "00",
       "suites_i": "00",
       "suites_r": "00",
@@ -359,7 +359,7 @@
       "oscore_secret_key_update_raw": "8f7c4212d7e42a1c5fbb5dc62fd7b7f3",
       "oscore_salt_key_update_raw": "87eb7db2fdcfa89c"
    },
-   test_vector_5: {
+   "test_vector_5": {
       "method": "03",
       "suites_i": "00",
       "x_raw": "9c6f2e4c7415c4a47ba8b5a9185d2727414ed1fd39cfc91a297ac483d4fc030f",
@@ -448,7 +448,7 @@
       "oscore_secret_key_update_raw": "9fab7339aaf5f11c8aa8daa4127cae00",
       "oscore_salt_key_update_raw": "2733d07d9e22c256"
    },
-   test_vector_6: {
+   "test_vector_6": {
       "method": "02",
       "suites_i": "00",
       "x_raw": "d3771a63e95e155ed9a360164cc6bd0bde0bc3addbe898260a316713907bfef7",
@@ -537,7 +537,7 @@
       "oscore_secret_key_update_raw": "22073e777d27710446d4ba8f8dfda21c",
       "oscore_salt_key_update_raw": "ab56c1af23ab4937"
    },
-   test_vector_7: {
+   "test_vector_7": {
       "method": "02",
       "suites_i": "00",
       "x_raw": "babea1a634b72e77558f216fea9550319c74a7aa686e04e4c88f9b21d7f8bdf8",
@@ -626,7 +626,7 @@
       "oscore_secret_key_update_raw": "00513bef8981fe0ab58d49166f2b2bc5",
       "oscore_salt_key_update_raw": "802449cbf0ce13bf"
    },
-   test_vector_8: {
+   "test_vector_8": {
       "method": "03",
       "suites_i": "83000201",
       "suites_r": "01",
@@ -716,7 +716,7 @@
       "oscore_secret_key_update_raw": "090f82721b8573ef89c203e603a0b4a0",
       "oscore_salt_key_update_raw": "ba75986770d8675b"
    },
-   test_vector_9: {
+   "test_vector_9": {
       "method": "00",
       "suites_i": "83000201",
       "suites_r": "01",
@@ -806,7 +806,7 @@
       "oscore_secret_key_update_raw": "c2261cd1fd2260aa3bd808bd00fa5480",
       "oscore_salt_key_update_raw": "024950ebd7b8e1c9"
    },
-   test_vector_10: {
+   "test_vector_10": {
       "method": "03",
       "suites_i": "00",
       "suites_r": "00",
@@ -896,7 +896,7 @@
       "oscore_secret_key_update_raw": "813127e0f5162b63d1738f255f164d5f",
       "oscore_salt_key_update_raw": "0a7a23a2a5186450"
    },
-   test_vector_11: {
+   "test_vector_11": {
       "method": "00",
       "suites_i": "00",
       "suites_r": "00",
@@ -986,7 +986,7 @@
       "oscore_secret_key_update_raw": "7b9cae08e7b68c7b057fb854c1065089",
       "oscore_salt_key_update_raw": "7bf61d816f30c983"
    },
-   test_vector_12: {
+   "test_vector_12": {
       "method": "03",
       "suites_i": "00",
       "suites_r": "00",
@@ -1076,7 +1076,7 @@
       "oscore_secret_key_update_raw": "6b0678181af8db3bf8a3376e7d04595e",
       "oscore_salt_key_update_raw": "429d2d0c0ebe60b7"
    },
-   test_vector_13: {
+   "test_vector_13": {
       "method": "00",
       "suites_i": "00",
       "suites_r": "00",
@@ -1166,7 +1166,7 @@
       "oscore_secret_key_update_raw": "4288342bc263487636afe94adee01428",
       "oscore_salt_key_update_raw": "b16798592f93a7ad"
    },
-   test_vector_14: {
+   "test_vector_14": {
       "method": "00",
       "suites_i": "02",
       "suites_r": "02",
@@ -1258,7 +1258,7 @@
       "oscore_secret_key_update_raw": "f64d9395307966f8d75e2f3e8296d8c3",
       "oscore_salt_key_update_raw": "931fffe1ab793d7d"
    },
-   test_vector_15: {
+   "test_vector_15": {
       "method": "02",
       "suites_i": "02",
       "suites_r": "02",
@@ -1350,7 +1350,7 @@
       "oscore_secret_key_update_raw": "c53d8c284bff56aa24c0345f86b214fc",
       "oscore_salt_key_update_raw": "0c9a832fc4ce2497"
    },
-   test_vector_16: {
+   "test_vector_16": {
       "method": "01",
       "suites_i": "02",
       "suites_r": "02",
@@ -1442,7 +1442,7 @@
       "oscore_secret_key_update_raw": "026176f1cb750264263a761e5fa5dfb5",
       "oscore_salt_key_update_raw": "1fa76d02eb36d589"
    },
-   test_vector_17: {
+   "test_vector_17": {
       "method": "00",
       "suites_i": "02",
       "suites_r": "02",
@@ -1534,7 +1534,7 @@
       "oscore_secret_key_update_raw": "470386e7498e05075af4aa34dc978a27",
       "oscore_salt_key_update_raw": "4cc6ef4300c2bff3"
    },
-   test_vector_18: {
+   "test_vector_18": {
       "method": "00",
       "suites_i": "02",
       "suites_r": "02",

@@ -11,8 +11,8 @@
 #include "oscore.h"
 #include "../inc/aad.h"
 #include "../inc/option.h"
-#include "../inc/print_util.h"
 #include "../cbor/aad_array.h"
+#include "../../common/inc/print_util.h"
 #include "../../common/inc/oscore_edhoc_error.h"
 #include "../../common/inc/memcpy_s.h"
 

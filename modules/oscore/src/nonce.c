@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../inc/memcpy_s.h"
-#include "../inc/print_util.h"
+#include "../../common/inc/print_util.h"
+#include "../../common/inc/memcpy_s.h"
 #include "../inc/security_context.h"
 
 enum err create_nonce(struct byte_array *id_piv, struct byte_array *piv,

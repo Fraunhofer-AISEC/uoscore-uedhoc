@@ -15,7 +15,7 @@
 #include "oscore.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../../common/inc/memcpy_s.h"
-#include "../inc/print_util.h"
+#include "../../common/inc/print_util.h"
 #include "../inc/security_context.h"
 #include "../cbor/enc_structure.h"
 

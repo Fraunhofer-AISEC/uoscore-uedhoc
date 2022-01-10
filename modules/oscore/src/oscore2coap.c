@@ -22,7 +22,7 @@
 #include "../inc/nonce.h"
 #include "../inc/option.h"
 #include "../inc/oscore_cose.h"
-#include "../inc/print_util.h"
+#include "../../common/inc/print_util.h"
 #include "../inc/security_context.h"
 
 /**
