@@ -222,6 +222,7 @@ int main()
 			   test_vec_buf, test_vec_buf_len),
 		   0);
 
+
 	TRY_EXPECT(start_coap_server(), 0);
 
 	TRY(edhoc_responder_run(&c_r, &cred_i, cred_num, err_msg, &err_msg_len,

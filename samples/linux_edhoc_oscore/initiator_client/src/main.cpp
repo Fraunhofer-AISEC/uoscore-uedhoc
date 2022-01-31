@@ -176,29 +176,6 @@ int main()
 			   test_vec_buf, test_vec_buf_len),
 		   0);
 
-#ifdef USE_RANDOM_EPHEMERAL_DH_KEY
-	uint32_t seed;
-	uint8_t G_X_random[32];
-	uint8_t X_random[32];
-
-	/*create a random seed*/
-	FILE *fp;
-	fp = fopen("/dev/urandom", "r");
-	uint64_t seed_len = fread((uint8_t *)&seed, 1, sizeof(seed), fp);
-	fclose(fp);
-	PRINT_ARRAY("seed", (uint8_t *)&seed, seed_len);
-
-	/*create ephemeral DH keys from seed*/
-	TRY(ephemeral_dh_key_gen(X25519, seed, X_random, G_X_random));
-	c_i.g_x.ptr = G_X_random;
-	c_i.g_x.len = sizeof(G_X_random);
-	c_i.x.ptr = X_random;
-	c_i.x.len = sizeof(X_random);
-	PRINT_ARRAY("secret ephemeral DH key", c_i.g_x.ptr, c_i.g_x.len);
-	PRINT_ARRAY("public ephemeral DH key", c_i.x.ptr, c_i.x.len);
-
-#endif
-
 	TRY_EXPECT(start_coap_client(), 0);
 
 	TRY(edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
@@ -231,7 +208,6 @@ int main()
 	uint16_t mid1 = 256, mid2 = 0;
 	uint32_t token = 0;
 	int32_t n;
-	//uint32_t len;
 	bool oscore_flag = false;
 	CoapPDU *unprotected_pdu = new CoapPDU();
 	CoapPDU *protected_pdu = new CoapPDU();
@@ -284,15 +260,6 @@ int main()
 			/* receive */
 			n = recv(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL);
 
-			// sendto(sockfd, buf_oscore, buf_oscore_len, 0,
-			//        (const struct sockaddr *)&servaddr,
-			//        sizeof(servaddr));
-
-			// /* receive */
-
-			// n = recvfrom(sockfd, (char *)buffer, MAXLINE,
-			// 	     MSG_WAITALL, (struct sockaddr *)&servaddr,
-			// 	     &len);
 			if (n < 0) {
 				printf("no response received\n");
 			} else {
@@ -304,7 +271,7 @@ int main()
 						      coap_rx_buf_len);
 				if (recvPDU->validate()) {
 					printf("\n===================================================\n");
-					printf("Response CoAP message\n");
+					printf("OSCORE message received and converted to CoAP:\n");
 					recvPDU->printHuman();
 				}
 			}
@@ -329,19 +296,10 @@ int main()
 				unprotected_pdu->printHuman();
 			}
 
-			send(sockfd, buf_oscore, buf_oscore_len, 0);
+			send(sockfd, unprotected_pdu->getPDUPointer(),
+			     unprotected_pdu->getPDULength(), 0);
 			/* receive */
 			n = recv(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL);
-
-			// sendto(sockfd, unprotected_pdu->getPDUPointer(),
-			//        unprotected_pdu->getPDULength(), 0,
-			//        (const struct sockaddr *)&servaddr,
-			//        sizeof(servaddr));
-
-			// /* receive */
-			// n = recvfrom(sockfd, (char *)buffer, MAXLINE,
-			// 	     MSG_WAITALL, (struct sockaddr *)&servaddr,
-			// 	     &len);
 
 			if (n < 0) {
 				printf("no response received\n");
@@ -349,7 +307,7 @@ int main()
 				recvPDU = new CoapPDU((uint8_t *)buffer, n);
 				if (recvPDU->validate()) {
 					printf("\n=============================================\n");
-					printf("Response CoAP message\n");
+					printf("Unprotected CoAP response message\n");
 					recvPDU->printHuman();
 				}
 			}
