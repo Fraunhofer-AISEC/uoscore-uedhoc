@@ -88,11 +88,11 @@ static int start_coap_server(void)
  * @param	pdu pointer to CoAP packet
  * @retval	error code
  */
-static int send_coap_reply(CoapPDU *pdu)
+static int send_coap_reply(void *sock, CoapPDU *pdu)
 {
 	int r;
 
-	r = sendto(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0,
+	r = sendto(*((int *)sock), pdu->getPDUPointer(), pdu->getPDULength(), 0,
 		   (struct sockaddr *)&client_addr, client_addr_len);
 	if (r < 0) {
 		printf("Error: failed to send reply (Code: %d, ErrNo: %d)\n", r,
@@ -104,15 +104,15 @@ static int send_coap_reply(CoapPDU *pdu)
 	return 0;
 }
 
-enum err tx(uint8_t *data, uint32_t data_len)
+enum err tx(void *sock, uint8_t *data, uint32_t data_len)
 {
 	txPDU->setCode(CoapPDU::COAP_CHANGED);
 	txPDU->setPayload(data, data_len);
-	send_coap_reply(txPDU);
+	send_coap_reply(sock, txPDU);
 	return ok;
 }
 
-enum err rx(uint8_t *data, uint32_t *data_len)
+enum err rx(void *sock, uint8_t *data, uint32_t *data_len)
 {
 	int n;
 
@@ -120,7 +120,7 @@ enum err rx(uint8_t *data, uint32_t *data_len)
 	client_addr_len = sizeof(client_addr);
 	memset(&client_addr, 0, sizeof(client_addr));
 
-	n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 0,
+	n = recvfrom(*((int *)sock), (char *)buffer, sizeof(buffer), 0,
 		     (struct sockaddr *)&client_addr, &client_addr_len);
 	if (n < 0) {
 		printf("recv error");
@@ -208,6 +208,7 @@ int main()
 #endif
 
 	TRY_EXPECT(start_coap_server(), 0);
+	c_r.sock = &sockfd;
 
 	while (1) {
 #ifdef USE_RANDOM_EPHEMERAL_DH_KEY
