@@ -128,25 +128,6 @@ enum err verify(enum sign_alg alg, const uint8_t *pk, const uint32_t pk_len,
 		const uint32_t sgn_len, bool *result);
 
 /**
- * @brief   aes_ccm_16_64_128 symmetric algorithm
- * @param   op ENCRYPT/DECRYPT
- * @param   in byte array containing the plaintext/ciphertext
- * @param   out byte array containing the plaintext/ciphertext
- * @param   key the key (16 Byte)
- * @param   nonce the nonce (13 Byte)
- * @param   aad data which is only authenticated not encrypted
- * @param   tag outputs the authentication tag in case of encryption. 
- *          In case of decryption the it is an input parameter.
- * @retval  oscore_authentication_error if the authentication fails
- *          else ok
- */
-//enum err
-// aes_ccm_16_64_128(enum aes_operation op, struct byte_array *in,
-// 		  struct byte_array *out, struct byte_array *key,
-// 		  struct byte_array *nonce, struct byte_array *aad,
-// 		  struct byte_array *tag);
-
-/**
  * @brief   HKDF funcion used for the derivation of the Common IV, 
  *          Recipient/Sender keys.
  * @param   master_secret the master secret

@@ -70,7 +70,7 @@ static int start_coap_client(void)
  * @param	data pointer to the data that needs to be send
  * @param	data_len lenhgt of the data in bytes
  */
-enum err tx(uint8_t *data, uint32_t data_len)
+enum err tx(void *sock, uint8_t *data, uint32_t data_len)
 {
 	/*construct a CoAP packet*/
 	static uint16_t mid = 0;
@@ -85,7 +85,7 @@ enum err tx(uint8_t *data, uint32_t data_len)
 	pdu->setURI((char *)".well-known/edhoc", 17);
 	pdu->setPayload(data, data_len);
 
-	send(sockfd, pdu->getPDUPointer(), pdu->getPDULength(), 0);
+	send(*(int *)sock, pdu->getPDUPointer(), pdu->getPDULength(), 0);
 
 	delete pdu;
 	return ok;
@@ -97,13 +97,13 @@ enum err tx(uint8_t *data, uint32_t data_len)
  * @param	data pointer to the data that needs to be received
  * @param	data_len lenhgt of the data in bytes
  */
-enum err rx(uint8_t *data, uint32_t *data_len)
+enum err rx(void *sock, uint8_t *data, uint32_t *data_len)
 {
 	int n;
 	char buffer[MAXLINE];
 	CoapPDU *recvPDU;
 	/* receive */
-	n = recv(sockfd, (char *)buffer, MAXLINE, MSG_WAITALL);
+	n = recv(*(int *)sock, (char *)buffer, MAXLINE, MSG_WAITALL);
 	if (n < 0) {
 		printf("recv error");
 	}
@@ -178,6 +178,7 @@ int main()
 
 	TRY_EXPECT(start_coap_client(), 0);
 
+	c_i.sock = &sockfd;
 	TRY(edhoc_initiator_run(&c_i, &cred_r, cred_num, err_msg, &err_msg_len,
 				ad_2, &ad_2_len, ad_4, &ad_4_len, PRK_4x3m,
 				sizeof(PRK_4x3m), th4, sizeof(th4), tx, rx));

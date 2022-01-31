@@ -21,7 +21,8 @@
 #define EDHOC_INTERNAL_H
 
 #include <stdint.h>
-#include "common/inc/oscore_edhoc_error.h"
+#include "../common/inc/oscore_edhoc_error.h"
+#include "../edhoc/inc/runtime_context.h"
 
 /**
  * @brief Initializes the EDHOC runtime context

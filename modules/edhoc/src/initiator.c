@@ -10,6 +10,7 @@
 */
 
 #include "../edhoc.h"
+#include "../edhoc_internal.h"
 #include "../inc/associated_data_encode.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
@@ -75,7 +76,7 @@ static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
 }
 
 enum err msg1_gen(const struct edhoc_initiator_context *c,
-				struct runtime_context *rc)
+		  struct runtime_context *rc)
 {
 	struct message_1 m1;
 
@@ -129,11 +130,11 @@ enum err msg1_gen(const struct edhoc_initiator_context *c,
 	return ok;
 }
 
-enum err
-msg3_gen(const struct edhoc_initiator_context *c, struct runtime_context *rc,
-	 struct other_party_cred *cred_r_array, uint16_t num_cred_r,
-	 uint8_t *ead_2, uint32_t *ead_2_len, uint8_t *prk_4x3m,
-	 uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
+enum err msg3_gen(const struct edhoc_initiator_context *c,
+		  struct runtime_context *rc,
+		  struct other_party_cred *cred_r_array, uint16_t num_cred_r,
+		  uint8_t *ead_2, uint32_t *ead_2_len, uint8_t *prk_4x3m,
+		  uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
 {
 	bool static_dh_i = false, static_dh_r = false;
 	TRY(get_suite((enum suite_label)c->suites_i.ptr[c->suites_i.len - 1],
@@ -268,10 +269,9 @@ msg3_gen(const struct edhoc_initiator_context *c, struct runtime_context *rc,
 }
 
 enum err msg4_process(const struct edhoc_initiator_context *c,
-				    struct runtime_context *rc, uint8_t *ead_4,
-				    uint32_t *ead_4_len, uint8_t *prk_4x3m,
-				    uint32_t prk_4x3m_len, uint8_t *th4,
-				    uint32_t th4_len)
+		      struct runtime_context *rc, uint8_t *ead_4,
+		      uint32_t *ead_4_len, uint8_t *prk_4x3m,
+		      uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
 {
 	PRINT_ARRAY("message_4 (CBOR Sequence)", rc->msg4, rc->msg4_len);
 

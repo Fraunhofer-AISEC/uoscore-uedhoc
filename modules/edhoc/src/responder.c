@@ -10,6 +10,7 @@
 */
 
 #include "../edhoc.h"
+#include "../edhoc_internal.h"
 #include "../inc/associated_data_encode.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"

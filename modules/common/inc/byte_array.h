@@ -29,9 +29,11 @@ extern struct byte_array EMPTY_ARRAY;
 extern struct byte_array NULL_ARRAY;
 
 /**
+ * @brief Initializes a variable of type byte_array
  * 
- * 
- * 
+ * @param buf buffer containing the data
+ * @param buf_len the lenhgt of the buffer
+ * @param byte_array the byte_array variable to be initialized
  */
 void byte_array_init(uint8_t *buf, uint32_t buf_len,
 		     struct byte_array *byte_array);
