@@ -73,13 +73,8 @@ static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
 
 	return ok;
 }
-/**
- * @brief   Encodes message 1
- * @param   c initiator context
- * @param   msg1 pointer to a buffer for holding the encoded message
- * @param   msg1_len length of the encoded message
- */
-static inline enum err msg1_gen(const struct edhoc_initiator_context *c,
+
+enum err msg1_gen(const struct edhoc_initiator_context *c,
 				struct runtime_context *rc)
 {
 	struct message_1 m1;
@@ -134,7 +129,7 @@ static inline enum err msg1_gen(const struct edhoc_initiator_context *c,
 	return ok;
 }
 
-static inline enum err
+enum err
 msg3_gen(const struct edhoc_initiator_context *c, struct runtime_context *rc,
 	 struct other_party_cred *cred_r_array, uint16_t num_cred_r,
 	 uint8_t *ead_2, uint32_t *ead_2_len, uint8_t *prk_4x3m,
@@ -272,7 +267,7 @@ msg3_gen(const struct edhoc_initiator_context *c, struct runtime_context *rc,
 	return ok;
 }
 
-static inline enum err msg4_process(const struct edhoc_initiator_context *c,
+enum err msg4_process(const struct edhoc_initiator_context *c,
 				    struct runtime_context *rc, uint8_t *ead_4,
 				    uint32_t *ead_4_len, uint8_t *prk_4x3m,
 				    uint32_t prk_4x3m_len, uint8_t *th4,

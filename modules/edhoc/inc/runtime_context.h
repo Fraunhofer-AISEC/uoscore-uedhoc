@@ -32,6 +32,6 @@ struct runtime_context {
 	bool static_dh_i;
 };
 
-void runtime_context_init(struct runtime_context *c);
+
 
 #endif

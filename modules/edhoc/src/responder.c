@@ -179,9 +179,8 @@ static inline enum err msg2_encode(const uint8_t *g_y, uint32_t g_y_len,
 	return ok;
 }
 
-static inline enum err msg2_gen(struct edhoc_responder_context *c,
-				struct runtime_context *rc, uint8_t *ead_1,
-				uint32_t *ead_1_len)
+enum err msg2_gen(struct edhoc_responder_context *c, struct runtime_context *rc,
+		  uint8_t *ead_1, uint32_t *ead_1_len)
 {
 	PRINT_ARRAY("message_1 (CBOR Sequence)", rc->msg1, rc->msg1_len);
 
@@ -268,11 +267,12 @@ static inline enum err msg2_gen(struct edhoc_responder_context *c,
 	return ok;
 }
 
-static inline enum err
-msg3_process(struct edhoc_responder_context *c, struct runtime_context *rc,
-	     struct other_party_cred *cred_i_array, uint16_t num_cred_i,
-	     uint8_t *ead_3, uint32_t *ead_3_len, uint8_t *prk_4x3m,
-	     uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
+enum err msg3_process(struct edhoc_responder_context *c,
+		      struct runtime_context *rc,
+		      struct other_party_cred *cred_i_array,
+		      uint16_t num_cred_i, uint8_t *ead_3, uint32_t *ead_3_len,
+		      uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4,
+		      uint32_t th4_len)
 {
 	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
 	uint32_t ciphertext_3_len = sizeof(ciphertext_3);
@@ -333,10 +333,9 @@ msg3_process(struct edhoc_responder_context *c, struct runtime_context *rc,
 	return ok;
 }
 
-static inline enum err msg4_gen(struct edhoc_responder_context *c,
-				struct runtime_context *rc, uint8_t *prk_4x3m,
-				uint32_t prk_4x3m_len, uint8_t *th4,
-				uint32_t th4_len)
+enum err msg4_gen(struct edhoc_responder_context *c, struct runtime_context *rc,
+		  uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4,
+		  uint32_t th4_len)
 {
 	/*Ciphertext 4 calculate*/
 	uint8_t ciphertext_4[CIPHERTEXT4_DEFAULT_SIZE];
