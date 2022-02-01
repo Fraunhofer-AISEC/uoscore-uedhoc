@@ -12,8 +12,12 @@
 #include "../inc/suites.h"
 
 /**
+ * @brief Xors two arrays
  * 
- * 
+ * @param in1 an input array
+ * @param in2 an input array
+ * @param len the lenhgt of the arrays
+ * @param out the result
  */
 static inline void xor_arrays(const uint8_t *in1, const uint8_t *in2,
 			      uint32_t len, uint8_t *out)
@@ -24,9 +28,23 @@ static inline void xor_arrays(const uint8_t *in1, const uint8_t *in2,
 }
 
 /**
+ * @brief Encrypts a plaintext or decrypts a cyphertext
  * 
- * 
- * 
+ * @param ctxt CIPHERTEXT2, CIPHERTEXT3 or CIPHERTEXT4
+ * @param op ENCRYPT or DECRYPT
+ * @param in ciphertext or plaintext 
+ * @param in_len lenhgt of in
+ * @param key the key used of encrption/decryption
+ * @param key_len lenhgt of key
+ * @param nonce AEAD nonce
+ * @param nonce_len lenhgt of nonce
+ * @param aad additional authenticated data for AEAD
+ * @param aad_len lenhgt of aad
+ * @param out the result
+ * @param out_len lenhgt of out
+ * @param tag AEAD authentication tag
+ * @param tag_len lenhgt of tag
+ * @return enum err 
  */
 static enum err ciphertext_encrypt_decrypt(
 	enum ciphertext ctxt, enum aes_operation op, const uint8_t *in,
@@ -46,14 +64,25 @@ static enum err ciphertext_encrypt_decrypt(
 }
 
 /**
+ * @brief Computes the keystream for ciphertext 2 and the key and IV for 
+ *        ciphertexts 3 and 4. 
  * 
- * 
- * 
+ * @param ctxt CIPHERTEXT2, CIPHERTEXT3 or CIPHERTEXT4
+ * @param edhoc_hash the hash algorithm used in the current edhoc run
+ * @param prk pseudoramdom key
+ * @param prk_len lenhgt of prk
+ * @param th thraskript hash
+ * @param th_len lenhgt of th
+ * @param key the generated key
+ * @param key_len lenhgt of key
+ * @param iv the generated iv
+ * @param iv_len lenhgt of iv
+ * @return enum err 
  */
-static enum err
-ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
-		   uint32_t prk_len, uint8_t *th, uint32_t th_len, uint8_t *key,
-		   uint32_t key_len, uint8_t *iv, uint32_t iv_len)
+static enum err key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash,
+			uint8_t *prk, uint32_t prk_len, uint8_t *th,
+			uint32_t th_len, uint8_t *key, uint32_t key_len,
+			uint8_t *iv, uint32_t iv_len)
 {
 	switch (ctxt) {
 	case CIPHERTEXT2:
@@ -83,20 +112,14 @@ ciphertext_key_gen(enum ciphertext ctxt, enum hash_alg edhoc_hash, uint8_t *prk,
 	return ok;
 }
 
-/**
- * @brief	Decrypts and decomposes a ciphertext. For that the function 
- * 		first computes the required key form prk and th.
- * 
- * 
- */
 enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
-				  uint8_t *prk, uint32_t prk_len, uint8_t *th,
-				  uint32_t th_len, uint8_t *ciphertext,
-				  uint32_t ciphertext_len, uint8_t *id_cred,
-				  uint32_t *id_cred_len,
+				  uint8_t *id_cred, uint32_t *id_cred_len,
 				  uint8_t *signature_or_mac,
 				  uint32_t *signature_or_mac_len, uint8_t *ead,
-				  uint32_t *ead_len)
+				  uint32_t *ead_len, uint8_t *prk,
+				  uint32_t prk_len, uint8_t *th,
+				  uint32_t th_len, uint8_t *ciphertext,
+				  uint32_t ciphertext_len)
 {
 	/*generate key and iv (no iv in for ciphertext 2)*/
 	uint32_t key_len;
@@ -112,8 +135,8 @@ enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
 	TRY(check_buffer_size(AEAD_IV_DEFAULT_SIZE, iv_len));
 	uint8_t iv[AEAD_IV_DEFAULT_SIZE];
 
-	TRY(ciphertext_key_gen(ctxt, suite->edhoc_hash, prk, prk_len, th,
-			       th_len, key, key_len, iv, iv_len));
+	TRY(key_gen(ctxt, suite->edhoc_hash, prk, prk_len, th, th_len, key,
+		    key_len, iv, iv_len));
 
 	/*Associated data*/
 	uint8_t associated_data[ASSOCIATED_DATA_DEFAULT_SIZE];
@@ -159,14 +182,6 @@ enum err ciphertext_decrypt_split(enum ciphertext ctxt, struct suite *suite,
 	return ok;
 }
 
-/**
- * @brief       Computes ciphertext_2, ciphertext_3 or ciphertext_4. For that 
- *              the function first computes the required key form prk and th 
- *              and constructs the plaintext. 
- * @param
- * 
- */
-//todo refactore this function simalar to ciphertext_decrypt_split
 enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 			uint8_t *id_cred, uint32_t id_cred_len,
 			uint8_t *signature_or_mac,
@@ -230,66 +245,45 @@ enum err ciphertext_gen(enum ciphertext ctxt, struct suite *suite,
 
 	PRINT_ARRAY("plaintext", plaintext, plaintext_len);
 
-	/*Calculate keys and encrypt*/
+	/*generate key and iv (no iv in for ciphertext 2)*/
+	uint32_t key_len;
+	uint8_t key[CIPHERTEXT2_DEFAULT_SIZE];
 	if (ctxt == CIPHERTEXT2) {
-		/*Derive KEYSTREAM_2*/
-		uint32_t KEYSTREAM_2_len = plaintext_len;
-		TRY(check_buffer_size(PLAINTEXT_DEFAULT_SIZE, KEYSTREAM_2_len));
-		uint8_t KEYSTREAM_2[PLAINTEXT_DEFAULT_SIZE];
-		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
-			     "KEYSTREAM_2", NULL, 0, KEYSTREAM_2,
-			     KEYSTREAM_2_len));
-
-		PRINT_ARRAY("KEYSTREAM_2", KEYSTREAM_2, sizeof(KEYSTREAM_2));
-
-		/*encrypt*/
-		//todo move this to a separate function
-		for (uint64_t i = 0; i < KEYSTREAM_2_len; i++) {
-			ciphertext[i] = KEYSTREAM_2[i] ^ plaintext[i];
-		}
-		*ciphertext_len = plaintext_len;
-		return ok;
+		key_len = plaintext_len;
+	} else {
+		key_len = get_aead_key_len(suite->edhoc_aead);
 	}
+	TRY(check_buffer_size(CIPHERTEXT2_DEFAULT_SIZE, key_len));
 
-	/*Calculate key, nonce and encrypt*/
-	//todo take the length of the key and nonce from the ciphersuite
-	uint8_t K[16], N[13];
-	if (ctxt == CIPHERTEXT3) {
-		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len, "K_3",
-			     NULL, 0, K, sizeof(K)));
-		PRINT_ARRAY("K_3", K, sizeof(K));
+	uint32_t iv_len = get_aead_iv_len(suite->edhoc_aead);
+	TRY(check_buffer_size(AEAD_IV_DEFAULT_SIZE, iv_len));
+	uint8_t iv[AEAD_IV_DEFAULT_SIZE];
 
-		/*Calculate IV_3*/
-		TRY(okm_calc(suite->edhoc_hash, prk, prk_len, th, th_len,
-			     "IV_3", NULL, 0, N, sizeof(N)));
+	TRY(key_gen(ctxt, suite->edhoc_hash, prk, prk_len, th, th_len, key,
+		    key_len, iv, iv_len));
 
-		PRINT_ARRAY("IV_3", N, sizeof(N));
-	}
-
-	if (ctxt == CIPHERTEXT4) {
-		TRY(edhoc_exporter(SHA_256, prk, prk_len, th, th_len,
-				   "EDHOC_K_4", K, sizeof(K)));
-		TRY(edhoc_exporter(SHA_256, prk, prk_len, th, th_len,
-				   "EDHOC_IV_4", N, sizeof(N)));
-	}
-
-	/*Associated data*/
-	uint8_t associated_data[ASSOCIATED_DATA_DEFAULT_SIZE];
-	uint32_t associated_data_len = sizeof(associated_data);
-	TRY(associated_data_encode(th, th_len, (uint8_t *)&associated_data,
-				   &associated_data_len));
-	PRINT_ARRAY("associated_data", associated_data, associated_data_len);
-
-	/*Ciphertext 3 calculate*/
-	uint32_t mac_len = get_aead_mac_len(suite->edhoc_aead);
-	TRY(check_buffer_size(MAC_DEFAULT_SIZE, mac_len));
+	/*encrypt*/
+	uint8_t aad[ASSOCIATED_DATA_DEFAULT_SIZE];
+	uint32_t aad_len = sizeof(aad);
+	uint32_t tag_len = get_aead_mac_len(suite->edhoc_aead);
+	TRY(check_buffer_size(MAC_DEFAULT_SIZE, tag_len));
 	uint8_t tag[MAC_DEFAULT_SIZE];
+	if (ctxt != CIPHERTEXT2) {
+		/*Associated data*/
+		TRY(associated_data_encode(th, th_len, aad, &aad_len));
+		PRINT_ARRAY("aad_data", aad, aad_len);
+	} else {
+		tag_len = 0;
+	}
+
 	*ciphertext_len = plaintext_len;
 
-	TRY(aead(ENCRYPT, plaintext, plaintext_len, K, sizeof(K), N, sizeof(N),
-		 associated_data, associated_data_len, ciphertext,
-		 *ciphertext_len, tag, mac_len));
-	*ciphertext_len += mac_len;
+	TRY(ciphertext_encrypt_decrypt(ctxt, ENCRYPT, plaintext, plaintext_len,
+				       key, key_len, iv, iv_len, aad, aad_len,
+				       ciphertext, *ciphertext_len, tag,
+				       tag_len));
+	*ciphertext_len += tag_len;
+
 	PRINT_ARRAY("ciphertext_2/3/4", ciphertext, *ciphertext_len);
 	return ok;
 }

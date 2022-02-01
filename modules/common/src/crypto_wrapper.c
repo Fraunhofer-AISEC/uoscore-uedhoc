@@ -61,6 +61,18 @@ modify setting in include/psa/crypto_config.h
 
 #ifdef MBEDTLS
 
+/**
+ * @brief Decompresses an elliptic curve point. 
+ * 
+ * 
+ * @param grp elliptic curve group point
+ * @param input the compressed key
+ * @param ilen the lenhgt if the compressed key
+ * @param output the uncopressed key
+ * @param olen the lenhgt of the output
+ * @param osize the actual available size of the out buffer
+ * @return 0 on success
+ */
 static inline int mbedtls_ecp_decompress(const mbedtls_ecp_group *grp,
 					 const unsigned char *input,
 					 size_t ilen, unsigned char *output,
@@ -504,14 +516,19 @@ shared_secret_derive(enum ecdh_alg alg, const uint8_t *sk,
 
 		mbedtls_pk_context ctx_verify;
 		mbedtls_pk_init(&ctx_verify);
-		mbedtls_pk_setup(&ctx_verify,
-				 mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
-		mbedtls_ecp_group_load(&mbedtls_pk_ec(ctx_verify)->grp,
-				       MBEDTLS_ECP_DP_SECP256R1);
-		mbedtls_ecp_decompress(&mbedtls_pk_ec(ctx_verify)->grp, pk,
-				       pk_len, pk_decompressed,
-				       &pk_decompressed_len,
-				       sizeof(pk_decompressed));
+		TRY_EXPECT(mbedtls_pk_setup(
+				   &ctx_verify,
+				   mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY)),
+			   0);
+		TRY_EXPECT(
+			mbedtls_ecp_group_load(&mbedtls_pk_ec(ctx_verify)->grp,
+					       MBEDTLS_ECP_DP_SECP256R1),
+			0);
+		TRY_EXPECT(mbedtls_ecp_decompress(
+				   &mbedtls_pk_ec(ctx_verify)->grp, pk, pk_len,
+				   pk_decompressed, &pk_decompressed_len,
+				   sizeof(pk_decompressed)),
+			   0);
 
 		PRINT_ARRAY("pk_decompressed", pk_decompressed,
 			    (uint32_t)pk_decompressed_len);

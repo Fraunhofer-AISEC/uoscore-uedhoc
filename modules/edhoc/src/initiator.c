@@ -11,7 +11,6 @@
 
 #include "../edhoc.h"
 #include "../edhoc_internal.h"
-#include "../inc/associated_data_encode.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
 #include "../../common/inc/oscore_edhoc_error.h"
@@ -193,10 +192,10 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
 	uint8_t id_cred_r[ID_CRED_DEFAULT_SIZE];
 	uint32_t id_cred_r_len = sizeof(id_cred_r);
 	TRY(ciphertext_decrypt_split(
-		CIPHERTEXT2, &rc->suite, PRK_2e, sizeof(PRK_2e), th2,
-		sizeof(th2), ciphertext2, ciphertext2_len, id_cred_r,
-		&id_cred_r_len, sign_or_mac, &sign_or_mac_len, ead_2,
-		(uint32_t *)ead_2_len));
+		CIPHERTEXT2, &rc->suite, id_cred_r, &id_cred_r_len, sign_or_mac,
+		&sign_or_mac_len, ead_2, (uint32_t *)ead_2_len, PRK_2e,
+		sizeof(PRK_2e), th2, sizeof(th2), ciphertext2,
+		ciphertext2_len));
 
 	/*check the authenticity of the responder*/
 	uint8_t cred_r[CRED_DEFAULT_SIZE];
@@ -281,10 +280,10 @@ enum err msg4_process(const struct edhoc_initiator_context *c,
 			       &ciphertext_4_len));
 	PRINT_ARRAY("ciphertext_4", ciphertext_4, ciphertext_4_len);
 
-	TRY(ciphertext_decrypt_split(CIPHERTEXT4, &rc->suite, prk_4x3m,
+	TRY(ciphertext_decrypt_split(CIPHERTEXT4, &rc->suite, NULL, 0, NULL, 0,
+				     ead_4, (uint32_t *)ead_4_len, prk_4x3m,
 				     prk_4x3m_len, th4, th4_len, ciphertext_4,
-				     ciphertext_4_len, NULL, 0, NULL, 0, ead_4,
-				     (uint32_t *)ead_4_len));
+				     ciphertext_4_len));
 	return ok;
 }
 

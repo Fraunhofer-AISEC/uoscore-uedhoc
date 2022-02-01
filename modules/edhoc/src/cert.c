@@ -121,6 +121,17 @@ static int find_pk_cb(void *void_ppk, int tag, unsigned char *start, size_t len)
 
 #endif
 
+/**
+ * @brief retrives the public key of the CA from CRED_ARRAY.
+ * 
+ * 
+ * @param cred_array contains the public key of the root CA
+ * @param cred_num the number of elements in cred_array
+ * @param issuer the issuer name, i.e. the name of the CA
+ * @param root_pk the root public key
+ * @param root_pk_len the lenhgt of the root public key
+ * @return enum err 
+ */
 static enum err ca_pk_get(const struct other_party_cred *cred_array,
 			  uint16_t cred_num, const uint8_t *issuer,
 			  uint8_t **root_pk, uint32_t *root_pk_len)
@@ -154,8 +165,8 @@ enum err cert_c509_verify(const uint8_t *cert, uint32_t cert_len,
 
 	PRINT_MSG("CBOR certificate parsed.\n");
 	PRINTF("Certificate type: %d\n", c._cert_type);
-	//PRINT_ARRAY("Serial number", c._cert_serial_number.value,
-	//	    c._cert_serial_number.len);
+	// PRINT_ARRAY("Serial number", c._cert_serial_number.value,
+	// 	    c._cert_serial_number.len);
 	PRINT_ARRAY("issuer", c._cert_issuer.value, c._cert_issuer.len);
 	PRINTF("validity_not_before: %d\n", c._cert_validity_not_before);
 	PRINTF("validity_not_after: %d\n", c._cert_validity_not_after);
@@ -178,7 +189,6 @@ enum err cert_c509_verify(const uint8_t *cert, uint32_t cert_len,
 		   root_pk_len, cert, cert_len - 2 - c._cert_signature.len,
 		   c._cert_signature.value, c._cert_signature.len, verified));
 
-	//todo eventually replace this with just giving back a pointer
 	TRY(_memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len));
 	*pk_len = c._cert_pk.len;
 
@@ -229,11 +239,6 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 	PRINTF("cert issuer_id: %.*s\n", (int)issuer_id->len, issuer_id->p);
 
 	enum sign_alg sign_alg;
-
-	// PRINT_ARRAY("m_cert.sig_oid", m_cert.sig_oid.p, m_cert.sig_oid.len);
-
-	// while (1)
-	// 	;
 
 	/* make sure it is ECDSA */
 	if (MBEDTLS_PK_ECDSA == m_cert.sig_pk) {
@@ -293,7 +298,6 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 			}
 			cpk_len = m_cert.pk_raw.len - (cpk - m_cert.pk_raw.p);
 		}
-		//todo eventually replace this with just giving back a pointer
 		TRY(_memcpy_s(pk, *pk_len, cpk, cpk_len));
 		*pk_len = cpk_len;
 		PRINT_ARRAY("pk from cert", pk, *pk_len);

@@ -144,7 +144,7 @@ void test_main(void)
 	//  ztest_unit_test(test_responder16),
 	//  ztest_unit_test(test_responder17));
 
-	// ztest_test_suite(responder_tests, ztest_unit_test(test_responder14));
+	//ztest_test_suite(responder_tests, ztest_unit_test(test_responder1));
 
 	ztest_run_test_suite(initiator_tests);
 	ztest_run_test_suite(responder_tests);
@@ -158,8 +158,7 @@ void test_main(void)
 			 ztest_unit_test(oscore_client_test5),
 			 ztest_unit_test(oscore_server_test6),
 			 //test7 - not supported yet
-			 ztest_unit_test(oscore_misc_test8)
-			 );
+			 ztest_unit_test(oscore_misc_test8));
 
 	ztest_run_test_suite(oscore_tests);
 }

@@ -36,7 +36,7 @@ enum aes_operation {
  * @param   out_len the length of out
  * @param   tag the authentication tag
  * @param   tag_len the length of tag
- * @retval  err code
+ * @retval  an err code
  */
 enum err aead(enum aes_operation op, const uint8_t *in, const uint32_t in_len,
 	      const uint8_t *key, const uint32_t key_len, uint8_t *nonce,
@@ -46,6 +46,7 @@ enum err aead(enum aes_operation op, const uint8_t *in, const uint32_t in_len,
 
 /**
  * @brief   Derives ECDH shared secret
+ * @param   alg the ECDH algorithm
  * @param   sk private key
  * @param   sk_len length of sk
  * @param   pk public key
@@ -98,7 +99,7 @@ enum err hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
 
 /**
  * @brief   Verifies an asymmetric signature
- * @param   curve   the curve to be used
+ * @param   alg signature algorithm to be used
  * @param   sk secret key
  * @param   sk_len length of sk
  * @param   pk public key
@@ -113,7 +114,7 @@ enum err sign(enum sign_alg alg, const uint8_t *sk, const uint32_t sk_len,
 
 /**
  * @brief   Verifies an asymmetric signature
- * @param   curve   the curve to be used
+ * @param   alg signature algorithm to be used
  * @param   pk public key
  * @param   pk_len length of pk
  * @param   msg the signed message

@@ -11,7 +11,6 @@
 
 #include "../edhoc.h"
 #include "../edhoc_internal.h"
-#include "../inc/associated_data_encode.h"
 #include "../../common/inc/crypto_wrapper.h"
 #include "../inc/err_msg.h"
 #include "../../common/inc/oscore_edhoc_error.h"
@@ -296,10 +295,10 @@ enum err msg3_process(struct edhoc_responder_context *c,
 	uint8_t sign_or_mac[SGN_OR_MAC_DEFAULT_SIZE];
 	uint32_t sign_or_mac_len = sizeof(sign_or_mac);
 	TRY(ciphertext_decrypt_split(
-		CIPHERTEXT3, &rc->suite, rc->PRK_3e2m, rc->PRK_3e2m_len,
-		rc->th3, rc->th3_len, ciphertext_3, ciphertext_3_len, id_cred_i,
-		&id_cred_i_len, sign_or_mac, &sign_or_mac_len, ead_3,
-		(uint32_t *)ead_3_len));
+		CIPHERTEXT3, &rc->suite, id_cred_i, &id_cred_i_len, sign_or_mac,
+		&sign_or_mac_len, ead_3, (uint32_t *)ead_3_len, rc->PRK_3e2m,
+		rc->PRK_3e2m_len, rc->th3, rc->th3_len, ciphertext_3,
+		ciphertext_3_len));
 
 	/*check the authenticity of the initiator*/
 	uint8_t cred_i[CRED_DEFAULT_SIZE];

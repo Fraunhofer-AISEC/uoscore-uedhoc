@@ -174,7 +174,7 @@ int main()
 	uint32_t ad_3_len = sizeof(ad_1);
 
 	/* test vector inputs */
-	const uint8_t TEST_VEC_NUM = 18;
+	const uint8_t TEST_VEC_NUM = 1;
 	uint16_t cred_num = 1;
 	struct other_party_cred cred_i;
 	struct edhoc_responder_context c_r;
