@@ -75,12 +75,11 @@ C_INCLUDES += -Iexternals/mbedtls/library
 C_INCLUDES += -Iexternals/mbedtls/include 
 C_INCLUDES += -Iexternals/mbedtls/include/mbedtls 
 C_INCLUDES += -Iexternals/mbedtls/include/psa 
-C_INCLUDES += -Iexternals/mbedtls_ecp_compression
 endif
 
 # CBOR engine
 ifeq ($(findstring ZCBOR,$(CBOR_ENGINE)),ZCBOR)
-C_INCLUDES += -Iexternals/cddl-gen/include
+C_INCLUDES += -Iexternals/zcbor/include
 endif
 
 ################################################################################
@@ -127,8 +126,8 @@ EXTENDED_CFLAGS += -Wall
 EXTENDED_CFLAGS += -Wextra
 EXTENDED_CFLAGS += -Wcast-qual
 EXTENDED_CFLAGS += -Wstack-usage=7000
-EXTENDED_CFLAGS += -Wconversion
-EXTENDED_CFLAGS += -Wpedantic
+#EXTENDED_CFLAGS += -Wconversion
+#EXTENDED_CFLAGS += -Wpedantic
 #EXTENDED_CFLAGS += -Werror
 
 #Clang warning flahs

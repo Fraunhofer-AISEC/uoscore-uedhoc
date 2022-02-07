@@ -11,7 +11,7 @@ FILE(GLOB app_sources
   oscore_testvector_tests/*.c 
   ../samples/common/test_vec_parser.c
   ../samples/common/cbor/*.c
-  ../externals/cddl-gen/src/*.c
+  ../externals/zcbor/src/*.c
   ../externals/compact25519/src/c25519/*.c
   ../externals/compact25519/src/*.c
   ../externals/mbedtls/library/*.c)
@@ -19,7 +19,7 @@ target_sources(app PRIVATE ${app_sources})
 
 include_directories(
   ../externals/jsmn
-  ../externals/cddl-gen/include 
+  ../externals/zcbor/include 
   ../externals/mbedtls/library 
   ../externals/mbedtls/include 
   ../externals/mbedtls/include/mbedtls 
