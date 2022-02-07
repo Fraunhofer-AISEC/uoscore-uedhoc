@@ -20,7 +20,7 @@
 #include "../cbor/enc_structure.h"
 
 /*the additional bytes in the enc_structure are constant*/
-#define ENCRYPT0_ENCODING_OVERHEAD 12
+#define ENCRYPT0_ENCODING_OVERHEAD 16
 
 /**
  * @brief Encode the input AAD to defined COSE structure
@@ -43,7 +43,7 @@ static enum err create_enc_structure(struct byte_array *external_aad,
 	enc_structure._enc_structure_external_aad.value = external_aad->ptr;
 	enc_structure._enc_structure_external_aad.len = external_aad->len;
 
-	uint32_t payload_len_out;
+	size_t payload_len_out = 0;
 	success_encoding = cbor_encode_enc_structure(
 		out->ptr, out->len, &enc_structure, &payload_len_out);
 
@@ -98,6 +98,7 @@ enum err cose_encrypt(struct byte_array *in_plaintext, uint8_t *out_ciphertext,
 		.ptr = aad_bytes,
 	};
 	TRY(create_enc_structure(sender_aad, &aad));
+	PRINT_ARRAY("add enc structure", aad.ptr, aad.len);
 
 	struct byte_array tag = {
 		.len = 8,

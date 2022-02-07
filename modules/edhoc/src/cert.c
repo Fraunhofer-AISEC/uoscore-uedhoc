@@ -158,7 +158,7 @@ enum err cert_c509_verify(const uint8_t *cert, uint32_t cert_len,
 			  uint16_t cred_num, uint8_t *pk, uint32_t *pk_len,
 			  bool *verified)
 {
-	uint32_t decode_len = 0;
+	size_t decode_len = 0;
 	struct cert c;
 
 	TRY_EXPECT(cbor_decode_cert(cert, cert_len, &c, &decode_len), true);

@@ -1,7 +1,7 @@
 /*
- * Generated using cddl_gen version 0.2.99
- * https://github.com/NordicSemiconductor/cddl-gen
- * Generated with a default_max_qty of 3
+ * Generated using zcbor version 0.3.99
+ * https://github.com/NordicSemiconductor/zcbor
+ * Generated with a --default-max-qty of 3
  */
 
 #ifndef ENCODE_MESSAGE_2_H__
@@ -11,8 +11,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_encode.h"
-#include "types_encode_message_2.h"
+#include "zcbor_encode.h"
+#include "encode_message_2_types.h"
 
 #if DEFAULT_MAX_QTY != 3
 #error "The type file was generated with a different default_max_qty than this file"
@@ -20,9 +20,9 @@
 
 
 bool cbor_encode_m2(
-		uint8_t *payload, uint32_t payload_len,
+		uint8_t *payload, size_t payload_len,
 		const struct m2 *input,
-		uint32_t *payload_len_out);
+		size_t *payload_len_out);
 
 
 #endif /* ENCODE_MESSAGE_2_H__ */

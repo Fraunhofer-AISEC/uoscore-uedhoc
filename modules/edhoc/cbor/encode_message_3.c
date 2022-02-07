@@ -1,14 +1,14 @@
 /*
- * Generated using cddl_gen version 0.2.99
- * https://github.com/NordicSemiconductor/cddl-gen
- * Generated with a default_max_qty of 3
+ * Generated using zcbor version 0.3.99
+ * https://github.com/NordicSemiconductor/zcbor
+ * Generated with a --default-max-qty of 3
  */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_encode.h"
+#include "zcbor_encode.h"
 #include "encode_message_3.h"
 
 #if DEFAULT_MAX_QTY != 3
@@ -17,14 +17,14 @@
 
 
 static bool encode_m3_CIPHERTEXT_3(
-		cbor_state_t *state, const cbor_string_type_t *input)
+		zcbor_state_t *state, const struct zcbor_string *input)
 {
-	cbor_print("%s\n", __func__);
+	zcbor_print("%s\r\n", __func__);
 
-	bool tmp_result = (((bstrx_encode(state, (&(*input))))));
+	bool tmp_result = (((zcbor_bstr_encode(state, (&(*input))))));
 
 	if (!tmp_result)
-		cbor_trace();
+		zcbor_trace();
 
 	return tmp_result;
 }
@@ -32,13 +32,13 @@ static bool encode_m3_CIPHERTEXT_3(
 
 
 bool cbor_encode_m3_CIPHERTEXT_3(
-		uint8_t *payload, uint32_t payload_len,
-		const cbor_string_type_t *input,
-		uint32_t *payload_len_out)
+		uint8_t *payload, size_t payload_len,
+		const struct zcbor_string *input,
+		size_t *payload_len_out)
 {
-	cbor_state_t states[2];
+	zcbor_state_t states[2];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 1);
+	zcbor_new_state(states, sizeof(states) / sizeof(zcbor_state_t), payload, payload_len, 1);
 
 	bool ret = encode_m3_CIPHERTEXT_3(states, input);
 

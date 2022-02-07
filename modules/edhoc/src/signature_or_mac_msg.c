@@ -29,8 +29,8 @@
 enum err encode_byte_string(const uint8_t *in, uint32_t in_len, uint8_t *out,
 			    uint32_t *out_len)
 {
-	uint32_t payload_len_out;
-	cbor_string_type_t tmp;
+	size_t payload_len_out;
+	struct zcbor_string tmp;
 	tmp.value = in;
 	tmp.len = in_len;
 	TRY_EXPECT(cbor_encode_bstr_type_b_str(out, *out_len, &tmp,
@@ -43,8 +43,8 @@ enum err encode_byte_string(const uint8_t *in, uint32_t in_len, uint8_t *out,
 enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
 			    uint8_t *out, uint32_t *out_len)
 {
-	cbor_string_type_t str;
-	uint32_t decode_len = 0;
+	struct zcbor_string str;
+	size_t decode_len = 0;
 
 	TRY_EXPECT(cbor_decode_bstr_type_b_str(in, in_len, &str, &decode_len),
 		   true);

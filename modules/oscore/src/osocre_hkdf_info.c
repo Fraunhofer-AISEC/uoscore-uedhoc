@@ -78,7 +78,7 @@ inline enum err oscore_create_hkdf_info(struct byte_array *id,
 	info_struct._oscore_info_type.len = (uint32_t)strlen(type_enc);
 	info_struct._oscore_info_L = len;
 
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 	success_encoding = cbor_encode_oscore_info(
 		out->ptr, out->len, &info_struct, &payload_len_out);
 

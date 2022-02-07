@@ -16,7 +16,7 @@ rm *.c
 
 
 #decode C_I or C_R 
-python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c c_x.cddl code -d -t cx --oc decode_c_x.c --oh decode_c_x.h
+python3 ../../../externals/cddl-gen/zcbor/zcbor.py -c c_x.cddl code -d -t cx --oc decode_c_x.c --oh decode_c_x.h
 
 #decode SUITES_I 
-python3 ../../../externals/cddl-gen/cddl_gen/cddl_gen.py -c suites_i.cddl code -d -t suites --oc decode_suites_i.c --oh decode_suites_i.h
+python3 ../../../externals/cddl-gen/zcbor/zcbor.py -c suites_i.cddl code -d -t suites --oc decode_suites_i.c --oh decode_suites_i.h

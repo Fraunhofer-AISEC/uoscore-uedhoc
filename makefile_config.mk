@@ -9,15 +9,15 @@
 #ARCH = -m32
 
 # the library is compiled with the folowing optimization 
-OPT = -O3
+OPT = -Og
 
 # Uncomment this to print intermediery results at runtime
 #DEBUG_PRINT += -DDEBUG_PRINT
 
 
 # CBOR engine
-# currently only CDDL is supported
-CBOR_ENGINE += -DCDDL_GEN
+# currently only ZCBOR is supported
+CBOR_ENGINE += -DZCBOR
 
 # The uoscore-uedhoc can be used with different crypto angines. 
 # The user can provide as well additinal cryptoengines by providing 

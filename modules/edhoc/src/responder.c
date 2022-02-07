@@ -56,7 +56,7 @@ static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 {
 	uint32_t i;
 	struct message_1 m;
-	uint32_t decode_len = 0;
+	size_t decode_len = 0;
 
 	TRY_EXPECT(cbor_decode_message_1(msg1, msg1_len, &m, &decode_len),
 		   true);
@@ -147,7 +147,7 @@ static inline enum err msg2_encode(const uint8_t *g_y, uint32_t g_y_len,
 				   uint32_t ciphertext_2_len, uint8_t *msg2,
 				   uint32_t *msg2_len)
 {
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 	struct m2 m;
 	uint32_t g_y_ciphertext_2_len = g_y_len + ciphertext_2_len;
 	TRY(check_buffer_size(G_Y_DEFAULT_SIZE + CIPHERTEXT2_DEFAULT_SIZE,

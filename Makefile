@@ -39,27 +39,6 @@ C_SOURCES += $(wildcard modules/edhoc/cbor/*.c)
 C_SOURCES += $(wildcard modules/oscore/src/*.c)
 C_SOURCES += $(wildcard modules/oscore/cbor/*.c)
 
-# Crypto engine
-#ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519)
-#C_SOURCES += $(wildcard ../../externals/compact25519/src/c25519/*.c)
-#C_SOURCES += $(wildcard ../../externals/compact25519/src/*.c)
-#endif
-
-#ifeq ($(findstring TINYCRYPT,$(CRYPTO_ENGINE)),TINYCRYPT)
-#C_SOURCES += $(wildcard ../../externals/tinycrypt/lib/source/*.c)
-#endif
-
-#ifeq ($(findstring MBEDTLS,$(CRYPTO_ENGINE)),MBEDTLS)
-#C_SOURCES += $(wildcard ../../externals/mbedtls/library/*.c)
-#C_SOURCES += $(wildcard ../../externals/mbedtls_ecp_compression/#ecc_point_compression.c)
-#endif
-
-# CBOR engine
-#ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
-#C_SOURCES += $(wildcard ../../externals/cddl-gen/src/*.c)
-#endif
-
-
 #$(info    \n C_SOURCES is $(C_SOURCES))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 
@@ -100,7 +79,7 @@ C_INCLUDES += -Iexternals/mbedtls_ecp_compression
 endif
 
 # CBOR engine
-ifeq ($(findstring CDDL_GEN,$(CBOR_ENGINE)),CDDL_GEN)
+ifeq ($(findstring ZCBOR,$(CBOR_ENGINE)),ZCBOR)
 C_INCLUDES += -Iexternals/cddl-gen/include
 endif
 
@@ -148,8 +127,8 @@ EXTENDED_CFLAGS += -Wall
 EXTENDED_CFLAGS += -Wextra
 EXTENDED_CFLAGS += -Wcast-qual
 EXTENDED_CFLAGS += -Wstack-usage=7000
-#EXTENDED_CFLAGS += -Wconversion
-#EXTENDED_CFLAGS += -Wpedantic
+EXTENDED_CFLAGS += -Wconversion
+EXTENDED_CFLAGS += -Wpedantic
 #EXTENDED_CFLAGS += -Werror
 
 #Clang warning flahs

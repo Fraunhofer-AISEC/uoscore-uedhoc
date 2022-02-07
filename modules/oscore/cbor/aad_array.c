@@ -1,14 +1,14 @@
 /*
- * Generated using cddl_gen version 0.2.99
- * https://github.com/NordicSemiconductor/cddl-gen
- * Generated with a default_max_qty of 3
+ * Generated using zcbor version 0.3.99
+ * https://github.com/NordicSemiconductor/zcbor
+ * Generated with a --default-max-qty of 3
  */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_encode.h"
+#include "zcbor_encode.h"
 #include "aad_array.h"
 
 #if DEFAULT_MAX_QTY != 3
@@ -17,21 +17,21 @@
 
 
 static bool encode_aad_array(
-		cbor_state_t *state, const struct aad_array *input)
+		zcbor_state_t *state, const struct aad_array *input)
 {
-	cbor_print("%s\n", __func__);
+	zcbor_print("%s\r\n", __func__);
 	bool int_res;
 
-	bool tmp_result = (((list_start_encode(state, 5) && (int_res = (((uintx32_encode(state, (&(*input)._aad_array_oscore_version))))
-	&& ((list_start_encode(state, 1) && (int_res = (((((*input)._aad_array_algorithms_alg_aead_choice == _aad_array_algorithms_alg_aead_int) ? ((intx32_encode(state, (&(*input)._aad_array_algorithms_alg_aead_int))))
-	: (((*input)._aad_array_algorithms_alg_aead_choice == _aad_array_algorithms_alg_aead_tstr) ? ((tstrx_encode(state, (&(*input)._aad_array_algorithms_alg_aead_tstr))))
-	: false)))), ((list_end_encode(state, 1)) && int_res))))
-	&& ((bstrx_encode(state, (&(*input)._aad_array_request_kid))))
-	&& ((bstrx_encode(state, (&(*input)._aad_array_request_piv))))
-	&& ((bstrx_encode(state, (&(*input)._aad_array_options))))), ((list_end_encode(state, 5)) && int_res)))));
+	bool tmp_result = (((zcbor_list_start_encode(state, 5) && (int_res = (((zcbor_uint32_encode(state, (&(*input)._aad_array_oscore_version))))
+	&& ((zcbor_list_start_encode(state, 1) && (int_res = (((((*input)._aad_array_algorithms_alg_aead_choice == _aad_array_algorithms_alg_aead_int) ? ((zcbor_int32_encode(state, (&(*input)._aad_array_algorithms_alg_aead_int))))
+	: (((*input)._aad_array_algorithms_alg_aead_choice == _aad_array_algorithms_alg_aead_tstr) ? ((zcbor_tstr_encode(state, (&(*input)._aad_array_algorithms_alg_aead_tstr))))
+	: false)))), ((zcbor_list_end_encode(state, 1)) && int_res))))
+	&& ((zcbor_bstr_encode(state, (&(*input)._aad_array_request_kid))))
+	&& ((zcbor_bstr_encode(state, (&(*input)._aad_array_request_piv))))
+	&& ((zcbor_bstr_encode(state, (&(*input)._aad_array_options))))), ((zcbor_list_end_encode(state, 5)) && int_res)))));
 
 	if (!tmp_result)
-		cbor_trace();
+		zcbor_trace();
 
 	return tmp_result;
 }
@@ -39,13 +39,13 @@ static bool encode_aad_array(
 
 
 bool cbor_encode_aad_array(
-		uint8_t *payload, uint32_t payload_len,
+		uint8_t *payload, size_t payload_len,
 		const struct aad_array *input,
-		uint32_t *payload_len_out)
+		size_t *payload_len_out)
 {
-	cbor_state_t states[5];
+	zcbor_state_t states[5];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 1);
+	zcbor_new_state(states, sizeof(states) / sizeof(zcbor_state_t), payload, payload_len, 1);
 
 	bool ret = encode_aad_array(states, input);
 

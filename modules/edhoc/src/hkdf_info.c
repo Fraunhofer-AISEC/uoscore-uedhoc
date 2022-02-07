@@ -34,7 +34,7 @@ enum err create_hkdf_info(const uint8_t *th, uint32_t th_len, const char *label,
 
 	info._info_length = okm_len;
 
-	uint32_t payload_len_out = 0;
+	size_t payload_len_out = 0;
 	TRY_EXPECT(cbor_encode_info(out, *out_len, &info, &payload_len_out),
 		   true);
 

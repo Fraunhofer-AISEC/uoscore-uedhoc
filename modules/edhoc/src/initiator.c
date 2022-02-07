@@ -46,7 +46,7 @@ static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
 				  struct c_x *c_r, uint8_t *ciphertext2,
 				  uint32_t *ciphertext2_len)
 {
-	uint32_t decode_len = 0;
+	size_t decode_len = 0;
 	struct m2 m;
 
 	TRY_EXPECT(cbor_decode_m2(msg2, msg2_len, &m, &decode_len), true);
@@ -118,7 +118,7 @@ enum err msg1_gen(const struct edhoc_initiator_context *c,
 		m1._message_1_ead_1_present = 0;
 	}
 
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 	TRY_EXPECT(cbor_encode_message_1(rc->msg1, rc->msg1_len, &m1,
 					 &payload_len_out),
 		   true);

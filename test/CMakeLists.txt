@@ -26,8 +26,8 @@ include_directories(
   ../externals/mbedtls/include/psa )
 
 add_definitions(
-#  -DDEBUG_PRINT
-  -DCDDL_CBOR_CANONICAL
+  #-DDEBUG_PRINT
+  -DZCBOR_CANONICAL
 )
 
 # The external static library that we are linking with does not know
@@ -68,21 +68,6 @@ message("LIB_TEST_LIB_DIR: ${LIB_TEST_LIB_DIR}")
 message("EDHOC_INCLUDE_DIR: ${EDHOC_INCLUDE_DIR}")
 
 
-# ExternalProject_Add(
-#   libuoscore-uedhoc                 # Name for custom target
-#   PREFIX     ${build_lib_test_dir} # Root dir for entire project
-#   SOURCE_DIR ${lib_test_dir}
-#   BINARY_DIR ${lib_test_dir} # This particular build system is invoked from the root
-#   CONFIGURE_COMMAND ""    # Skip configuring the project, e.g. with autoconf
-#   BUILD_COMMAND
-#   ${submake}
-#   PREFIX=${build_lib_test_dir}
-#   CC=${CMAKE_C_COMPILER}
-#   AR=${CMAKE_AR}
-#   CFLAGS=${external_project_cflags}
-#   INSTALL_COMMAND ""      # This particular build system has no install command
-#   BUILD_BYPRODUCTS ${LIB_TEST_LIB_DIR}/libuoscore-uedhoc.a
-#   )
 
 ExternalProject_Add(
   oscore_edhoc_project                 # Name for custom target

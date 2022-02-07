@@ -1,14 +1,14 @@
 /*
- * Generated using cddl_gen version 0.2.99
- * https://github.com/NordicSemiconductor/cddl-gen
- * Generated with a default_max_qty of 3
+ * Generated using zcbor version 0.3.99
+ * https://github.com/NordicSemiconductor/zcbor
+ * Generated with a --default-max-qty of 3
  */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_decode.h"
+#include "zcbor_decode.h"
 #include "decode_c_x.h"
 
 #if DEFAULT_MAX_QTY != 3
@@ -17,16 +17,16 @@
 
 
 static bool decode_cx_C_X(
-		cbor_state_t *state, struct cx_C_X_ *result)
+		zcbor_state_t *state, struct cx_C_X_ *result)
 {
-	cbor_print("%s\n", __func__);
+	zcbor_print("%s\r\n", __func__);
 	bool int_res;
 
-	bool tmp_result = (((union_start_code(state) && (int_res = ((((bstrx_decode(state, (&(*result)._cx_C_X_bstr)))) && (((*result)._cx_C_X_choice = _cx_C_X_bstr) || 1))
-	|| (((intx32_decode(state, (&(*result)._cx_C_X_int)))) && (((*result)._cx_C_X_choice = _cx_C_X_int) || 1))), union_end_code(state), int_res))));
+	bool tmp_result = (((zcbor_union_start_code(state) && (int_res = ((((zcbor_bstr_decode(state, (&(*result)._cx_C_X_bstr)))) && (((*result)._cx_C_X_choice = _cx_C_X_bstr) || 1))
+	|| (((zcbor_int32_decode(state, (&(*result)._cx_C_X_int)))) && (((*result)._cx_C_X_choice = _cx_C_X_int) || 1))), zcbor_union_end_code(state), int_res))));
 
 	if (!tmp_result)
-		cbor_trace();
+		zcbor_trace();
 
 	return tmp_result;
 }
@@ -34,13 +34,13 @@ static bool decode_cx_C_X(
 
 
 bool cbor_decode_cx_C_X(
-		const uint8_t *payload, uint32_t payload_len,
+		const uint8_t *payload, size_t payload_len,
 		struct cx_C_X_ *result,
-		uint32_t *payload_len_out)
+		size_t *payload_len_out)
 {
-	cbor_state_t states[3];
+	zcbor_state_t states[3];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 1);
+	zcbor_new_state(states, sizeof(states) / sizeof(zcbor_state_t), payload, payload_len, 1);
 
 	bool ret = decode_cx_C_X(states, result);
 

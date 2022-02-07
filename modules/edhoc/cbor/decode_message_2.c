@@ -1,14 +1,14 @@
 /*
- * Generated using cddl_gen version 0.2.99
- * https://github.com/NordicSemiconductor/cddl-gen
- * Generated with a default_max_qty of 3
+ * Generated using zcbor version 0.3.99
+ * https://github.com/NordicSemiconductor/zcbor
+ * Generated with a --default-max-qty of 3
  */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_decode.h"
+#include "zcbor_decode.h"
 #include "decode_message_2.h"
 
 #if DEFAULT_MAX_QTY != 3
@@ -17,17 +17,17 @@
 
 
 static bool decode_m2(
-		cbor_state_t *state, struct m2 *result)
+		zcbor_state_t *state, struct m2 *result)
 {
-	cbor_print("%s\n", __func__);
+	zcbor_print("%s\r\n", __func__);
 	bool int_res;
 
-	bool tmp_result = (((((bstrx_decode(state, (&(*result)._m2_G_Y_CIPHERTEXT_2))))
-	&& ((union_start_code(state) && (int_res = ((((intx32_decode(state, (&(*result)._m2_C_R_int)))) && (((*result)._m2_C_R_choice = _m2_C_R_int) || 1))
-	|| (((bstrx_decode(state, (&(*result)._m2_C_R_bstr)))) && (((*result)._m2_C_R_choice = _m2_C_R_bstr) || 1))), union_end_code(state), int_res))))));
+	bool tmp_result = (((((zcbor_bstr_decode(state, (&(*result)._m2_G_Y_CIPHERTEXT_2))))
+	&& ((zcbor_union_start_code(state) && (int_res = ((((zcbor_int32_decode(state, (&(*result)._m2_C_R_int)))) && (((*result)._m2_C_R_choice = _m2_C_R_int) || 1))
+	|| (((zcbor_bstr_decode(state, (&(*result)._m2_C_R_bstr)))) && (((*result)._m2_C_R_choice = _m2_C_R_bstr) || 1))), zcbor_union_end_code(state), int_res))))));
 
 	if (!tmp_result)
-		cbor_trace();
+		zcbor_trace();
 
 	return tmp_result;
 }
@@ -35,13 +35,13 @@ static bool decode_m2(
 
 
 bool cbor_decode_m2(
-		const uint8_t *payload, uint32_t payload_len,
+		const uint8_t *payload, size_t payload_len,
 		struct m2 *result,
-		uint32_t *payload_len_out)
+		size_t *payload_len_out)
 {
-	cbor_state_t states[3];
+	zcbor_state_t states[3];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 2);
+	zcbor_new_state(states, sizeof(states) / sizeof(zcbor_state_t), payload, payload_len, 2);
 
 	bool ret = decode_m2(states, result);
 

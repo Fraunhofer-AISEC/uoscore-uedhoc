@@ -35,7 +35,7 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 				 uint8_t *id_cred_x, uint32_t *id_cred_x_len)
 {
 	struct id_cred_x_map map = {0};
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 
 
 	switch (label) {
@@ -75,7 +75,7 @@ enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
 			 uint8_t *sign_or_mac, uint32_t *sign_or_mac_len,
 			 uint8_t *ad, uint32_t *ad_len)
 {
-	uint32_t decode_len = 0;
+	size_t decode_len = 0;
 	struct plaintext p;
 
 	TRY_EXPECT(cbor_decode_plaintext(ptxt, ptxt_len, &p, &decode_len),

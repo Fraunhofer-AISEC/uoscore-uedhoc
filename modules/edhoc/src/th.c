@@ -38,7 +38,7 @@ static inline enum err th2_input_encode(uint8_t *hash_msg1,
 					uint8_t *th2_input,
 					uint32_t *th2_input_len)
 {
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 	struct th2 th2;
 
 	/*Encode hash_msg1*/
@@ -97,7 +97,7 @@ static inline enum err th3_input_encode(uint8_t *th2, uint32_t th2_len,
 	th3._th3_CIPHERTEXT_2.value = ciphertext_2;
 	th3._th3_CIPHERTEXT_2.len = ciphertext_2_len;
 
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 	TRY_EXPECT(cbor_encode_th3(th3_input, *th3_input_len, &th3,
 				   &payload_len_out),
 		   true);
@@ -133,7 +133,7 @@ static inline enum err th4_input_encode(uint8_t *th3, uint32_t th3_len,
 	th4._th4_CIPHERTEXT_3.value = ciphertext_3;
 	th4._th4_CIPHERTEXT_3.len = ciphertext_3_len;
 
-	uint32_t payload_len_out;
+	size_t payload_len_out;
 	TRY_EXPECT(cbor_encode_th4(th4_input, *th4_input_len, &th4,
 				   &payload_len_out),
 		   true);

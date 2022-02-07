@@ -1,14 +1,14 @@
 /*
- * Generated using cddl_gen version 0.2.99
- * https://github.com/NordicSemiconductor/cddl-gen
- * Generated with a default_max_qty of 3
+ * Generated using zcbor version 0.3.99
+ * https://github.com/NordicSemiconductor/zcbor
+ * Generated with a --default-max-qty of 3
  */
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include "cbor_encode.h"
+#include "zcbor_encode.h"
 #include "encode_info.h"
 
 #if DEFAULT_MAX_QTY != 3
@@ -17,17 +17,17 @@
 
 
 static bool encode_info(
-		cbor_state_t *state, const struct info *input)
+		zcbor_state_t *state, const struct info *input)
 {
-	cbor_print("%s\n", __func__);
+	zcbor_print("%s\r\n", __func__);
 
-	bool tmp_result = (((((bstrx_encode(state, (&(*input)._info_transcript_hash))))
-	&& ((tstrx_encode(state, (&(*input)._info_label))))
-	&& ((bstrx_encode(state, (&(*input)._info_context))))
-	&& ((uintx32_encode(state, (&(*input)._info_length)))))));
+	bool tmp_result = (((((zcbor_bstr_encode(state, (&(*input)._info_transcript_hash))))
+	&& ((zcbor_tstr_encode(state, (&(*input)._info_label))))
+	&& ((zcbor_bstr_encode(state, (&(*input)._info_context))))
+	&& ((zcbor_uint32_encode(state, (&(*input)._info_length)))))));
 
 	if (!tmp_result)
-		cbor_trace();
+		zcbor_trace();
 
 	return tmp_result;
 }
@@ -35,13 +35,13 @@ static bool encode_info(
 
 
 bool cbor_encode_info(
-		uint8_t *payload, uint32_t payload_len,
+		uint8_t *payload, size_t payload_len,
 		const struct info *input,
-		uint32_t *payload_len_out)
+		size_t *payload_len_out)
 {
-	cbor_state_t states[2];
+	zcbor_state_t states[2];
 
-	new_state(states, sizeof(states) / sizeof(cbor_state_t), payload, payload_len, 4);
+	zcbor_new_state(states, sizeof(states) / sizeof(zcbor_state_t), payload, payload_len, 4);
 
 	bool ret = encode_info(states, input);
 

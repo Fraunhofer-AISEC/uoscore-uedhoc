@@ -97,7 +97,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" 
 
 # required for gddl-gen library
-CFLAGS += -DCDDL_CBOR_CANONICAL 
+CFLAGS += -DZCBOR_CANONICAL 
 
 
 

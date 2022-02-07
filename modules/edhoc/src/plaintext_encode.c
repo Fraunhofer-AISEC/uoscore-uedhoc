@@ -21,12 +21,12 @@
 #include "../cbor/decode_id_cred_x.h"
 #include "../cbor/encode_int_type.h"
 
-enum err id_cred2kid(const uint8_t *id_cred, uint32_t id_cred_len, uint8_t *_kid,
-		     uint32_t *kid_len)
+enum err id_cred2kid(const uint8_t *id_cred, uint32_t id_cred_len,
+		     uint8_t *_kid, uint32_t *kid_len)
 {
 	struct id_cred_x_map map;
-	uint32_t payload_len_out;
-	uint32_t decode_len = 0;
+	size_t payload_len_out;
+	size_t decode_len = 0;
 	TRY_EXPECT(cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
 					     &decode_len),
 		   true);

@@ -145,7 +145,7 @@ enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
 		       uint8_t *pk, uint32_t *pk_len, uint8_t *g,
 		       uint32_t *g_len)
 {
-	uint32_t decode_len = 0;
+	size_t decode_len = 0;
 	struct id_cred_x_map map;
 
 	TRY_EXPECT(cbor_decode_id_cred_x_map(id_cred, id_cred_len, &map,
