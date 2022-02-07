@@ -1,9 +1,6 @@
 [submodule "externals/cantcoap"]
 	path = externals/cantcoap
 	url = https://github.com/staropram/cantcoap.git
-[submodule "externals/tinycbor"]
-	path = externals/tinycbor
-	url = https://github.com/zephyrproject-rtos/tinycbor.git
 [submodule "externals/tinycrypt"]
 	path = externals/tinycrypt
 	url = https://github.com/intel/tinycrypt.git
@@ -13,17 +10,3 @@
 [submodule "externals/blerouter"]
 	path = externals/blerouter
 	url = https://github.com/Fraunhofer-AISEC/blerouter.git
-[submodule "externals/cddl-gen"]
-	path = externals/cddl-gen
-	url = https://github.com/NordicSemiconductor/cddl-gen.git
-
-[submodule "externals/jsmn"]
-	path = externals/jsmn
-	url = git@github.com:zserge/jsmn.git
-[submodule "externals/mbedtls"]
-	path = externals/mbedtls
-	url = git@github.com:ARMmbed/mbedtls.git
-
-[submodule "externals/mbedtls_ecp_compression"]
-	path = externals/mbedtls_ecp_compression
-	url = git@github.com:mwarning/mbedtls_ecp_compression.git
