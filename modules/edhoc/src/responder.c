@@ -12,7 +12,6 @@
 #include "../edhoc.h"
 #include "../edhoc_internal.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../inc/err_msg.h"
 #include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
@@ -365,12 +364,12 @@ enum err edhoc_responder_run(
 	struct runtime_context rc = { 0 };
 	runtime_context_init(&rc);
 
-	PRINT_MSG("waiting to receive message 1...");
+	PRINT_MSG("waiting to receive message 1...\n");
 	TRY(rx(c->sock, rc.msg1, &rc.msg1_len));
 	TRY(msg2_gen(c, &rc, ead_1, ead_1_len));
 	TRY(tx(c->sock, rc.msg2, rc.msg2_len));
 
-	PRINT_MSG("waiting to receive message 3...");
+	PRINT_MSG("waiting to receive message 3...\n");
 	TRY(rx(c->sock, rc.msg3, &rc.msg3_len));
 	TRY(msg3_process(c, &rc, cred_i_array, num_cred_i, ead_3, ead_3_len,
 			 prk_4x3m, prk_4x3m_len, th4, th4_len));

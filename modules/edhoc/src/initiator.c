@@ -12,7 +12,6 @@
 #include "../edhoc.h"
 #include "../edhoc_internal.h"
 #include "../../common/inc/crypto_wrapper.h"
-#include "../inc/err_msg.h"
 #include "../../common/inc/oscore_edhoc_error.h"
 #include "../inc/hkdf_info.h"
 #include "../inc/memcpy_s.h"
@@ -303,14 +302,14 @@ enum err edhoc_initiator_run(
 	TRY(msg1_gen(c, &rc));
 	TRY(tx(c->sock, rc.msg1, rc.msg1_len));
 
-	PRINT_MSG("waiting to receive message 2...");
+	PRINT_MSG("waiting to receive message 2...\n");
 	TRY(rx(c->sock, rc.msg2, &rc.msg2_len));
 	TRY(msg3_gen(c, &rc, cred_r_array, num_cred_r, ead_2, ead_2_len,
 		     prk_4x3m, prk_4x3m_len, th4, th4_len));
 	TRY(tx(c->sock, rc.msg3, rc.msg3_len));
 
 	if (c->msg4) {
-		PRINT_MSG("waiting to receive message 4...");
+		PRINT_MSG("waiting to receive message 4...\n");
 		TRY(rx(c->sock, rc.msg4, &rc.msg4_len));
 		TRY(msg4_process(c, &rc, ead_4, ead_4_len, prk_4x3m,
 				 prk_4x3m_len, th4, th4_len));

@@ -17,12 +17,14 @@
 #include "suites.h"
 
 /**
- * @brief   Encodes the HKDF Info as into the out-array
- * @param   aead_alg AEAD Algorithm
+ * @brief   Encodes the HKDF Info 
+ * 
  * @param   th transcripthash
  * @param   th_len length of th
  * @param   label human readable label
- * @param   okm_len length of output keying material
+ * @param   context relevant only for MAC_2 and MAC_3
+ * @param   context_len lenhgt of context
+ * @param   okm_len the lenhgt of the output keying material
  * @param   out out-array
  * @param   out_len length of out
  * @return  err

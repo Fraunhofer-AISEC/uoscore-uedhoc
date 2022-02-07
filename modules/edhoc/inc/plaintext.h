@@ -44,7 +44,7 @@ enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
 /**
  * @brief   Encodes a plaintext 
  * @param   id_cred ID_CRED_x
- * @param   id_cred_len length of id_cred_len
+ * @param   id_cred_len length of id_cred
  * @param   sign_or_mac signature or mac
  * @param   sign_or_mac_len length of sign_or_mac
  * @param   ad axillary data
