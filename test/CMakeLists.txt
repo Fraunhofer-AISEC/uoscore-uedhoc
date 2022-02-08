@@ -18,6 +18,7 @@ FILE(GLOB app_sources
 target_sources(app PRIVATE ${app_sources})
 
 include_directories(
+  ../test_vectors
   ../externals/jsmn
   ../externals/zcbor/include 
   ../externals/mbedtls/library 
