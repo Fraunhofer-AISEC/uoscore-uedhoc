@@ -110,8 +110,7 @@ oscore_option_parser(struct o_coap_packet *in,
 						out->kid_context.len;
 					temp_kid_len =
 						(uint8_t)(temp_kid_len -
-							  out->kid_context.len +
-							  1);
+							  (out->kid_context.len + 1));
 				}
 
 				/* Get KID */
