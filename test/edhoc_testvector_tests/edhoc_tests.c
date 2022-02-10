@@ -47,7 +47,7 @@ int test_edhoc(enum role p, uint8_t vec_num)
 	//uint32_t test_vec_buf_len = sizeof(test_vec_buf);
 	//struct results_bufs res_bufs;
 	struct results res;
-	int r;
+	//int r;
 	enum err err;
 
 	vec_num = vec_num - 1;
@@ -106,10 +106,18 @@ int test_edhoc(enum role p, uint8_t vec_num)
 		cred_r.ca_pk.len = test_vectors[vec_num].ca_pk_len;
 		cred_r.ca_pk.ptr = test_vectors[vec_num].ca_pk;
 
-		//todo check how to set up c_i and ead
-		//c_i.c_i.mem
-		c_i.msg4 = true; /*we allways test message 4 */
-		//c_i.c_i.mem
+		if (test_vectors[vec_num].c_i_raw != NULL) {
+			c_i.c_i.type = BSTR;
+			c_i.c_i.mem.c_x_bstr.len =
+				test_vectors[vec_num].c_i_raw_len;
+			c_i.c_i.mem.c_x_bstr.ptr =
+				test_vectors[vec_num].c_i_raw;
+		} else {
+			c_i.c_i.type = INT;
+			c_i.c_i.mem.c_x_int =
+				*test_vectors[vec_num].c_i_raw_int;
+		}
+		c_i.msg4 = true;
 		c_i.method = *test_vectors[vec_num].method;
 
 		c_i.suites_i.len = test_vectors[vec_num].suites_i_len;
@@ -169,8 +177,8 @@ int test_edhoc(enum role p, uint8_t vec_num)
 		const uint16_t num_cred_i_elements = 1;
 		struct other_party_cred cred_i;
 		struct edhoc_responder_context c_r;
-		struct other_party_cred_bufs other_party_bufs;
-		struct edhoc_responder_context_bufs responder_context_bufs;
+		//struct other_party_cred_bufs other_party_bufs;
+		//struct edhoc_responder_context_bufs responder_context_bufs;
 
 		rx_initiator_switch = false;
 		cred_i.id_cred.len = test_vectors[vec_num].id_cred_i_len;
@@ -194,11 +202,11 @@ int test_edhoc(enum role p, uint8_t vec_num)
 		c_r.suites_r.len = test_vectors[vec_num].suites_r_len;
 		c_r.suites_r.ptr = test_vectors[vec_num].suites_r;
 
-		c_r.ead_1.len = test_vectors[vec_num].ead_2_len;
-		c_r.ead_1.ptr = test_vectors[vec_num].ead_2;
+		c_r.ead_2.len = test_vectors[vec_num].ead_2_len;
+		c_r.ead_2.ptr = test_vectors[vec_num].ead_2;
 
-		c_r.ead_3.len = test_vectors[vec_num].ead_4_len;
-		c_r.ead_3.ptr = test_vectors[vec_num].ead_4;
+		c_r.ead_4.len = test_vectors[vec_num].ead_4_len;
+		c_r.ead_4.ptr = test_vectors[vec_num].ead_4;
 
 		c_r.id_cred_r.len = test_vectors[vec_num].id_cred_r_len;
 		c_r.id_cred_r.ptr = test_vectors[vec_num].id_cred_r;

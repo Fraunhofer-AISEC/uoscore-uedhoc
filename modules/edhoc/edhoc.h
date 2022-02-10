@@ -115,6 +115,8 @@
 #define TH_ENC_DEFAULT_SIZE 42
 #define ENCODING_OVERHEAD 6
 
+
+
 struct other_party_cred {
 	struct byte_array id_cred; /*ID_CRED_x of the other party*/
 	struct byte_array cred; /*CBOR encoded credentials*/

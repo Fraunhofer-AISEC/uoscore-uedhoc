@@ -9,22 +9,22 @@ FILE(GLOB app_sources
   main.c
   edhoc_testvector_tests/*.c 
   oscore_testvector_tests/*.c 
-  ../samples/common/test_vec_parser.c
-  ../samples/common/cbor/*.c
   ../externals/zcbor/src/*.c
   ../externals/compact25519/src/c25519/*.c
   ../externals/compact25519/src/*.c
   ../externals/mbedtls/library/*.c)
 target_sources(app PRIVATE ${app_sources})
+#../samples/common/cbor/*.c
+#../samples/common/test_vec_parser.c
 
 include_directories(
   ../test_vectors
-  ../externals/jsmn
   ../externals/zcbor/include 
   ../externals/mbedtls/library 
   ../externals/mbedtls/include 
   ../externals/mbedtls/include/mbedtls 
   ../externals/mbedtls/include/psa )
+#  ../externals/jsmn
 
 add_definitions(
   #-DDEBUG_PRINT

@@ -7,298 +7,303 @@ import json
 import binascii
 
 HEADER = "/*This is an automatically generated file!*/\n\n"
-INCLUDES = "#include <stdint.h>\n#include <stdio.h>\n#include <stdlib.h>\n\n"
+INCLUDES = "#include \"../modules/edhoc/edhoc.h\"\n#include <stdint.h>\n#include <stdio.h>\n#include <stdlib.h>\n\n"
 STRUCT_DEF = "\n\
 struct test_vector {\n\
-	uint8_t method;\n\
-	\n\
-	uint8_t *suites_i;\n\
-	uint32_t suites_i_len;\n\
-	\n\
-	uint8_t *suites_r;\n\
-	uint32_t suites_r_len;\n\
-	\n\
-	uint8_t *x_raw;\n\
-	uint32_t x_raw_len;\n\
-	\n\
-	uint8_t *g_x_raw;\n\
-	uint32_t g_x_raw_len;\n\
-	\n\
-	uint8_t *g_x;\n\
-	uint32_t g_x_len;\n\
-	\n\
-	uint8_t *c_i;\n\
-	uint32_t c_i_len;\n\
-	\n\
-	uint8_t *ead_1;\n\
-	uint32_t ead_1_len;\n\
-	\n\
-	uint8_t *message_1;\n\
-	uint32_t message_1_len;\n\
-	\n\
-	uint8_t *y_raw;\n\
-	uint32_t y_raw_len;\n\
-	\n\
-	uint8_t *g_y_raw;\n\
-	uint32_t g_y_raw_len;\n\
-	\n\
-	uint8_t *g_y;\n\
-	uint32_t g_y_len;\n\
-	\n\
-	uint8_t *g_xy_raw;\n\
-	uint32_t g_xy_raw_len;\n\
-	\n\
-	uint8_t *salt_raw;\n\
-	uint32_t salt_raw_len;\n\
-	\n\
-	uint8_t *prk_2e_raw;\n\
-	uint32_t prk_2e_raw_len;\n\
-	\n\
-	uint8_t *sk_r_raw;\n\
-	uint32_t sk_r_raw_len;\n\
-	\n\
-	uint8_t *pk_r_raw;\n\
-	uint32_t pk_r_raw_len;\n\
-	\n\
-	uint8_t *prk_3e2m_raw;\n\
-	uint32_t prk_3e2m_raw_len;\n\
-	\n\
-	uint8_t *c_r_raw;\n\
-	uint32_t c_r_raw_len;\n\
-	\n\
-	uint8_t *c_r;\n\
-	uint32_t c_r_len;\n\
-	\n\
-	uint8_t *h_message_1_raw;\n\
-	uint32_t h_message_1_raw_len;\n\
-	\n\
-	uint8_t *h_message_1;\n\
-	uint32_t h_message_1_len;\n\
-	\n\
-	uint8_t *input_th_2;\n\
-	uint32_t input_th_2_len;\n\
-	\n\
-	uint8_t *th_2_raw;\n\
-	uint32_t th_2_raw_len;\n\
-	\n\
-	uint8_t *th_2;\n\
-	uint32_t th_2_len;\n\
-	\n\
-	uint8_t *id_cred_r;\n\
-	uint32_t id_cred_r_len;\n\
-	\n\
-	uint8_t *cred_r;\n\
-	uint32_t cred_r_len;\n\
-	\n\
-	uint8_t *ead_2;\n\
-	uint32_t ead_2_len;\n\
-	\n\
-	uint8_t *info_mac_2;\n\
-	uint32_t info_mac_2_len;\n\
-	\n\
-	uint8_t *mac_2_raw;\n\
-	uint32_t mac_2_raw_len;\n\
-	\n\
-	uint8_t *mac_2;\n\
-	uint32_t mac_2_len;\n\
-	\n\
-	uint8_t *m_2;\n\
-	uint32_t m_2_len;\n\
-	\n\
-	uint8_t *sig_or_mac_2_raw;\n\
-	uint32_t sig_or_mac_2_raw_len;\n\
-	\n\
-	uint8_t *sig_or_mac_2;\n\
-	uint32_t sig_or_mac_2_len;\n\
-	\n\
-	uint8_t *plaintext_2;\n\
-	uint32_t plaintext_2_len;\n\
-	\n\
-	uint8_t *info_keystream_2;\n\
-	uint32_t info_keystream_2_len;\n\
-	\n\
-	uint8_t *keystream_2_raw;\n\
-	uint32_t keystream_2_raw_len;\n\
-	\n\
-	uint8_t *ciphertext_2_raw;\n\
-	uint32_t ciphertext_2_raw_len;\n\
-	\n\
-	uint8_t *ciphertext_2;\n\
-	uint32_t ciphertext_2_len;\n\
-	\n\
-	uint8_t *message_2;\n\
-	uint32_t message_2_len;\n\
-	\n\
-	uint8_t *sk_i_raw;\n\
-	uint32_t sk_i_raw_len;\n\
-	\n\
-	uint8_t *pk_i_raw;\n\
-	uint32_t pk_i_raw_len;\n\
-	\n\
-	uint8_t *prk_4x3m_raw;\n\
-	uint32_t prk_4x3m_raw_len;\n\
-	\n\
-	uint8_t *input_TH_3;\n\
-	uint32_t input_TH_3_len;\n\
-	\n\
-	uint8_t *th_3_raw;\n\
-	uint32_t th_3_raw_len;\n\
-	\n\
-	uint8_t *th_3;\n\
-	uint32_t th_3_len;\n\
-	\n\
-	uint8_t *id_cred_i;\n\
-	uint32_t id_cred_i_len;\n\
-	\n\
-	uint8_t *cred_i;\n\
-	uint32_t cred_i_len;\n\
-	\n\
-	uint8_t *ead_3;\n\
-	uint32_t ead_3_len;\n\
-	\n\
-	uint8_t *info_mac_3;\n\
-	uint32_t info_mac_3_len;\n\
-	\n\
-	uint8_t *mac_3_raw;\n\
-	uint32_t mac_3_raw_len;\n\
-	\n\
-	uint8_t *mac_3;\n\
-	uint32_t mac_3_len;\n\
-	\n\
-	uint8_t *m_3;\n\
-	uint32_t m_3_len;\n\
-	\n\
-	uint8_t *sig_or_mac_3_raw;\n\
-	uint32_t sig_or_mac_3_raw_len;\n\
-	\n\
-	uint8_t *sig_or_mac_3;\n\
-	uint32_t sig_or_mac_3_len;\n\
-	\n\
-	uint8_t *p_3;\n\
-	uint32_t p_3_len;\n\
-	\n\
-	uint8_t *a_3;\n\
-	uint32_t a_3_len;\n\
-	\n\
-	uint8_t *info_k_3;\n\
-	uint32_t info_k_3_len;\n\
-	\n\
-	uint8_t *k_3_raw;\n\
-	uint32_t k_3_raw_len;\n\
-	\n\
-	uint8_t *info_iv_3;\n\
-	uint32_t info_iv_3_len;\n\
-	\n\
-	uint8_t *iv_3_raw;\n\
-	uint32_t iv_3_raw_len;\n\
-	\n\
-	uint8_t *ciphertext_3_raw;\n\
-	uint32_t ciphertext_3_raw_len;\n\
-	\n\
-	uint8_t *ciphertext_3;\n\
-	uint32_t ciphertext_3_len;\n\
-	\n\
-	uint8_t *message_3;\n\
-	uint32_t message_3_len;\n\
-	\n\
-	uint8_t *input_th_4;\n\
-	uint32_t input_th_4_len;\n\
-	\n\
-	uint8_t *th_4_raw;\n\
-	uint32_t th_4_raw_len;\n\
-	\n\
-	uint8_t *th_4;\n\
-	uint32_t th_4_len;\n\
-	\n\
-	uint8_t *ead_4;\n\
-	uint32_t ead_4_len;\n\
-	\n\
-	uint8_t *p_4;\n\
-	uint32_t p_4_len;\n\
-	\n\
-	uint8_t *a_4;\n\
-	uint32_t a_4_len;\n\
-	\n\
-	uint8_t *info_k_4;\n\
-	uint32_t info_k_4_len;\n\
-	\n\
-	uint8_t *k_4_raw;\n\
-	uint32_t k_4_raw_len;\n\
-	\n\
-	uint8_t *info_iv_4;\n\
-	uint32_t info_iv_4_len;\n\
-	\n\
-	uint8_t *iv_4_raw;\n\
-	uint32_t iv_4_raw_len;\n\
-	\n\
-	uint8_t *ciphertext_4_raw;\n\
-	uint32_t ciphertext_4_raw_len;\n\
-	\n\
-	uint8_t *ciphertext_4;\n\
-	uint32_t ciphertext_4_len;\n\
-	\n\
-	uint8_t *message_4;\n\
-	uint32_t message_4_len;\n\
-	\n\
-	uint8_t *oscore_aead_alg;\n\
-	uint32_t oscore_aead_alg_len;\n\
-	\n\
-	uint8_t *oscore_hash_alg;\n\
-	uint32_t oscore_hash_alg_len;\n\
-	\n\
-	uint8_t *client_sender_id_raw;\n\
-	uint32_t client_sender_id_raw_len;\n\
-	\n\
-	uint8_t *server_sender_id_raw;\n\
-	uint32_t server_sender_id_raw_len;\n\
-	\n\
-	uint8_t *info_oscore_secret;\n\
-	uint32_t info_oscore_secret_len;\n\
-	\n\
-	uint8_t *oscore_secret_raw;\n\
-	uint32_t oscore_secret_raw_len;\n\
-	\n\
-	uint8_t *info_oscore_salt;\n\
-	uint32_t info_oscore_salt_len;\n\
-	\n\
-	uint8_t *oscore_salt_raw;\n\
-	uint32_t oscore_salt_raw_len;\n\
-	\n\
-	uint8_t *key_update_nonce_raw;\n\
-	uint32_t key_update_nonce_raw_len;\n\
-	\n\
-	uint8_t *prk_4x3m_key_update_raw;\n\
-	uint32_t prk_4x3m_key_update_raw_len;\n\
-	\n\
-	uint8_t *oscore_secret_key_update_raw;\n\
-	uint32_t oscore_secret_key_update_raw_len;\n\
-	\n\
-	uint8_t *oscore_salt_key_update_raw;\n\
-	uint32_t oscore_salt_key_update_raw_len;\n\
-	\n\
-	uint8_t *ca;\n\
-	uint32_t ca_len;\n\
-	\n\
-	uint8_t *ca_pk;\n\
-	uint32_t ca_pk_len;\n\
-	\n\
-	uint8_t *i_raw;\n\
-	uint32_t i_raw_len;\n\
-	\n\
-	uint8_t *g_i_raw;\n\
-	uint32_t g_i_raw_len;\n\
-	\n\
-	uint8_t *r_raw;\n\
-	uint32_t r_raw_len;\n\
-	\n\
-	uint8_t *g_r_raw;\n\
-	uint32_t g_r_raw_len;\n\
+        uint8_t *method;\n\
+        uint32_t method_len;\n\
+        \n\
+        uint8_t *suites_i;\n\
+        uint32_t suites_i_len;\n\
+        \n\
+        uint8_t *suites_r;\n\
+        uint32_t suites_r_len;\n\
+        \n\
+        uint8_t *x_raw;\n\
+        uint32_t x_raw_len;\n\
+        \n\
+        uint8_t *g_x_raw;\n\
+        uint32_t g_x_raw_len;\n\
+        \n\
+        uint8_t *g_x;\n\
+        uint32_t g_x_len;\n\
+        \n\
+        uint8_t *c_i;\n\
+        uint32_t c_i_len;\n\
+        \n\
+        uint8_t *ead_1;\n\
+        uint32_t ead_1_len;\n\
+        \n\
+        uint8_t *message_1;\n\
+        uint32_t message_1_len;\n\
+        \n\
+        uint8_t *y_raw;\n\
+        uint32_t y_raw_len;\n\
+        \n\
+        uint8_t *g_y_raw;\n\
+        uint32_t g_y_raw_len;\n\
+        \n\
+        uint8_t *g_y;\n\
+        uint32_t g_y_len;\n\
+        \n\
+        uint8_t *g_xy_raw;\n\
+        uint32_t g_xy_raw_len;\n\
+        \n\
+        uint8_t *salt_raw;\n\
+        uint32_t salt_raw_len;\n\
+        \n\
+        uint8_t *prk_2e_raw;\n\
+        uint32_t prk_2e_raw_len;\n\
+        \n\
+        uint8_t *sk_r_raw;\n\
+        uint32_t sk_r_raw_len;\n\
+        \n\
+        uint8_t *pk_r_raw;\n\
+        uint32_t pk_r_raw_len;\n\
+        \n\
+        uint8_t *prk_3e2m_raw;\n\
+        uint32_t prk_3e2m_raw_len;\n\
+        \n\
+        uint8_t *c_r;\n\
+        uint32_t c_r_len;\n\
+        \n\
+        uint8_t *h_message_1_raw;\n\
+        uint32_t h_message_1_raw_len;\n\
+        \n\
+        uint8_t *h_message_1;\n\
+        uint32_t h_message_1_len;\n\
+        \n\
+        uint8_t *input_th_2;\n\
+        uint32_t input_th_2_len;\n\
+        \n\
+        uint8_t *th_2_raw;\n\
+        uint32_t th_2_raw_len;\n\
+        \n\
+        uint8_t *th_2;\n\
+        uint32_t th_2_len;\n\
+        \n\
+        uint8_t *id_cred_r;\n\
+        uint32_t id_cred_r_len;\n\
+        \n\
+        uint8_t *cred_r;\n\
+        uint32_t cred_r_len;\n\
+        \n\
+        uint8_t *ead_2;\n\
+        uint32_t ead_2_len;\n\
+        \n\
+        uint8_t *info_mac_2;\n\
+        uint32_t info_mac_2_len;\n\
+        \n\
+        uint8_t *mac_2_raw;\n\
+        uint32_t mac_2_raw_len;\n\
+        \n\
+        uint8_t *mac_2;\n\
+        uint32_t mac_2_len;\n\
+        \n\
+        uint8_t *m_2;\n\
+        uint32_t m_2_len;\n\
+        \n\
+        uint8_t *sig_or_mac_2_raw;\n\
+        uint32_t sig_or_mac_2_raw_len;\n\
+        \n\
+        uint8_t *sig_or_mac_2;\n\
+        uint32_t sig_or_mac_2_len;\n\
+        \n\
+        uint8_t *plaintext_2;\n\
+        uint32_t plaintext_2_len;\n\
+        \n\
+        uint8_t *info_keystream_2;\n\
+        uint32_t info_keystream_2_len;\n\
+        \n\
+        uint8_t *keystream_2_raw;\n\
+        uint32_t keystream_2_raw_len;\n\
+        \n\
+        uint8_t *ciphertext_2_raw;\n\
+        uint32_t ciphertext_2_raw_len;\n\
+        \n\
+        uint8_t *ciphertext_2;\n\
+        uint32_t ciphertext_2_len;\n\
+        \n\
+        uint8_t *message_2;\n\
+        uint32_t message_2_len;\n\
+        \n\
+        uint8_t *sk_i_raw;\n\
+        uint32_t sk_i_raw_len;\n\
+        \n\
+        uint8_t *pk_i_raw;\n\
+        uint32_t pk_i_raw_len;\n\
+        \n\
+        uint8_t *prk_4x3m_raw;\n\
+        uint32_t prk_4x3m_raw_len;\n\
+        \n\
+        uint8_t *input_TH_3;\n\
+        uint32_t input_TH_3_len;\n\
+        \n\
+        uint8_t *th_3_raw;\n\
+        uint32_t th_3_raw_len;\n\
+        \n\
+        uint8_t *th_3;\n\
+        uint32_t th_3_len;\n\
+        \n\
+        uint8_t *id_cred_i;\n\
+        uint32_t id_cred_i_len;\n\
+        \n\
+        uint8_t *cred_i;\n\
+        uint32_t cred_i_len;\n\
+        \n\
+        uint8_t *ead_3;\n\
+        uint32_t ead_3_len;\n\
+        \n\
+        uint8_t *info_mac_3;\n\
+        uint32_t info_mac_3_len;\n\
+        \n\
+        uint8_t *mac_3_raw;\n\
+        uint32_t mac_3_raw_len;\n\
+        \n\
+        uint8_t *mac_3;\n\
+        uint32_t mac_3_len;\n\
+        \n\
+        uint8_t *m_3;\n\
+        uint32_t m_3_len;\n\
+        \n\
+        uint8_t *sig_or_mac_3_raw;\n\
+        uint32_t sig_or_mac_3_raw_len;\n\
+        \n\
+        uint8_t *sig_or_mac_3;\n\
+        uint32_t sig_or_mac_3_len;\n\
+        \n\
+        uint8_t *p_3;\n\
+        uint32_t p_3_len;\n\
+        \n\
+        uint8_t *a_3;\n\
+        uint32_t a_3_len;\n\
+        \n\
+        uint8_t *info_k_3;\n\
+        uint32_t info_k_3_len;\n\
+        \n\
+        uint8_t *k_3_raw;\n\
+        uint32_t k_3_raw_len;\n\
+        \n\
+        uint8_t *info_iv_3;\n\
+        uint32_t info_iv_3_len;\n\
+        \n\
+        uint8_t *iv_3_raw;\n\
+        uint32_t iv_3_raw_len;\n\
+        \n\
+        uint8_t *ciphertext_3_raw;\n\
+        uint32_t ciphertext_3_raw_len;\n\
+        \n\
+        uint8_t *ciphertext_3;\n\
+        uint32_t ciphertext_3_len;\n\
+        \n\
+        uint8_t *message_3;\n\
+        uint32_t message_3_len;\n\
+        \n\
+        uint8_t *input_th_4;\n\
+        uint32_t input_th_4_len;\n\
+        \n\
+        uint8_t *th_4_raw;\n\
+        uint32_t th_4_raw_len;\n\
+        \n\
+        uint8_t *th_4;\n\
+        uint32_t th_4_len;\n\
+        \n\
+        uint8_t *ead_4;\n\
+        uint32_t ead_4_len;\n\
+        \n\
+        uint8_t *p_4;\n\
+        uint32_t p_4_len;\n\
+        \n\
+        uint8_t *a_4;\n\
+        uint32_t a_4_len;\n\
+        \n\
+        uint8_t *info_k_4;\n\
+        uint32_t info_k_4_len;\n\
+        \n\
+        uint8_t *k_4_raw;\n\
+        uint32_t k_4_raw_len;\n\
+        \n\
+        uint8_t *info_iv_4;\n\
+        uint32_t info_iv_4_len;\n\
+        \n\
+        uint8_t *iv_4_raw;\n\
+        uint32_t iv_4_raw_len;\n\
+        \n\
+        uint8_t *ciphertext_4_raw;\n\
+        uint32_t ciphertext_4_raw_len;\n\
+        \n\
+        uint8_t *ciphertext_4;\n\
+        uint32_t ciphertext_4_len;\n\
+        \n\
+        uint8_t *message_4;\n\
+        uint32_t message_4_len;\n\
+        \n\
+        int32_t *oscore_aead_alg;\n\
+        \n\
+        int32_t *oscore_hash_alg;\n\
+        \n\
+        uint8_t *client_sender_id_raw;\n\
+        uint32_t client_sender_id_raw_len;\n\
+        \n\
+        uint8_t *server_sender_id_raw;\n\
+        uint32_t server_sender_id_raw_len;\n\
+        \n\
+        uint8_t *info_oscore_secret;\n\
+        uint32_t info_oscore_secret_len;\n\
+        \n\
+        uint8_t *oscore_secret_raw;\n\
+        uint32_t oscore_secret_raw_len;\n\
+        \n\
+        uint8_t *info_oscore_salt;\n\
+        uint32_t info_oscore_salt_len;\n\
+        \n\
+        uint8_t *oscore_salt_raw;\n\
+        uint32_t oscore_salt_raw_len;\n\
+        \n\
+        uint8_t *key_update_nonce_raw;\n\
+        uint32_t key_update_nonce_raw_len;\n\
+        \n\
+        uint8_t *prk_4x3m_key_update_raw;\n\
+        uint32_t prk_4x3m_key_update_raw_len;\n\
+        \n\
+        uint8_t *oscore_secret_key_update_raw;\n\
+        uint32_t oscore_secret_key_update_raw_len;\n\
+        \n\
+        uint8_t *oscore_salt_key_update_raw;\n\
+        uint32_t oscore_salt_key_update_raw_len;\n\
+        \n\
+        uint8_t *ca;\n\
+        uint32_t ca_len;\n\
+        \n\
+        uint8_t *ca_pk;\n\
+        uint32_t ca_pk_len;\n\
+        \n\
+        uint8_t *i_raw;\n\
+        uint32_t i_raw_len;\n\
+        \n\
+        uint8_t *g_i_raw;\n\
+        uint32_t g_i_raw_len;\n\
+        \n\
+        uint8_t *r_raw;\n\
+        uint32_t r_raw_len;\n\
+        \n\
+        uint8_t *g_r_raw;\n\
+        uint32_t g_r_raw_len;\n\
+        \n\
+        uint8_t *c_i_raw;\n\
+        uint32_t c_i_raw_len;\n\
+        int32_t *c_i_raw_int;\n\
+        \n\
+        uint8_t *c_r_raw;\n\
+        uint32_t c_r_raw_len;\n\
+        int32_t *c_r_raw_int;\n\
 };\n"
 
 STRUCT_POPULATE_START = "\n\nstruct test_vector test_vectors[] = {\n"
 STRUCT_POPULATE = "\n\
 	{\n\
-         method = 0,\n\
+        .method = NULL,\n\
+        .method_len = 0,\n\
         \n\
         .suites_i = NULL,\n\
         .suites_i_len = 0,\n\
@@ -350,9 +355,6 @@ STRUCT_POPULATE = "\n\
         \n\
         .prk_3e2m_raw = NULL,\n\
         .prk_3e2m_raw_len = 0,\n\
-        \n\
-        .c_r_raw = NULL,\n\
-        .c_r_raw_len = 0,\n\
         \n\
         .c_r = NULL,\n\
         .c_r_len = 0,\n\
@@ -529,10 +531,8 @@ STRUCT_POPULATE = "\n\
         .message_4_len = 0,\n\
         \n\
         .oscore_aead_alg = NULL,\n\
-        .oscore_aead_alg_len = 0,\n\
         \n\
         .oscore_hash_alg = NULL,\n\
-        .oscore_hash_alg_len = 0,\n\
         \n\
         .client_sender_id_raw = NULL,\n\
         .client_sender_id_raw_len = 0,\n\
@@ -581,15 +581,24 @@ STRUCT_POPULATE = "\n\
         \n\
         .g_r_raw = NULL,\n\
         .g_r_raw_len = 0,\n\
+        \n\
+        .c_r_raw = NULL,\n\
+        .c_r_raw_len = 0,\n\
+        .c_r_raw_int = NULL,\n\
+        \n\
+        .c_i_raw = NULL,\n\
+        .c_i_raw_len = 0,\n\
+        .c_i_raw_int = NULL,\n\
 	},\n\
 "
 STRUCT_POPULATE_END = "};"
 
 
 def print_c_array(in_string):
-    out_string = " = {\n\t"
+
     cnt = 1
     if type(in_string) is str:
+        out_string = "[] = {\n\t"
         for i in range(0, len(in_string), 2):
             out_string = out_string + "0x" + in_string[i]+in_string[i+1]
 
@@ -604,8 +613,9 @@ def print_c_array(in_string):
 
         if(len(in_string) == 0):
             out_string = out_string + "};\n"
-    else:
-        out_string = out_string + hex(in_string) + "};\n"
+
+    if type(in_string) is int:
+        out_string = " = " + str(in_string) + ";\n"
 
     # print(out_string)
     return out_string
@@ -618,10 +628,38 @@ def get_len_str(i, data):
         return "1"
 
 
-def populate_struct_body(input, key="dummy", array_name="dummy"):
-    input = re.sub("        ." + key + "_len = 0", "        ." + key +
-                   "_len = sizeof(" + array_name + ")", input)
-    return re.sub("        ." + key + " = NULL", "        ." + key + " = " + array_name, input)
+def populate_struct_body(input, val="dummy", key="dummy", array_name="dummy"):
+
+        pattern_str_len = "        ." + key + "_len = 0"
+        repl_str_len = "        ." + key + "_len = sizeof(" + array_name + ")"
+        pattern_str_val = "        ." + key + " = NULL"
+        repl_str_val = "        ." + key + " = " + array_name
+
+        pattern_int_val = "        ." + key + " = NULL"
+        repl_int_val = "        ." + key + " = &" + array_name
+
+        pattern_c_x_int_val = "        ." + key + "_int = NULL"
+#     repl_c_x_str_val = "        ." + key + \
+#         " =  {BSTR, {sizeof(" + array_name + "), " + array_name + "}}"
+        repl_c_x_int_val = "        ." + key + "_int" + \
+                " =  &" + array_name
+
+#     if (key == "c_r_raw") or (key == "c_i_raw"):
+#         if isinstance(val, str):
+#             return re.sub(pattern_c_x_str_val, repl_c_x_str_val, input)
+#         if isinstance(val, int):
+#             return re.sub(pattern_c_x_str_val, repl_c_x_int_val, input)
+
+        if isinstance(val, str):
+                changed_len = re.sub(pattern_str_len, repl_str_len, input)
+                changed_val_len = re.sub(pattern_str_val, repl_str_val, changed_len)
+                return changed_val_len
+
+        if isinstance(val, int):
+                if (key == "c_r_raw") or (key == "c_i_raw"):
+                        return re.sub(pattern_c_x_int_val, repl_c_x_int_val, input)
+                changed_val_len = re.sub(pattern_int_val, repl_int_val, input)
+                return changed_val_len
 
 
 def main():
@@ -643,12 +681,22 @@ def main():
 
         struct_body = populate_struct_body(STRUCT_POPULATE)
         for key in test_vector_elements.keys():
-            #print(key, test_vector_elements[key])
+            # print(key, test_vector_elements[key])
             array_name = vec_num + "_" + key
-            data_arrays = data_arrays + "uint8_t " + array_name + \
-                "[]" + print_c_array(test_vector_elements[key])
+            type = test_vector_elements[key]
 
-            struct_body = populate_struct_body(struct_body, key, array_name)
+            # if the value of an element is a int save it as int_32
+            if isinstance(type, int):
+                data_arrays = data_arrays + "int32_t " + array_name + \
+                    print_c_array(test_vector_elements[key])
+
+            # if the value of an element is a string save it in uint8_t array
+            if isinstance(type, str):
+                data_arrays = data_arrays + "uint8_t " + array_name + \
+                    print_c_array(test_vector_elements[key])
+
+            struct_body = populate_struct_body(
+                struct_body, type, key, array_name)
 
         struct_body_out += "/*--------------- " + vec_num + " ------------*/\n "
         struct_body_out += struct_body
