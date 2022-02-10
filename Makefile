@@ -28,16 +28,11 @@ $(shell mkdir -p $(DIR))
 ################################################################################
 # C Source files
 
-# common source files for OSCORE and EDHOC
-C_SOURCES += $(wildcard modules/common/src/*.c)
+C_SOURCES += $(wildcard src/edhoc/*.c)
+C_SOURCES += $(wildcard src/oscore/*.c)
+C_SOURCES += $(wildcard src/common/*.c)
+C_SOURCES += $(wildcard src/cbor/*.c)
 
-# EDHOC specific source files
-C_SOURCES += $(wildcard modules/edhoc/src/*.c)
-C_SOURCES += $(wildcard modules/edhoc/cbor/*.c)
-
-# OSCORE specific source files
-C_SOURCES += $(wildcard modules/oscore/src/*.c)
-C_SOURCES += $(wildcard modules/oscore/cbor/*.c)
 
 #$(info    \n C_SOURCES is $(C_SOURCES))
 vpath %.c $(sort $(dir $(C_SOURCES)))
@@ -49,16 +44,12 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 ################################################################################
 # C includes
 
-# common include files for OSCORE and EDHOC
-C_INCLUDES += -Imodules/common/inc
+C_INCLUDES += -I.
+C_INCLUDES += -Iinc
 
-# EDHOC specific include files
-C_INCLUDES += -Imodules/edhoc/inc
-C_INCLUDES += -Imodules/edhoc
+#eventually remove this after fix in zcbor
+C_INCLUDES += -Iinc/cbor
 
-# OSCORE specific inlude files
-C_INCLUDES += -Imodules/oscore/inc
-C_INCLUDES += -Imodules/oscore
 
 # Crypto engine
 ifeq ($(findstring COMPACT25519,$(CRYPTO_ENGINE)),COMPACT25519) 

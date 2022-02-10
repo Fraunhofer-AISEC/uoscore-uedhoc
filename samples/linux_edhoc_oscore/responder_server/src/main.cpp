@@ -22,11 +22,11 @@
 extern "C" {
 #include "../../../../modules/oscore/oscore.h"
 #include "../../../../modules/edhoc/edhoc.h"
-#include "../../../common/sock.h"
-#include "../../../common/test_vec_parser.h"
+#include "../../common/sock.h"
+#include "../../common/test_vec_parser.h"
 }
 #include "../../../../externals/cantcoap/cantcoap.h"
-#include "../inc/credentials.h"
+#include "edhoc/credentials.h"
 
 #define USE_IPV4
 

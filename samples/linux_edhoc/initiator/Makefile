@@ -46,8 +46,8 @@ CPP_SOURCES += ../../../externals/cantcoap/cantcoap.cpp
 # todo clean up this
 $(shell mv ../../../externals/compact25519/src/c25519/sha512.c ../../../externals/compact25519/src/c25519/_sha512.c )
 
-C_SOURCES += $(wildcard ../../common/*.c) 
-C_SOURCES += $(wildcard ../../common/cbor/*.c) 
+C_SOURCES += $(wildcard ../common/*.c) 
+C_SOURCES += $(wildcard ../common/cbor/*.c) 
 C_SOURCES += $(wildcard ../../../externals/cddl-gen/src/*.c)
 C_SOURCES += $(wildcard ../../../externals/mbedtls/library/*.c)
 C_SOURCES += $(wildcard ../../../externals/compact25519/src/c25519/*.c)

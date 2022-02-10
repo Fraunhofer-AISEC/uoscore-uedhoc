@@ -45,13 +45,13 @@ enum err rx(void *sock, uint8_t *data, uint32_t *data_len)
 		/*The initiator must get msg2 and msg4*/
 		if (msg_cnt == 1) {
 			/*message 2*/
-			TRY(_memcpy_s(data, *data_len, m.m2.ptr, m.m2.len));
-			*data_len = m.m2.len;
+			TRY(_memcpy_s(data, *data_len, m.m2, m.m2_len));
+			*data_len = m.m2_len;
 			msg_cnt++;
 		} else {
 			/*message 4*/
-			TRY(_memcpy_s(data, *data_len, m.m4.ptr, m.m4.len));
-			*data_len = m.m4.len;
+			TRY(_memcpy_s(data, *data_len, m.m4, m.m4_len));
+			*data_len = m.m4_len;
 			msg_cnt = 1;
 		}
 	} else {
@@ -60,13 +60,13 @@ enum err rx(void *sock, uint8_t *data, uint32_t *data_len)
 		/*The responder must get msg1 and msg3*/
 		if (msg_cnt == 1) {
 			/*message 1 */
-			TRY(_memcpy_s(data, *data_len, m.m1.ptr, m.m1.len));
-			*data_len = m.m1.len;
+			TRY(_memcpy_s(data, *data_len, m.m1, m.m1_len));
+			*data_len = m.m1_len;
 			msg_cnt++;
 		} else {
 			/*message 3*/
-			TRY(_memcpy_s(data, *data_len, m.m3.ptr, m.m3.len));
-			*data_len = m.m3.len;
+			TRY(_memcpy_s(data, *data_len, m.m3, m.m3_len));
+			*data_len = m.m3_len;
 			msg_cnt = 1;
 		}
 	}

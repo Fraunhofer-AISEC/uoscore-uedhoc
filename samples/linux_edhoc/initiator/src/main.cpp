@@ -20,8 +20,8 @@
 
 extern "C" {
 #include "../../../../modules/edhoc/edhoc.h"
-#include "../../../common/sock.h"
-#include "../../../common/test_vec_parser.h"
+#include "../../common/sock.h"
+#include "../../common/test_vec_parser.h"
 }
 #include "../../../../externals/cantcoap/cantcoap.h"
 

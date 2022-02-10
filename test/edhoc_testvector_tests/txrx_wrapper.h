@@ -11,7 +11,7 @@
 
 #ifndef TXRX_WRAPPER_H
 #define TXRX_WRAPPER_H
-#include <edhoc.h>
+#include "edhoc.h"
 
 extern bool rx_initiator_switch;
 enum err rx(void *sock, uint8_t *data, uint32_t *data_len);

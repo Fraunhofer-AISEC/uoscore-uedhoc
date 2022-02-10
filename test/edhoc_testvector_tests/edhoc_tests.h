@@ -12,10 +12,23 @@
 #define EDHOC_TESTS_H
 
 #include <stdint.h>
-#include "../../samples/common/test_vec_parser.h"
+//#include "../../samples/common/test_vec_parser.h"
 
-extern struct messages_bufs m_bufs;
+struct messages {
+	uint8_t *m1;
+	uint32_t m1_len;
+	uint8_t *m2;
+	uint32_t m2_len;
+	uint8_t *m3;
+	uint32_t m3_len;
+	uint8_t *m4;
+	uint32_t m4_len;
+};
+
+//extern struct messages_bufs m_bufs;
 extern struct messages m;
+
+enum role { INITIATOR, RESPONDER };
 
 /**
  * @brief       Runs an initiator/responder and compares the results with the  *              official test vectors.

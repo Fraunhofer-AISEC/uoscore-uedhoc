@@ -646,7 +646,7 @@
    "test_vector_8": {
       "method": "03",
       "suites_i": "83000201",
-      "suites_r": "00",
+      "suites_r": "01",
       "x_raw": "f2884bf358703328fbff328410a76fda60333c622ba83364a1160f368143397b",
       "g_x_raw": "a84c69c827b7aee7a68125c11c9f3991d88d44690bbbaeee6244bb34672fdb0c",
       "g_x": "5820a84c69c827b7aee7a68125c11c9f3991d88d44690bbbaeee6244bb34672fdb0c",
@@ -738,7 +738,7 @@
    "test_vector_9": {
       "method": "00",
       "suites_i": "83000201",
-      "suites_r": "83000201",
+      "suites_r": "01",
       "x_raw": "23ffd8d22dfa7b71ca2ac02873b784e96fcc668404f284aac5be07e80f7d2f60",
       "g_x_raw": "fa5701c2627141ca7784b522a7140c1e329e94d3e4fcf7430ddba3891ed09938",
       "g_x": "5820fa5701c2627141ca7784b522a7140c1e329e94d3e4fcf7430ddba3891ed09938",

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <zephyr.h>
 #include <ztest.h>
-#include <oscore.h>
+#include "oscore.h"
 
 #include "test_vectors_oscore.h"
 

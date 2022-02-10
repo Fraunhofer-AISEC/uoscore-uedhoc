@@ -6,7 +6,7 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(auto_test)
 
 FILE(GLOB app_sources 
-  main.c
+  *.c
   edhoc_testvector_tests/*.c 
   oscore_testvector_tests/*.c 
   ../externals/zcbor/src/*.c
@@ -18,13 +18,15 @@ target_sources(app PRIVATE ${app_sources})
 #../samples/common/test_vec_parser.c
 
 include_directories(
+  ../inc
   ../test_vectors
   ../externals/zcbor/include 
   ../externals/mbedtls/library 
   ../externals/mbedtls/include 
   ../externals/mbedtls/include/mbedtls 
   ../externals/mbedtls/include/psa )
-#  ../externals/jsmn
+#todo remove the inc after cleaning up all self defined types in oscore.h and edhoc.h
+  #  ../externals/jsmn
 
 add_definitions(
   #-DDEBUG_PRINT
@@ -52,8 +54,8 @@ set(src_dir   ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(build_dir ${CMAKE_CURRENT_BINARY_DIR}/uoscore_uedhoc)
 
 set(LIB_TEST_LIB_DIR     ${CMAKE_CURRENT_SOURCE_DIR}/../build)
-set(EDHOC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/edhoc)
-set(OSCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../modules/oscore)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
 
 if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
 # https://www.gnu.org/software/make/manual/html_node/MAKE-Variable.html
@@ -66,7 +68,7 @@ message("build_dir: ${build_dir}")
 message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("LIB_TEST_LIB_DIR: ${LIB_TEST_LIB_DIR}")
-message("EDHOC_INCLUDE_DIR: ${EDHOC_INCLUDE_DIR}")
+message("INCLUDE_DIR: ${INCLUDE_DIR}")
 
 
 
@@ -94,8 +96,7 @@ add_dependencies(
   )
 set_target_properties(test PROPERTIES IMPORTED_LOCATION ${build_dir}/libuoscore-uedhoc.a)
 target_include_directories(test INTERFACE
-  ${EDHOC_INCLUDE_DIR}
-  ${OSCORE_INCLUDE_DIR}
+  ${INCLUDE_DIR}
 )
 
 
