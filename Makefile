@@ -43,8 +43,6 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 
 ################################################################################
 # C includes
-
-C_INCLUDES += -I.
 C_INCLUDES += -Iinc
 
 #eventually remove this after fix in zcbor
