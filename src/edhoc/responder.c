@@ -82,14 +82,14 @@ static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 		for (i = 0; i < m._SUITES_I__suite_suite_count; i++) {
 			suites_i[i] = (uint8_t)m._SUITES_I__suite_suite[i];
 		}
-		*suites_i_len = m._SUITES_I__suite_suite_count;
+		*suites_i_len = (uint32_t) m._SUITES_I__suite_suite_count;
 	}
 	PRINT_ARRAY("msg1 SUITES_I", suites_i, *suites_i_len);
 
 	/*G_X*/
 	TRY(_memcpy_s(g_x, *g_x_len, m._message_1_G_X.value,
-		      m._message_1_G_X.len));
-	*g_x_len = m._message_1_G_X.len;
+		     (uint32_t) m._message_1_G_X.len));
+	*g_x_len = (uint32_t) m._message_1_G_X.len;
 	PRINT_ARRAY("msg1 G_X", g_x, *g_x_len);
 
 	/*C_I*/
@@ -106,8 +106,8 @@ static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 	/*ead_1*/
 	if (m._message_1_ead_1_present) {
 		TRY(_memcpy_s(ad1, *ad1_len, m._message_1_ead_1.value,
-			      m._message_1_ead_1.len));
-		*ad1_len = m._message_1_ead_1.len;
+			      (uint32_t) m._message_1_ead_1.len));
+		*ad1_len = (uint32_t) m._message_1_ead_1.len;
 		PRINT_ARRAY("msg1 ead_1", ad1, *ad1_len);
 	}
 	return ok;
@@ -175,7 +175,7 @@ static inline enum err msg2_encode(const uint8_t *g_y, uint32_t g_y_len,
 	}
 
 	TRY_EXPECT(cbor_encode_m2(msg2, *msg2_len, &m, &payload_len_out), true);
-	*msg2_len = payload_len_out;
+	*msg2_len = (uint32_t) payload_len_out;
 
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, *msg2_len);
 	return ok;

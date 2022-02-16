@@ -58,7 +58,7 @@ enum err id_cred2kid(const uint8_t *id_cred, uint32_t id_cred_len,
 				   &map._id_cred_x_map_kid._id_cred_x_map_kid,
 				   &payload_len_out),
 			   true);
-		*kid_len = payload_len_out;
+		*kid_len = (uint32_t) payload_len_out;
 	} else {
 		*kid_len = 0;
 	}

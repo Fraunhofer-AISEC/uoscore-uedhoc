@@ -63,7 +63,7 @@ static inline enum err th2_input_encode(uint8_t *hash_msg1,
 		   true);
 
 	/* Get the the total th2 length */
-	*th2_input_len = payload_len_out;
+	*th2_input_len = (uint32_t) payload_len_out;
 
 	PRINT_ARRAY("Input to calculate TH_2 (CBOR Sequence)", th2_input,
 		    *th2_input_len);
@@ -101,7 +101,7 @@ static inline enum err th3_input_encode(uint8_t *th2, uint32_t th2_len,
 	TRY_EXPECT(cbor_encode_th3(th3_input, *th3_input_len, &th3,
 				   &payload_len_out),
 		   true);
-	*th3_input_len = payload_len_out;
+	*th3_input_len = (uint32_t) payload_len_out;
 
 	PRINT_ARRAY("Input to calculate TH_3 (CBOR Sequence)", th3_input,
 		    *th3_input_len);
@@ -138,7 +138,7 @@ static inline enum err th4_input_encode(uint8_t *th3, uint32_t th3_len,
 				   &payload_len_out),
 		   true);
 
-	*th4_input_len = payload_len_out;
+	*th4_input_len = (uint32_t) payload_len_out;
 
 	PRINT_ARRAY("Input to calculate TH_4 (CBOR Sequence)", th4_input,
 		    *th4_input_len);

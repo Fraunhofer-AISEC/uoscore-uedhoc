@@ -47,16 +47,16 @@
 #define MAX_OPTION_COUNT 20
 
 
-#define TYPE_CON			0b00
-#define TYPE_NON			0b01
-#define TYPE_ACK			0b10
-#define TYPE_RST			0b11
+#define TYPE_CON			0x00
+#define TYPE_NON			0x01
+#define TYPE_ACK			0x02
+#define TYPE_RST			0x03
 
-#define CODE_CLASS_MASK		0xe0
-#define CODE_DETAIL_MASK	0x1f
+#define CODE_CLASS_MASK			0xe0
+#define CODE_DETAIL_MASK		0x1f
 #define CODE_EMPTY			0x00
-#define CODE_REQ_POST		0x02
-#define CODE_RESP_CHANGED	0x44
+#define CODE_REQ_POST			0x02
+#define CODE_RESP_CHANGED		0x44
 
 #define REQUEST_CLASS 0
 

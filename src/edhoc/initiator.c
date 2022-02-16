@@ -55,17 +55,17 @@ static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
 
 	TRY(_memcpy_s(ciphertext2, *ciphertext2_len,
 		      m._m2_G_Y_CIPHERTEXT_2.value + g_y_len,
-		      m._m2_G_Y_CIPHERTEXT_2.len - g_y_len));
+		      (uint32_t)(m._m2_G_Y_CIPHERTEXT_2.len - g_y_len)));
 
-	*ciphertext2_len = m._m2_G_Y_CIPHERTEXT_2.len - g_y_len;
+	*ciphertext2_len = (uint32_t)m._m2_G_Y_CIPHERTEXT_2.len - g_y_len;
 	PRINT_ARRAY("ciphertext2", ciphertext2, *ciphertext2_len);
 
 	if (m._m2_C_R_choice == _m2_C_R_int) {
 		TRY(c_x_set(INT, NULL, 0, m._m2_C_R_int, c_r));
 		PRINTF("C_R is an int: %d\n", c_r->mem.c_x_int);
 	} else {
-		TRY(c_x_set(BSTR, m._m2_C_R_bstr.value, m._m2_C_R_bstr.len, 0,
-			    c_r));
+		TRY(c_x_set(BSTR, m._m2_C_R_bstr.value,
+			    (uint32_t)m._m2_C_R_bstr.len, 0, c_r));
 		PRINT_ARRAY("C_R_raw bstr", c_r->mem.c_x_bstr.ptr,
 			    c_r->mem.c_x_bstr.len);
 	}
@@ -122,7 +122,7 @@ enum err msg1_gen(const struct edhoc_initiator_context *c,
 	TRY_EXPECT(cbor_encode_message_1(rc->msg1, rc->msg1_len, &m1,
 					 &payload_len_out),
 		   true);
-	rc->msg1_len = payload_len_out;
+	rc->msg1_len = (uint32_t)payload_len_out;
 
 	PRINT_ARRAY("message_1 (CBOR Sequence)", rc->msg1, rc->msg1_len);
 	return ok;

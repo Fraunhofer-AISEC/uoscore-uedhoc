@@ -36,7 +36,7 @@ enum err cose_enc_structure_encode(const uint8_t *context, uint32_t context_len,
 	TRY_EXPECT(cbor_encode_enc_structure(out, *out_len, &enc_structure,
 					     &payload_len_out),
 		   true);
-	*out_len = payload_len_out;
+	*out_len = (uint32_t) payload_len_out;
 	return ok;
 }
 
@@ -64,6 +64,6 @@ enum err cose_sig_structure_encode(const uint8_t *context, uint32_t context_len,
 					     &payload_len_out),
 		   true);
 
-	*out_len = payload_len_out;
+	*out_len = (uint32_t) payload_len_out;
 	return ok;
 }

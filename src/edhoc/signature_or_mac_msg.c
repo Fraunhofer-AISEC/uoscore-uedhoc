@@ -36,7 +36,7 @@ enum err encode_byte_string(const uint8_t *in, uint32_t in_len, uint8_t *out,
 	TRY_EXPECT(cbor_encode_bstr_type_b_str(out, *out_len, &tmp,
 					       &payload_len_out),
 		   true);
-	*out_len = payload_len_out;
+	*out_len = (uint32_t) payload_len_out;
 	return ok;
 }
 
@@ -49,8 +49,8 @@ enum err decode_byte_string(const uint8_t *in, const uint32_t in_len,
 	TRY_EXPECT(cbor_decode_bstr_type_b_str(in, in_len, &str, &decode_len),
 		   true);
 
-	TRY(_memcpy_s(out, *out_len, str.value, str.len));
-	*out_len = str.len;
+	TRY(_memcpy_s(out, *out_len, str.value, (uint32_t) str.len));
+	*out_len = (uint32_t) str.len;
 
 	return ok;
 }
