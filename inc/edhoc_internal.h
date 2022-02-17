@@ -61,7 +61,7 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
 		  struct runtime_context *rc,
 		  struct other_party_cred *cred_r_array, uint16_t num_cred_r,
 		  uint8_t *ead_2, uint32_t *ead_2_len, uint8_t *prk_4x3m,
-		  uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len);
+		  uint32_t prk_4x3m_len, uint8_t *th4);
 
 /**
  * @brief Processes message 4. This function should by used by on the initiator 
@@ -77,8 +77,7 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
  * @param th4_len length of th4
  * @return enum err 
  */
-enum err msg4_process(const struct edhoc_initiator_context *c,
-		      struct runtime_context *rc, uint8_t *ead_4,
+enum err msg4_process(struct runtime_context *rc, uint8_t *ead_4,
 		      uint32_t *ead_4_len, uint8_t *prk_4x3m,
 		      uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len);
 
@@ -115,8 +114,7 @@ enum err msg3_process(struct edhoc_responder_context *c,
 		      struct runtime_context *rc,
 		      struct other_party_cred *cred_i_array,
 		      uint16_t num_cred_i, uint8_t *ead_3, uint32_t *ead_3_len,
-		      uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4,
-		      uint32_t th4_len);
+		      uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4);
 
 /**
  * @brief Generates message 4. This function should by used by on the responder 

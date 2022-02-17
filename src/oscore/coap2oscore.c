@@ -161,7 +161,7 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 	TRY(options_into_byte_string(E_options, E_options_cnt,
 				     &E_option_byte_string));
 
-	uint32_t dest_size = (uint32_t)(plaintext->len - (temp_plaintext_ptr +
+	uint32_t dest_size = (plaintext->len - (uint32_t)(temp_plaintext_ptr +
 							  1 - plaintext->ptr));
 	TRY(_memcpy_s(++temp_plaintext_ptr, dest_size, temp_opt_bytes,
 		      E_option_byte_string.len));
@@ -172,7 +172,7 @@ static inline enum err plaintext_setup(struct o_coap_packet *in_o_coap,
 		/* An extra byte 0xFF before payload*/
 		*temp_plaintext_ptr = 0xff;
 
-		dest_size = (uint32_t)(plaintext->len - (temp_plaintext_ptr +
+		dest_size = (plaintext->len - (uint32_t)(temp_plaintext_ptr +
 							 1 - plaintext->ptr));
 		TRY(_memcpy_s(++temp_plaintext_ptr, dest_size,
 			      in_o_coap->payload, in_o_coap->payload_len));

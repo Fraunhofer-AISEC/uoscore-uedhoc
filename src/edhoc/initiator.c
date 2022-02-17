@@ -55,17 +55,17 @@ static inline enum err msg2_parse(uint8_t *msg2, uint32_t msg2_len,
 
 	TRY(_memcpy_s(ciphertext2, *ciphertext2_len,
 		      m._m2_G_Y_CIPHERTEXT_2.value + g_y_len,
-		      m._m2_G_Y_CIPHERTEXT_2.len - g_y_len));
+		      (uint32_t)(m._m2_G_Y_CIPHERTEXT_2.len - g_y_len)));
 
-	*ciphertext2_len = m._m2_G_Y_CIPHERTEXT_2.len - g_y_len;
+	*ciphertext2_len = (uint32_t)m._m2_G_Y_CIPHERTEXT_2.len - g_y_len;
 	PRINT_ARRAY("ciphertext2", ciphertext2, *ciphertext2_len);
 
 	if (m._m2_C_R_choice == _m2_C_R_int) {
 		TRY(c_x_set(INT, NULL, 0, m._m2_C_R_int, c_r));
 		PRINTF("C_R is an int: %d\n", c_r->mem.c_x_int);
 	} else {
-		TRY(c_x_set(BSTR, m._m2_C_R_bstr.value, m._m2_C_R_bstr.len, 0,
-			    c_r));
+		TRY(c_x_set(BSTR, m._m2_C_R_bstr.value,
+			    (uint32_t)m._m2_C_R_bstr.len, 0, c_r));
 		PRINT_ARRAY("C_R_raw bstr", c_r->mem.c_x_bstr.ptr,
 			    c_r->mem.c_x_bstr.len);
 	}
@@ -122,7 +122,7 @@ enum err msg1_gen(const struct edhoc_initiator_context *c,
 	TRY_EXPECT(cbor_encode_message_1(rc->msg1, rc->msg1_len, &m1,
 					 &payload_len_out),
 		   true);
-	rc->msg1_len = payload_len_out;
+	rc->msg1_len = (uint32_t)payload_len_out;
 
 	PRINT_ARRAY("message_1 (CBOR Sequence)", rc->msg1, rc->msg1_len);
 	return ok;
@@ -132,7 +132,7 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
 		  struct runtime_context *rc,
 		  struct other_party_cred *cred_r_array, uint16_t num_cred_r,
 		  uint8_t *ead_2, uint32_t *ead_2_len, uint8_t *prk_4x3m,
-		  uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
+		  uint32_t prk_4x3m_len, uint8_t *th4)
 {
 	bool static_dh_i = false, static_dh_r = false;
 	TRY(get_suite((enum suite_label)c->suites_i.ptr[c->suites_i.len - 1],
@@ -266,8 +266,7 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
 	return ok;
 }
 
-enum err msg4_process(const struct edhoc_initiator_context *c,
-		      struct runtime_context *rc, uint8_t *ead_4,
+enum err msg4_process(struct runtime_context *rc, uint8_t *ead_4,
 		      uint32_t *ead_4_len, uint8_t *prk_4x3m,
 		      uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
 {
@@ -305,14 +304,14 @@ enum err edhoc_initiator_run(
 	PRINT_MSG("waiting to receive message 2...\n");
 	TRY(rx(c->sock, rc.msg2, &rc.msg2_len));
 	TRY(msg3_gen(c, &rc, cred_r_array, num_cred_r, ead_2, ead_2_len,
-		     prk_4x3m, prk_4x3m_len, th4, th4_len));
+		     prk_4x3m, prk_4x3m_len, th4));
 	TRY(tx(c->sock, rc.msg3, rc.msg3_len));
 
 	if (c->msg4) {
 		PRINT_MSG("waiting to receive message 4...\n");
 		TRY(rx(c->sock, rc.msg4, &rc.msg4_len));
-		TRY(msg4_process(c, &rc, ead_4, ead_4_len, prk_4x3m,
-				 prk_4x3m_len, th4, th4_len));
+		TRY(msg4_process(&rc, ead_4, ead_4_len, prk_4x3m, prk_4x3m_len,
+				 th4, th4_len));
 	}
 	return ok;
 }

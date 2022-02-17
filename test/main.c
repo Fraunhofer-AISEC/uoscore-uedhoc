@@ -160,7 +160,8 @@ void test_main(void)
 			 //test7 - not supported yet
 			 ztest_unit_test(oscore_misc_test8));
 
-	//ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1));
+	// ztest_test_suite(oscore_tests, ztest_unit_test(oscore_client_test1),
+	// 		 ztest_unit_test(oscore_server_test2));
 
 	ztest_run_test_suite(oscore_tests);
 }

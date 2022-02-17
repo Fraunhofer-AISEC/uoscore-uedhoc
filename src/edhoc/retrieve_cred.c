@@ -168,7 +168,7 @@ enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
 		TRY(verify_cert2cred(
 			static_dh_auth, cred_array, cred_num, x5chain,
 			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.value,
-			map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len,
+			(uint32_t) map._id_cred_x_map_x5chain._id_cred_x_map_x5chain.len,
 			cred, cred_len, pk, pk_len, g, g_len));
 		return ok;
 	}
@@ -177,7 +177,7 @@ enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
 		TRY(verify_cert2cred(
 			static_dh_auth, cred_array, cred_num, x5bag,
 			map._id_cred_x_map_x5bag._id_cred_x_map_x5bag.value,
-			map._id_cred_x_map_x5bag._id_cred_x_map_x5bag.len, cred,
+			(uint32_t) map._id_cred_x_map_x5bag._id_cred_x_map_x5bag.len, cred,
 			cred_len, pk, pk_len, g, g_len));
 		return ok;
 	}
@@ -186,7 +186,7 @@ enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
 		TRY(verify_cert2cred(
 			static_dh_auth, cred_array, cred_num, c5c,
 			map._id_cred_x_map_c5c._id_cred_x_map_c5c.value,
-			map._id_cred_x_map_c5c._id_cred_x_map_c5c.len, cred,
+			(uint32_t) map._id_cred_x_map_c5c._id_cred_x_map_c5c.len, cred,
 			cred_len, pk, pk_len, g, g_len));
 		return ok;
 	}
@@ -195,7 +195,7 @@ enum err retrieve_cred(bool static_dh_auth, struct other_party_cred *cred_array,
 		TRY(verify_cert2cred(
 			static_dh_auth, cred_array, cred_num, c5b,
 			map._id_cred_x_map_c5b._id_cred_x_map_c5b.value,
-			map._id_cred_x_map_c5b._id_cred_x_map_c5b.len, cred,
+			(uint32_t) map._id_cred_x_map_c5b._id_cred_x_map_c5b.len, cred,
 			cred_len, pk, pk_len, g, g_len));
 		return ok;
 	}

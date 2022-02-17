@@ -620,7 +620,7 @@ ephemeral_dh_key_gen(enum ecdh_alg alg, uint32_t seed, uint8_t *sk, uint8_t *pk)
 }
 
 enum err __attribute__((weak))
-hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len, uint8_t *out)
+hash(enum hash_alg alg, const uint8_t *in, const uint32_t in_len, uint8_t *out)
 {
 	if (alg == SHA_256) {
 #ifdef TINYCRYPT

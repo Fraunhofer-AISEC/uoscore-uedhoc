@@ -38,7 +38,7 @@ enum err create_hkdf_info(const uint8_t *th, uint32_t th_len, const char *label,
 	TRY_EXPECT(cbor_encode_info(out, *out_len, &info, &payload_len_out),
 		   true);
 
-	*out_len = payload_len_out;
+	*out_len = (uint32_t) payload_len_out;
 
 	return ok;
 }

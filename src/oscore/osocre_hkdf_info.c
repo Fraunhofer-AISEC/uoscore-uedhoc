@@ -85,6 +85,6 @@ inline enum err oscore_create_hkdf_info(struct byte_array *id,
 	if (!success_encoding) {
 		return cbor_encoding_error;
 	}
-	out->len = payload_len_out;
+	out->len = (uint32_t) payload_len_out;
 	return ok;
 }

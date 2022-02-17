@@ -13,12 +13,13 @@
 #include <stdint.h>
 
 #include "edhoc.h"
+#include "edhoc/cert.h"
+
 #include "common/memcpy_s.h"
 #include "common/oscore_edhoc_error.h"
 #include "common/crypto_wrapper.h"
-#include "cbor/edhoc_decode_cert.h"
 
-//#define MBEDTLS
+#include "cbor/edhoc_decode_cert.h"
 
 #ifdef MBEDTLS
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
@@ -30,48 +31,6 @@
 #include <mbedtls/oid.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_crt.h>
-
-/* copied from include/mbedtls/psa_util.h */
-static inline psa_algorithm_t m_alg_to_p_alg(mbedtls_md_type_t m_alg)
-{
-	switch (m_alg) {
-#if defined(MBEDTLS_MD2_C)
-	case MBEDTLS_MD_MD2:
-		return (PSA_ALG_MD2);
-#endif
-#if defined(MBEDTLS_MD4_C)
-	case MBEDTLS_MD_MD4:
-		return (PSA_ALG_MD4);
-#endif
-#if defined(MBEDTLS_MD5_C)
-	case MBEDTLS_MD_MD5:
-		return (PSA_ALG_MD5);
-#endif
-#if defined(MBEDTLS_SHA1_C)
-	case MBEDTLS_MD_SHA1:
-		return (PSA_ALG_SHA_1);
-#endif
-#if defined(MBEDTLS_SHA256_C)
-	case MBEDTLS_MD_SHA224:
-		return (PSA_ALG_SHA_224);
-	case MBEDTLS_MD_SHA256:
-		return (PSA_ALG_SHA_256);
-#endif
-#if defined(MBEDTLS_SHA512_C)
-	case MBEDTLS_MD_SHA384:
-		return (PSA_ALG_SHA_384);
-	case MBEDTLS_MD_SHA512:
-		return (PSA_ALG_SHA_512);
-#endif
-#if defined(MBEDTLS_RIPEMD160_C)
-	case MBEDTLS_MD_RIPEMD160:
-		return (PSA_ALG_RIPEMD160);
-#endif
-	case MBEDTLS_MD_NONE:
-	default:
-		return (0);
-	}
-}
 
 struct deser_sign_ctx_s {
 	uint8_t *seek;
@@ -95,7 +54,7 @@ static int deser_sign_cb(void *void_ctx, int tag, unsigned char *start,
 		uint8_t *unit_end = ctx->seek + ctx->unit_size;
 		if (unit_end <= ctx->end) {
 			memcpy(ctx->seek, start + len - ctx->unit_size,
-			       ctx->unit_size);
+			       (uint32_t)ctx->unit_size);
 			ctx->seek = unit_end;
 		}
 	}
@@ -186,11 +145,13 @@ enum err cert_c509_verify(const uint8_t *cert, uint32_t cert_len,
 
 	/*verify the certificates signature*/
 	TRY(verify((enum sign_alg)c._cert_issuer_signature_algorithm, root_pk,
-		   root_pk_len, cert, cert_len - 2 - c._cert_signature.len,
-		   c._cert_signature.value, c._cert_signature.len, verified));
+		   root_pk_len, cert,
+		   cert_len - 2 - (uint32_t)c._cert_signature.len,
+		   c._cert_signature.value, (uint32_t)c._cert_signature.len,
+		   verified));
 
-	TRY(_memcpy_s(pk, *pk_len, c._cert_pk.value, c._cert_pk.len));
-	*pk_len = c._cert_pk.len;
+	TRY(_memcpy_s(pk, *pk_len, c._cert_pk.value, (uint32_t)c._cert_pk.len));
+	*pk_len = (uint32_t)c._cert_pk.len;
 
 	return ok;
 }
@@ -202,7 +163,7 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 {
 #ifdef MBEDTLS
 
-	PRINTF("Start parsing an ASN.1 certificate\n");
+	PRINT_MSG("Start parsing an ASN.1 certificate\n");
 
 	mbedtls_x509_crt m_cert;
 	mbedtls_x509_crt_init(&m_cert);
@@ -219,7 +180,7 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 	/* write details about the issuer */
 	/* and find CN (Common Name), further referred to as "issuer_id" */
 	const mbedtls_x509_name *p = &m_cert.issuer;
-	PRINTF("cert.issuer:\n");
+
 #ifdef DEBUG_PRINT
 	const char *short_name;
 #endif
@@ -236,7 +197,7 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 		p = p->next;
 	};
 
-	PRINTF("cert issuer_id: %.*s\n", (int)issuer_id->len, issuer_id->p);
+	PRINT_ARRAY("cert issuer_id", issuer_id->p, issuer_id->len);
 
 	enum sign_alg sign_alg;
 
@@ -257,10 +218,10 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 		mbedtls_x509_crt_free(&m_cert);
 		return unsupported_signature_algorithm;
 	}
-	size_t hash_len = mbedtls_md_get_size(md_info);
+	int hash_len = mbedtls_md_get_size(md_info);
 
 	size_t sig_len = get_signature_len(sign_alg);
-	TRY(check_buffer_size(SIGNATURE_DEFAULT_SIZE, sig_len));
+	TRY(check_buffer_size(SIGNATURE_DEFAULT_SIZE, (uint32_t)sig_len));
 	uint8_t sig[SIGNATURE_DEFAULT_SIZE];
 
 	/* get the public key of the CA */
@@ -282,8 +243,8 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 	}
 
 	/*verify the certificates signature*/
-	TRY(verify(sign_alg, root_pk, root_pk_len, m_cert.tbs.p, m_cert.tbs.len,
-		   sig, sig_len, verified));
+	TRY(verify(sign_alg, root_pk, root_pk_len, m_cert.tbs.p,
+		   (uint32_t)m_cert.tbs.len, sig, (uint32_t)sig_len, verified));
 
 	/* export the public key from certificate */
 	{
@@ -296,10 +257,11 @@ enum err cert_x509_verify(const uint8_t *cert, uint32_t cert_len,
 			if (*cpk == 0) {
 				++cpk;
 			}
-			cpk_len = m_cert.pk_raw.len - (cpk - m_cert.pk_raw.p);
+			cpk_len = m_cert.pk_raw.len -
+				  (size_t)(cpk - m_cert.pk_raw.p);
 		}
-		TRY(_memcpy_s(pk, *pk_len, cpk, cpk_len));
-		*pk_len = cpk_len;
+		TRY(_memcpy_s(pk, *pk_len, cpk, (uint32_t)cpk_len));
+		*pk_len = (uint32_t)cpk_len;
 		PRINT_ARRAY("pk from cert", pk, *pk_len);
 	}
 

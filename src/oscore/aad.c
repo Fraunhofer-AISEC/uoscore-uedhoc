@@ -53,7 +53,7 @@ enum err create_aad(struct o_coap_option *options, uint16_t opt_num,
 					 &payload_len_out),
 		   true);
 
-	out->len = payload_len_out;
+	out->len = (uint32_t) payload_len_out;
 	PRINT_ARRAY("AAD", out->ptr, out->len);
 	return ok;
 }

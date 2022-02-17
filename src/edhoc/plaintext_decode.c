@@ -34,9 +34,8 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 				 const void *id, uint32_t id_len,
 				 uint8_t *id_cred_x, uint32_t *id_cred_x_len)
 {
-	struct id_cred_x_map map = {0};
+	struct id_cred_x_map map = { 0 };
 	size_t payload_len_out;
-
 
 	switch (label) {
 	case kid:
@@ -65,7 +64,7 @@ static enum err id_cred_x_encode(enum id_cred_x_label label, int algo,
 					     &payload_len_out),
 		   true);
 
-	*id_cred_x_len = payload_len_out;
+	*id_cred_x_len = (uint32_t)payload_len_out;
 
 	return ok;
 }
@@ -90,8 +89,8 @@ enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
 				x5chain, 0,
 				p._plaintext_ID_CRED_x__map._map_x5chain
 					._map_x5chain.value,
-				p._plaintext_ID_CRED_x__map._map_x5chain
-					._map_x5chain.len,
+				(uint32_t)p._plaintext_ID_CRED_x__map
+					._map_x5chain._map_x5chain.len,
 				id_cred_x, id_cred_x_len));
 		}
 		if (p._plaintext_ID_CRED_x__map._map_x5t_present) {
@@ -102,7 +101,7 @@ enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
 					._map_x5t_alg_int,
 				p._plaintext_ID_CRED_x__map._map_x5t
 					._map_x5t_hash.value,
-				p._plaintext_ID_CRED_x__map._map_x5t
+				(uint32_t)p._plaintext_ID_CRED_x__map._map_x5t
 					._map_x5t_hash.len,
 				id_cred_x, id_cred_x_len));
 		}
@@ -112,10 +111,10 @@ enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
             is conveyed in the plaintext encoded as a bstr or int*/
 		if (p._plaintext_ID_CRED_x_choice ==
 		    _plaintext_ID_CRED_x_bstr) {
-			TRY(id_cred_x_encode(kid, 0,
-					     p._plaintext_ID_CRED_x_bstr.value,
-					     p._plaintext_ID_CRED_x_bstr.len,
-					     id_cred_x, id_cred_x_len));
+			TRY(id_cred_x_encode(
+				kid, 0, p._plaintext_ID_CRED_x_bstr.value,
+				(uint32_t)p._plaintext_ID_CRED_x_bstr.len,
+				id_cred_x, id_cred_x_len));
 
 		} else {
 			int _kid = p._plaintext_ID_CRED_x_int;
@@ -125,13 +124,13 @@ enum err plaintext_split(uint8_t *ptxt, const uint32_t ptxt_len,
 	}
 	TRY(_memcpy_s(sign_or_mac, *sign_or_mac_len,
 		      p._plaintext_SGN_or_MAC_x.value,
-		      p._plaintext_SGN_or_MAC_x.len));
-	*sign_or_mac_len = p._plaintext_SGN_or_MAC_x.len;
+		      (uint32_t)p._plaintext_SGN_or_MAC_x.len));
+	*sign_or_mac_len = (uint32_t)p._plaintext_SGN_or_MAC_x.len;
 
 	if (p._plaintext_AD_x_present == true) {
 		TRY(_memcpy_s(ad, *ad_len, p._plaintext_AD_x.value,
-			      p._plaintext_AD_x.len));
-		*ad_len = p._plaintext_AD_x.len;
+			      (uint32_t)p._plaintext_AD_x.len));
+		*ad_len = (uint32_t)p._plaintext_AD_x.len;
 	} else {
 		*ad_len = 0;
 	}

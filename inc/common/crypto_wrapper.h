@@ -94,7 +94,7 @@ enum err hkdf_expand(enum hash_alg alg, const uint8_t *prk,
  * @param   out the hash 
  * @retval  an err code
  */
-enum err hash(enum hash_alg alg, const uint8_t *in, const uint64_t in_len,
+enum err hash(enum hash_alg alg, const uint8_t *in, const uint32_t in_len,
 	      uint8_t *out);
 
 /**

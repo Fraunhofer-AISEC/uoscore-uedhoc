@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include "edhoc_internal.h"
 #include "edhoc/runtime_context.h"
 
 void runtime_context_init(struct runtime_context *c)

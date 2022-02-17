@@ -115,9 +115,9 @@ EXTENDED_CFLAGS += -Wall
 EXTENDED_CFLAGS += -Wextra
 EXTENDED_CFLAGS += -Wcast-qual
 EXTENDED_CFLAGS += -Wstack-usage=7000
-#EXTENDED_CFLAGS += -Wconversion
-#EXTENDED_CFLAGS += -Wpedantic
-#EXTENDED_CFLAGS += -Werror
+EXTENDED_CFLAGS += -Wconversion
+EXTENDED_CFLAGS += -Wpedantic
+EXTENDED_CFLAGS += -Werror
 
 #Clang warning flahs
 else ifeq ($(findstring clang,$(CC)),clang)
@@ -129,10 +129,10 @@ EXTENDED_CFLAGS += -Wmissing-noreturn
 EXTENDED_CFLAGS += -Wmissing-prototypes
 EXTENDED_CFLAGS += -Wno-missing-braces
 EXTENDED_CFLAGS += -Wold-style-cast
-#EXTENDED_CFLAGS += -Wshadow
+EXTENDED_CFLAGS += -Wshadow
 EXTENDED_CFLAGS += -Wweak-vtables
 EXTENDED_CFLAGS += -Wall
-#EXTENDED_CFLAGS += -Wextra
+EXTENDED_CFLAGS += -Wextra
 EXTENDED_CFLAGS += -Wpedantic
 EXTENDED_CFLAGS += -Wstack-exhausted
 EXTENDED_CFLAGS += -Wconversion

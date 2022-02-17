@@ -53,7 +53,7 @@ static enum err create_enc_structure(struct byte_array *external_aad,
 	if (!success_encoding) {
 		return cbor_encoding_error;
 	}
-	out->len = payload_len_out;
+	out->len = (uint32_t) payload_len_out;
 	return ok;
 }
 
