@@ -132,7 +132,7 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
 		  struct runtime_context *rc,
 		  struct other_party_cred *cred_r_array, uint16_t num_cred_r,
 		  uint8_t *ead_2, uint32_t *ead_2_len, uint8_t *prk_4x3m,
-		  uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
+		  uint32_t prk_4x3m_len, uint8_t *th4)
 {
 	bool static_dh_i = false, static_dh_r = false;
 	TRY(get_suite((enum suite_label)c->suites_i.ptr[c->suites_i.len - 1],
@@ -266,8 +266,7 @@ enum err msg3_gen(const struct edhoc_initiator_context *c,
 	return ok;
 }
 
-enum err msg4_process(const struct edhoc_initiator_context *c,
-		      struct runtime_context *rc, uint8_t *ead_4,
+enum err msg4_process(struct runtime_context *rc, uint8_t *ead_4,
 		      uint32_t *ead_4_len, uint8_t *prk_4x3m,
 		      uint32_t prk_4x3m_len, uint8_t *th4, uint32_t th4_len)
 {
@@ -305,14 +304,14 @@ enum err edhoc_initiator_run(
 	PRINT_MSG("waiting to receive message 2...\n");
 	TRY(rx(c->sock, rc.msg2, &rc.msg2_len));
 	TRY(msg3_gen(c, &rc, cred_r_array, num_cred_r, ead_2, ead_2_len,
-		     prk_4x3m, prk_4x3m_len, th4, th4_len));
+		     prk_4x3m, prk_4x3m_len, th4));
 	TRY(tx(c->sock, rc.msg3, rc.msg3_len));
 
 	if (c->msg4) {
 		PRINT_MSG("waiting to receive message 4...\n");
 		TRY(rx(c->sock, rc.msg4, &rc.msg4_len));
-		TRY(msg4_process(c, &rc, ead_4, ead_4_len, prk_4x3m,
-				 prk_4x3m_len, th4, th4_len));
+		TRY(msg4_process(&rc, ead_4, ead_4_len, prk_4x3m, prk_4x3m_len,
+				 th4, th4_len));
 	}
 	return ok;
 }

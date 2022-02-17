@@ -82,14 +82,14 @@ static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 		for (i = 0; i < m._SUITES_I__suite_suite_count; i++) {
 			suites_i[i] = (uint8_t)m._SUITES_I__suite_suite[i];
 		}
-		*suites_i_len = (uint32_t) m._SUITES_I__suite_suite_count;
+		*suites_i_len = (uint32_t)m._SUITES_I__suite_suite_count;
 	}
 	PRINT_ARRAY("msg1 SUITES_I", suites_i, *suites_i_len);
 
 	/*G_X*/
 	TRY(_memcpy_s(g_x, *g_x_len, m._message_1_G_X.value,
-		     (uint32_t) m._message_1_G_X.len));
-	*g_x_len = (uint32_t) m._message_1_G_X.len;
+		      (uint32_t)m._message_1_G_X.len));
+	*g_x_len = (uint32_t)m._message_1_G_X.len;
 	PRINT_ARRAY("msg1 G_X", g_x, *g_x_len);
 
 	/*C_I*/
@@ -106,8 +106,8 @@ static inline enum err msg1_parse(uint8_t *msg1, uint32_t msg1_len,
 	/*ead_1*/
 	if (m._message_1_ead_1_present) {
 		TRY(_memcpy_s(ad1, *ad1_len, m._message_1_ead_1.value,
-			      (uint32_t) m._message_1_ead_1.len));
-		*ad1_len = (uint32_t) m._message_1_ead_1.len;
+			      (uint32_t)m._message_1_ead_1.len));
+		*ad1_len = (uint32_t)m._message_1_ead_1.len;
 		PRINT_ARRAY("msg1 ead_1", ad1, *ad1_len);
 	}
 	return ok;
@@ -175,7 +175,7 @@ static inline enum err msg2_encode(const uint8_t *g_y, uint32_t g_y_len,
 	}
 
 	TRY_EXPECT(cbor_encode_m2(msg2, *msg2_len, &m, &payload_len_out), true);
-	*msg2_len = (uint32_t) payload_len_out;
+	*msg2_len = (uint32_t)payload_len_out;
 
 	PRINT_ARRAY("message_2 (CBOR Sequence)", msg2, *msg2_len);
 	return ok;
@@ -273,8 +273,7 @@ enum err msg3_process(struct edhoc_responder_context *c,
 		      struct runtime_context *rc,
 		      struct other_party_cred *cred_i_array,
 		      uint16_t num_cred_i, uint8_t *ead_3, uint32_t *ead_3_len,
-		      uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4,
-		      uint32_t th4_len)
+		      uint8_t *prk_4x3m, uint32_t prk_4x3m_len, uint8_t *th4)
 {
 	uint8_t ciphertext_3[CIPHERTEXT3_DEFAULT_SIZE];
 	uint32_t ciphertext_3_len = sizeof(ciphertext_3);
@@ -375,7 +374,7 @@ enum err edhoc_responder_run(
 	PRINT_MSG("waiting to receive message 3...\n");
 	TRY(rx(c->sock, rc.msg3, &rc.msg3_len));
 	TRY(msg3_process(c, &rc, cred_i_array, num_cred_i, ead_3, ead_3_len,
-			 prk_4x3m, prk_4x3m_len, th4, th4_len));
+			 prk_4x3m, prk_4x3m_len, th4));
 	if (c->msg4) {
 		TRY(msg4_gen(c, &rc, prk_4x3m, prk_4x3m_len, th4, th4_len));
 		TRY(tx(c->sock, rc.msg4, rc.msg4_len));

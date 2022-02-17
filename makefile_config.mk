@@ -3,7 +3,7 @@
 #AR = ar
 #CC = /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/arm-none-eabi-gcc
 #AR = /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/arm-none-eabi-ar
-#CC = clang-13
+CC = clang-13
 
 #architecture
 #ARCH = -m32
