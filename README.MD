@@ -1,3 +1,13 @@
+
+ 
+## :warning: This repository is obsolete, the project is now maintained [here](https://github.com/eriptic/uoscore-uedhoc).:warning:
+
+
+
+
+
+
+
 # uOSCORE / uEDHOC 
 
 This repository contains C implementations  for constrained (and non-constrained) devices of the IETF protocols:
